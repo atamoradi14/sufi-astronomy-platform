@@ -2,13 +2,14 @@ import { ProblemList } from "@/components/problems/ProblemList";
 
 export default function ProblemsPage() {
   return (
-    <div className="mx-auto max-w-6xl space-y-6 px-4 py-10">
+    <div className="mx-auto max-w-6xl space-y-6 px-4 py-8">
       <header>
-        <h1 className="font-[family-name:var(--font-display)] text-3xl text-[var(--gold-soft)] md:text-4xl">
+        <p className="text-sm text-[var(--teal)]">بانک مسائل · المپیاد و Smart</p>
+        <h1 className="mt-2 font-[family-name:var(--font-display)] text-3xl text-[var(--gold-soft)] md:text-4xl">
           مسائل و راه‌حل‌ها
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-8 text-[var(--muted)]">
-          تمرین‌های طبقه‌بندی‌شده با راهنما و پاسخ تشریحی برای تثبیت مفاهیم ریاضیات کروی و نجوم رصدی.
+          تمرین‌های طبقه‌بندی‌شده با راهنما و پاسخ تشریحی؛ منبع هر سؤال کنار درجهٔ سختی آمده است.
         </p>
       </header>
       <ProblemList />

@@ -8,12 +8,14 @@ import { useState } from "react";
 
 const NAV = [
   { href: "/", label: "خانه" },
-  { href: "/learn", label: "آموزش کروی" },
-  { href: "/sky", label: "آسمان‌نما" },
-  { href: "/compass", label: "قطب‌نما و قبله" },
-  { href: "/map", label: "نقشه و حرکت" },
+  { href: "/lab", label: "کرهٔ تعاملی" },
+  { href: "/proofs", label: "اثبات‌ها" },
+  { href: "/learn", label: "درس‌نامه" },
   { href: "/problems", label: "مسائل" },
-  { href: "/charts", label: "نمودارها" },
+  { href: "/sky", label: "آسمان‌نما" },
+  { href: "/charts", label: "زمان و نمودار" },
+  { href: "/compass", label: "قبله" },
+  { href: "/map", label: "نقشه" },
 ];
 
 export function SiteHeader() {

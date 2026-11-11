@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { PROBLEMS } from "@/lib/content/problems";
-import { LESSONS } from "@/lib/content/lessons";
+import { COURSES } from "@/lib/content/courses";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toPersianDigits } from "@/lib/utils";
@@ -24,7 +24,7 @@ export function ProblemList() {
         <FilterChip active={filter === "all"} onClick={() => setFilter("all")}>
           همه
         </FilterChip>
-        {LESSONS.map((l) => (
+        {COURSES.map((l) => (
           <FilterChip
             key={l.id}
             active={filter === l.id}
@@ -48,9 +48,14 @@ export function ProblemList() {
                     </CardTitle>
                     <CardDescription className="mt-1">{p.prompt}</CardDescription>
                   </div>
-                  <span className="rounded-md border border-[var(--border)] px-2 py-1 text-[11px] text-[var(--gold-soft)]">
-                    {p.difficulty}
-                  </span>
+                  <div className="flex flex-col items-end gap-1">
+                    <span className="rounded-md border border-[var(--border)] px-2 py-1 text-[11px] text-[var(--gold-soft)]">
+                      {p.difficulty}
+                    </span>
+                    <span className="max-w-[12rem] text-left text-[10px] text-[var(--muted)] dir-ltr">
+                      {p.source}
+                    </span>
+                  </div>
                 </div>
               </CardHeader>
               {open && (

@@ -1,46 +1,45 @@
 import Link from "next/link";
 import { Hero } from "@/components/home/Hero";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LESSONS } from "@/lib/content/lessons";
-import { CONSTELLATIONS } from "@/lib/astronomy/constellations";
-import { BookOpen, Compass, Map, Orbit, Sigma, Stars } from "lucide-react";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { COURSES } from "@/lib/content/courses";
+import { Box, BookOpen, Compass, Map, Orbit, PenLine, Stars } from "lucide-react";
 
 const FEATURES = [
   {
+    href: "/lab",
+    title: "کرهٔ تعاملی سه‌بعدی",
+    desc: "چرخش و tilt، دایره‌های عظیمه و صغیره، مثلث کروی با اندازه‌گیری زنده.",
+    icon: Box,
+  },
+  {
+    href: "/proofs",
+    title: "اثبات sin و cos کروی",
+    desc: "انیمیشن گام‌به‌گام به سبک Smart و جزوه‌های المپیاد ایران.",
+    icon: PenLine,
+  },
+  {
     href: "/learn",
-    title: "ریاضیات کروی",
-    desc: "دروس، فرمول‌ها و آزمایشگاه تعاملی فاصلهٔ زاویه‌ای و تبدیل مختصات.",
-    icon: Sigma,
-  },
-  {
-    href: "/compass",
-    title: "قطب‌نما و قبله",
-    desc: "حسگر جهت‌گیری و GPS برای سمت قبله روی دایرهٔ عظیمه.",
-    icon: Compass,
-  },
-  {
-    href: "/map",
-    title: "نقشه و ماهواره",
-    desc: "سرعت، موقعیت، جهت و دایره‌های هم‌فاصله روی تصویر ماهواره‌ای.",
-    icon: Map,
+    title: "درس‌نامه المپیادی",
+    desc: "مسیر Smart I–II–VI + هندسه/مثلثات کروی المپیاد نجوم.",
+    icon: BookOpen,
   },
   {
     href: "/sky",
     title: "آسمان‌نما صوفی",
-    desc: "صورت‌های فلکی صور الکواکب با سمت و ارتفاع زنده.",
+    desc: "صورت‌های صور الکواکب با سمت و ارتفاع.",
     icon: Stars,
   },
   {
     href: "/charts",
-    title: "نمودار و زمان نجومی",
-    desc: "میل، بعد، سمت، ارتفاع، JD، LST و رویدادهای تقریبی.",
+    title: "زمان و نمودار",
+    desc: "JD، LST، میل و بعد، سمت و ارتفاع.",
     icon: Orbit,
   },
   {
-    href: "/problems",
-    title: "مسائل و راه‌حل",
-    desc: "تمرین‌های طبقه‌بندی‌شده با راهنما و پاسخ تشریحی.",
-    icon: BookOpen,
+    href: "/map",
+    title: "نقشه و قبله",
+    desc: "GPS، ماهواره، دایره‌های هم‌فاصله و قطب‌نما.",
+    icon: Map,
   },
 ];
 
@@ -50,12 +49,24 @@ export default function HomePage() {
       <Hero />
       <section className="mx-auto max-w-6xl px-4 pb-16">
         <div className="manuscript-rule mb-10" />
-        <h2 className="font-[family-name:var(--font-display)] text-2xl text-[var(--gold-soft)] md:text-3xl animate-in-fade">
-          ویژگی‌ها
-        </h2>
-        <p className="mt-2 max-w-2xl text-sm leading-7 text-[var(--muted)] animate-in-fade animate-delay-1">
-          وب‌اپلیکیشن سازگار با اندروید که از GPS، قطب‌نما و نقشه بهره می‌برد — آماده برای استقرار میکروسرویس روی Kubernetes.
-        </p>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h2 className="font-[family-name:var(--font-display)] text-2xl text-[var(--gold-soft)] md:text-3xl">
+              ابزارهای اصلی
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-7 text-[var(--muted)]">
+              تمرکز روی تجسم کروی و استدلال ریاضی — برای المپیاد و رصد.
+            </p>
+          </div>
+          <Link
+            href="/compass"
+            className="inline-flex items-center gap-2 text-sm text-[var(--muted)] hover:text-[var(--gold-soft)]"
+          >
+            <Compass className="h-4 w-4" />
+            قطب‌نما و قبله
+          </Link>
+        </div>
+
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f) => (
             <Link key={f.href} href={f.href} className="animate-in-fade">
@@ -70,49 +81,31 @@ export default function HomePage() {
           ))}
         </div>
 
-        <div className="mt-14 grid gap-6 lg:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>مسیر یادگیری</CardTitle>
-              <CardDescription>از کره تا رصد — به ترتیب پیشنهادی</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {LESSONS.map((l, i) => (
-                <Link
-                  key={l.id}
-                  href={`/learn#${l.id}`}
-                  className="flex gap-3 rounded-lg border border-[var(--border)] px-3 py-3 hover:border-[var(--gold)]/40"
-                >
-                  <span className="font-[family-name:var(--font-display)] text-[var(--gold)]">
-                    {i + 1}
+        <div className="mt-14">
+          <h2 className="font-[family-name:var(--font-display)] text-2xl text-[var(--gold-soft)]">
+            مسیر دوره
+          </h2>
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            {COURSES.map((l, i) => (
+              <Link
+                key={l.id}
+                href={`/learn#${l.id}`}
+                className="group flex gap-3 rounded-xl border border-[var(--border)] bg-[var(--panel)]/60 px-4 py-3 transition-colors hover:border-[var(--gold)]/45"
+              >
+                <span className="font-[family-name:var(--font-display)] text-lg text-[var(--gold)]">
+                  {i + 1}
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-[var(--parchment)] group-hover:text-[var(--gold-soft)]">
+                    {l.title}
                   </span>
-                  <span>
-                    <span className="block text-[var(--parchment)]">{l.title}</span>
-                    <span className="block text-xs text-[var(--muted)] leading-6">{l.summary}</span>
+                  <span className="mt-1 block text-[11px] leading-6 text-[var(--muted)]">
+                    {l.smartRef} · {l.olympiadTag}
                   </span>
-                </Link>
-              ))}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>صورت‌های برگزیده</CardTitle>
-              <CardDescription>از سنت نگاشتهٔ عبدالرحمن صوفی</CardDescription>
-            </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-2">
-              {CONSTELLATIONS.map((c) => (
-                <Link
-                  key={c.id}
-                  href="/sky"
-                  className="rounded-lg border border-[var(--border)] px-3 py-3 text-sm hover:border-[var(--gold)]/40"
-                >
-                  <span className="block text-[var(--gold-soft)]">{c.nameFa}</span>
-                  <span className="block text-[11px] text-[var(--muted)]">{c.nameAr}</span>
-                </Link>
-              ))}
-            </CardContent>
-          </Card>
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
     </>

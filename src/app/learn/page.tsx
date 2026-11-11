@@ -1,44 +1,31 @@
-import { LESSONS } from "@/lib/content/lessons";
-import { SphereDemo } from "@/components/learn/SphereDemo";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CourseBrowser } from "@/components/learn/CourseBrowser";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function LearnPage() {
   return (
-    <div className="mx-auto max-w-6xl space-y-10 px-4 py-10">
-      <header className="animate-in-fade">
+    <div className="mx-auto max-w-6xl space-y-8 px-4 py-8">
+      <header className="space-y-4">
+        <p className="text-sm text-[var(--teal)]">دورهٔ المپیادی · نجوم کروی</p>
         <h1 className="font-[family-name:var(--font-display)] text-3xl text-[var(--gold-soft)] md:text-4xl">
-          آموزش ریاضیات کروی
+          درس‌نامهٔ ریاضیات کروی
         </h1>
-        <p className="mt-3 max-w-2xl text-sm leading-8 text-[var(--muted)]">
-          مفاهیم پایه تا مثلث نجومی، با آزمایشگاه تعاملی برای فاصلهٔ زاویه‌ای و تبدیل مختصات استوایی به افقی.
+        <p className="max-w-3xl text-sm leading-8 text-[var(--muted)]">
+          برای داوطلبان المپیاد نجوم و رصدگران آماتور: از دایرهٔ عظیمه تا مثلث نجومی و زمان، با ارجاع به Smart و منابع فارسی المپیاد.
         </p>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild>
+            <Link href="/lab">آزمایشگاه کره</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/proofs">اثبات sin / cos</Link>
+          </Button>
+          <Button asChild variant="secondary">
+            <Link href="/problems">بانک مسائل</Link>
+          </Button>
+        </div>
       </header>
-
-      <SphereDemo />
-
-      <div className="space-y-4">
-        {LESSONS.map((lesson) => (
-          <Card key={lesson.id} id={lesson.id}>
-            <CardHeader>
-              <CardTitle>{lesson.title}</CardTitle>
-              <CardDescription>{lesson.summary}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-5 prose-fa">
-              {lesson.sections.map((s) => (
-                <div key={s.heading}>
-                  <h3 className="text-[var(--gold-soft)] font-medium">{s.heading}</h3>
-                  <p className="mt-1 text-sm text-[var(--parchment)]/90">{s.body}</p>
-                  {s.formula && (
-                    <p className="mt-2 rounded-md border border-[var(--border)] bg-[var(--ink)]/50 px-3 py-2 font-mono text-xs text-[var(--teal)] dir-ltr text-left">
-                      {s.formula}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <CourseBrowser />
     </div>
   );
 }

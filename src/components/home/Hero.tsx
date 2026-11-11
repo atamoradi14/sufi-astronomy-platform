@@ -2,124 +2,101 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Compass, BookOpen, Map } from "lucide-react";
+import { BookOpen, Box, PenLine } from "lucide-react";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden">
-      <div
-        className="absolute inset-0 opacity-40"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 30% 40%, rgba(201,162,39,0.15), transparent 35%), radial-gradient(circle at 70% 60%, rgba(61,122,122,0.2), transparent 40%)",
-        }}
-      />
-      <div className="relative mx-auto grid max-w-6xl gap-10 px-4 pb-16 pt-10 md:grid-cols-[1.1fr_0.9fr] md:items-center md:pt-16">
+    <section className="relative overflow-hidden border-b border-[var(--border)]">
+      <div className="hero-grid absolute inset-0 opacity-40" />
+      <div className="relative mx-auto grid max-w-6xl gap-10 px-4 pb-14 pt-12 md:grid-cols-[1.15fr_0.85fr] md:items-center md:pt-16">
         <div className="animate-in-fade">
-          <p className="ornament mb-3 text-sm text-[var(--teal)]">صور الکواکب الثابتة</p>
-          <h1 className="font-[family-name:var(--font-display)] text-4xl leading-tight text-[var(--gold-soft)] md:text-6xl md:leading-[1.15]">
+          <p className="ornament mb-3 text-sm tracking-wide text-[var(--teal)]">
+            المپیاد نجوم · رصد آماتوری · Smart
+          </p>
+          <h1 className="font-[family-name:var(--font-display)] text-4xl leading-[1.2] text-[var(--gold-soft)] md:text-6xl">
             صوفی‌آسمان
           </h1>
-          <p className="mt-4 max-w-xl text-base leading-8 text-[var(--parchment)]/90 md:text-lg">
-            آموزش زندهٔ ریاضیات کروی، رصد، زمان نجومی و قبله — با حسگرهای گوشی، نقشهٔ ماهواره‌ای و میراث عبدالرحمن صوفی.
+          <p className="mt-5 max-w-xl text-base leading-8 text-[var(--parchment)]/90 md:text-lg">
+            آزمایشگاه سه‌بعدی کره، اثبات سینوس و کسینوس کروی، و درس‌نامهٔ المپیادی — به زبان فارسی، با میراث عبدالرحمن صوفی.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild size="lg">
-              <Link href="/learn">
-                <BookOpen className="h-4 w-4" />
-                شروع آموزش
+              <Link href="/lab">
+                <Box className="h-4 w-4" />
+                کرهٔ تعاملی
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <Link href="/compass">
-                <Compass className="h-4 w-4" />
-                قطب‌نما و قبله
+              <Link href="/proofs">
+                <PenLine className="h-4 w-4" />
+                اثبات‌ها
               </Link>
             </Button>
             <Button asChild variant="secondary" size="lg">
-              <Link href="/map">
-                <Map className="h-4 w-4" />
-                نقشه و دایره‌ها
+              <Link href="/learn">
+                <BookOpen className="h-4 w-4" />
+                درس‌نامه
               </Link>
             </Button>
           </div>
         </div>
 
-        <div className="animate-in-fade animate-delay-1 relative aspect-square max-h-[420px] w-full justify-self-center">
-          <SufiSkyWheel />
+        <div className="animate-in-fade animate-delay-1 relative aspect-[4/3] w-full justify-self-center">
+          <HeroSphereArt />
         </div>
       </div>
     </section>
   );
 }
 
-function SufiSkyWheel() {
+function HeroSphereArt() {
   return (
-    <svg viewBox="0 0 400 400" className="h-full w-full drop-shadow-2xl" aria-hidden>
+    <svg viewBox="0 0 420 320" className="h-full w-full" aria-hidden>
       <defs>
-        <radialGradient id="disk" cx="50%" cy="45%" r="55%">
-          <stop offset="0%" stopColor="#1c3148" />
-          <stop offset="70%" stopColor="#101c30" />
+        <radialGradient id="hg" cx="45%" cy="40%" r="55%">
+          <stop offset="0%" stopColor="#1a2a44" />
           <stop offset="100%" stopColor="#070d18" />
         </radialGradient>
-        <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id="rim2" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#e6d39a" />
-          <stop offset="50%" stopColor="#c9a227" />
           <stop offset="100%" stopColor="#8a7020" />
         </linearGradient>
       </defs>
-      <circle cx="200" cy="200" r="188" fill="url(#disk)" stroke="url(#rim)" strokeWidth="3" className="compass-ring" />
-      <circle cx="200" cy="200" r="160" fill="none" stroke="rgba(201,162,39,0.25)" strokeWidth="1" />
-      <circle cx="200" cy="200" r="120" fill="none" stroke="rgba(91,124,153,0.35)" strokeWidth="1" strokeDasharray="4 6" />
-      <ellipse cx="200" cy="200" rx="140" ry="48" fill="none" stroke="rgba(61,122,122,0.55)" strokeWidth="1.5" transform="rotate(-18 200 200)" />
-      <ellipse cx="200" cy="200" rx="140" ry="48" fill="none" stroke="rgba(201,162,39,0.35)" strokeWidth="1" transform="rotate(42 200 200)" />
-      {[
-        [200, 70],
-        [280, 110],
-        [310, 200],
-        [250, 290],
-        [150, 300],
-        [90, 210],
-        [120, 120],
-        [220, 150],
-        [170, 180],
-        [240, 220],
-      ].map(([x, y], i) => (
-        <circle
-          key={i}
-          cx={x}
-          cy={y}
-          r={i % 3 === 0 ? 2.8 : 1.6}
-          fill={i % 2 === 0 ? "#e6d39a" : "#e8e2d4"}
-          className="twinkle"
-          style={{ animationDelay: `${i * 0.25}s` }}
-        />
-      ))}
+      <ellipse cx="210" cy="160" rx="150" ry="150" fill="url(#hg)" stroke="url(#rim2)" strokeWidth="2.5" />
+      {/* great circle equator */}
+      <ellipse cx="210" cy="160" rx="148" ry="42" fill="none" stroke="#c9a227" strokeWidth="2" />
+      {/* great meridian */}
+      <ellipse cx="210" cy="160" rx="55" ry="148" fill="none" stroke="#5b7c99" strokeWidth="1.5" />
+      {/* small circle / parallel */}
+      <ellipse cx="210" cy="100" rx="110" ry="22" fill="none" stroke="#3d7a7a" strokeWidth="1.75" strokeDasharray="5 5" />
+      {/* spherical triangle */}
       <path
-        d="M130 150 L165 140 L200 155 L235 135 L270 150"
-        fill="none"
-        stroke="rgba(230,211,154,0.55)"
-        strokeWidth="1.2"
+        d="M210 28 L320 190 L120 175 Z"
+        fill="rgba(201,162,39,0.08)"
+        stroke="#e6d39a"
+        strokeWidth="1.8"
       />
-      <text
-        x="200"
-        y="205"
-        textAnchor="middle"
-        fill="#e6d39a"
-        fontSize="22"
-        fontFamily="var(--font-display), serif"
-      >
-        عبدالرحمن صوفی
+      <circle cx="210" cy="28" r="4" fill="#e6d39a" className="twinkle" />
+      <circle cx="320" cy="190" r="4" fill="#e6d39a" />
+      <circle cx="120" cy="175" r="4" fill="#e6d39a" />
+      <text x="218" y="26" fill="#e6d39a" fontSize="12" fontFamily="var(--font-display), serif">
+        A
+      </text>
+      <text x="328" y="194" fill="#e6d39a" fontSize="12">
+        B
+      </text>
+      <text x="100" y="180" fill="#e6d39a" fontSize="12">
+        C
       </text>
       <text
-        x="200"
-        y="232"
+        x="210"
+        y="300"
         textAnchor="middle"
         fill="#9aa6b8"
         fontSize="11"
         fontFamily="var(--font-body), sans-serif"
       >
-        کتاب صور الکواکب
+        عظیمه · صغیره · مثلث کروی
       </text>
     </svg>
   );
