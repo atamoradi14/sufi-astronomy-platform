@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sufi-astronomy
+  namespace: sufi-astronomy
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: sufi-astronomy.example.com
+      http:
+        paths:
+          - path: /api/astro/clock
+            pathType: Prefix
+            backend:
+              service: { name: astro-time, port: { number: 8081 } }
+          - path: /api/astro
+            pathType: Prefix
+            backend:
+              service: { name: sphere-math, port: { number: 8082 } }
+          - path: /api/geo
+            pathType: Prefix
+            backend:
+              service: { name: qibla, port: { number: 8083 } }
+          - path: /api/catalog
+            pathType: Prefix
+            backend:
+              service: { name: catalog, port: { number: 8084 } }
+          - path: /
+            pathType: Prefix
+            backend:
+              service: { name: web-gateway, port: { number: 80 } }

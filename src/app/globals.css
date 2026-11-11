@@ -1,0 +1,152 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #0c1424;
+  --ink-deep: #070d18;
+  --panel: #152238;
+  --border: rgba(201, 162, 39, 0.22);
+  --gold: #c9a227;
+  --gold-soft: #e6d39a;
+  --parchment: #e8e2d4;
+  --muted: #9aa6b8;
+  --teal: #3d7a7a;
+  --rose-ink: #8b4557;
+  --sky-line: #5b7c99;
+  --success: #6f9e7a;
+  --danger: #c45c5c;
+  --background: var(--ink);
+  --foreground: var(--parchment);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  color: var(--parchment);
+  background:
+    radial-gradient(ellipse 80% 50% at 20% -10%, rgba(61, 122, 122, 0.18), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 90% 10%, rgba(201, 162, 39, 0.12), transparent 45%),
+    radial-gradient(ellipse 50% 60% at 50% 100%, rgba(91, 124, 153, 0.12), transparent 50%),
+    linear-gradient(180deg, var(--ink-deep) 0%, var(--ink) 40%, #101a2e 100%);
+  background-attachment: fixed;
+  font-family: var(--font-body), Tahoma, sans-serif;
+}
+
+body::before {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  opacity: 0.35;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(230, 211, 154, 0.7), transparent),
+    radial-gradient(1px 1px at 30% 80%, rgba(230, 211, 154, 0.5), transparent),
+    radial-gradient(1.5px 1.5px at 70% 30%, rgba(232, 226, 212, 0.55), transparent),
+    radial-gradient(1px 1px at 85% 60%, rgba(230, 211, 154, 0.45), transparent),
+    radial-gradient(1px 1px at 55% 15%, rgba(232, 226, 212, 0.4), transparent),
+    radial-gradient(1px 1px at 15% 55%, rgba(230, 211, 154, 0.35), transparent);
+  z-index: 0;
+}
+
+#__next,
+body > main,
+.app-shell {
+  position: relative;
+  z-index: 1;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.manuscript-rule {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(201, 162, 39, 0.55),
+    transparent
+  );
+}
+
+.ornament {
+  font-family: var(--font-display), serif;
+}
+
+.animate-in-fade {
+  animation: fade-up 0.55s ease both;
+}
+
+.animate-delay-1 {
+  animation-delay: 0.12s;
+}
+.animate-delay-2 {
+  animation-delay: 0.24s;
+}
+.animate-delay-3 {
+  animation-delay: 0.36s;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes compass-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(201, 162, 39, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(201, 162, 39, 0);
+  }
+}
+
+.compass-ring {
+  animation: compass-pulse 2.8s ease-in-out infinite;
+}
+
+@keyframes star-twinkle {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.twinkle {
+  animation: star-twinkle 3s ease-in-out infinite;
+}
+
+.leaflet-container {
+  font-family: var(--font-body), Tahoma, sans-serif;
+  background: #0a1220;
+  border-radius: 0.75rem;
+}
+
+.prose-fa p {
+  line-height: 1.9;
+}

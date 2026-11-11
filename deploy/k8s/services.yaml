@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: astro-time
+  namespace: sufi-astronomy
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: astro-time }
+  template:
+    metadata:
+      labels: { app: astro-time }
+    spec:
+      containers:
+        - name: astro-time
+          image: sufi-astronomy/astro-time:latest
+          ports: [{ containerPort: 8081 }]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: astro-time
+  namespace: sufi-astronomy
+spec:
+  selector: { app: astro-time }
+  ports: [{ port: 8081, targetPort: 8081 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sphere-math
+  namespace: sufi-astronomy
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: sphere-math }
+  template:
+    metadata:
+      labels: { app: sphere-math }
+    spec:
+      containers:
+        - name: sphere-math
+          image: sufi-astronomy/sphere-math:latest
+          ports: [{ containerPort: 8082 }]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sphere-math
+  namespace: sufi-astronomy
+spec:
+  selector: { app: sphere-math }
+  ports: [{ port: 8082, targetPort: 8082 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qibla
+  namespace: sufi-astronomy
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: qibla }
+  template:
+    metadata:
+      labels: { app: qibla }
+    spec:
+      containers:
+        - name: qibla
+          image: sufi-astronomy/qibla:latest
+          ports: [{ containerPort: 8083 }]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qibla
+  namespace: sufi-astronomy
+spec:
+  selector: { app: qibla }
+  ports: [{ port: 8083, targetPort: 8083 }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog
+  namespace: sufi-astronomy
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: catalog }
+  template:
+    metadata:
+      labels: { app: catalog }
+    spec:
+      containers:
+        - name: catalog
+          image: sufi-astronomy/catalog:latest
+          ports: [{ containerPort: 8084 }]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog
+  namespace: sufi-astronomy
+spec:
+  selector: { app: catalog }
+  ports: [{ port: 8084, targetPort: 8084 }]

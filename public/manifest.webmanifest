@@ -1,0 +1,19 @@
+{
+  "name": "صوفی‌آسمان",
+  "short_name": "صوفی‌آسمان",
+  "description": "آموزش ریاضیات کروی و نجوم به زبان فارسی",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070d18",
+  "theme_color": "#0c1424",
+  "lang": "fa",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
