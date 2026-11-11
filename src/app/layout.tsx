@@ -45,7 +45,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa" dir="rtl">
+    <html lang="fa" dir="rtl" data-scroll-behavior="smooth">
       <body className={`${display.variable} ${body.variable} antialiased`}>
         <div className="app-shell flex min-h-dvh flex-col">
           <SiteHeader />

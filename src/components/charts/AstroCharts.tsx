@@ -22,16 +22,21 @@ export function AstroCharts() {
   const geo = useGeolocation(false);
   const lat = geo.reading?.lat ?? 35.6892;
   const lon = geo.reading?.lon ?? 51.389;
-  const [now, setNow] = useState(() => new Date());
+  const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
+    setNow(new Date());
     const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
 
-  const clock = useMemo(() => computeAstroClock(now, lon), [now, lon]);
+  const clock = useMemo(
+    () => (now ? computeAstroClock(now, lon) : null),
+    [now, lon],
+  );
 
   const daySeries = useMemo(() => {
+    if (!now) return [];
     const points = [];
     for (let h = 0; h < 24; h += 0.5) {
       const d = new Date(now);
@@ -77,6 +82,14 @@ export function AstroCharts() {
     }
     return [...rises, ...sets];
   }, [daySeries]);
+
+  if (!now || !clock) {
+    return (
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--panel)]/80 px-4 py-10 text-center text-sm text-[var(--muted)]">
+        در حال همگام‌سازی ساعت نجومی…
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

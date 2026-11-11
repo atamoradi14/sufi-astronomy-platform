@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CONSTELLATIONS } from "@/lib/astronomy/constellations";
 import { equatorialToHorizontal } from "@/lib/astronomy/sphere";
 import { computeAstroClock } from "@/lib/astronomy/time";
@@ -10,18 +10,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 export function ConstellationViewer() {
   const [id, setId] = useState(CONSTELLATIONS[0].id);
+  const [now, setNow] = useState<Date | null>(null);
   const geo = useGeolocation(false);
   const cons = CONSTELLATIONS.find((c) => c.id === id)!;
   const lon = geo.reading?.lon ?? 51.389;
   const lat = geo.reading?.lat ?? 35.6892;
-  const clock = useMemo(() => computeAstroClock(new Date(), lon), [lon]);
+
+  useEffect(() => {
+    setNow(new Date());
+    const t = setInterval(() => setNow(new Date()), 30_000);
+    return () => clearInterval(t);
+  }, []);
+
+  const clock = useMemo(
+    () => (now ? computeAstroClock(now, lon) : null),
+    [now, lon],
+  );
 
   const projected = useMemo(() => {
+    if (!clock) return cons.stars.map((s) => ({ ...s, az: 0, alt: 0, ha: 0 }));
     return cons.stars.map((s) => {
       const h = equatorialToHorizontal(s.ra, s.dec, lat, clock.lst);
       return { ...s, ...h };
     });
-  }, [cons, lat, clock.lst]);
+  }, [cons, lat, clock]);
 
   return (
     <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
@@ -56,7 +68,8 @@ export function ConstellationViewer() {
             </h3>
             <p className="mt-2 text-sm text-[var(--parchment)]/90">{cons.description}</p>
             <p className="mt-3 text-xs text-[var(--muted)]">
-              LST ناظر: {formatHours(clock.lst, 3)} · عرض: {formatDeg(lat, 2)}
+              LST ناظر: {clock ? formatHours(clock.lst, 3) : "…"} · عرض:{" "}
+              {formatDeg(lat, 2)}
             </p>
           </div>
           <ul className="space-y-2 text-sm">

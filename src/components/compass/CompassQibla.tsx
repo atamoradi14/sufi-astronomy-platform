@@ -147,7 +147,7 @@ export function CompassQibla() {
               label="فاصله"
               value={
                 qibla
-                  ? `${toPersianDigits(Math.round(qibla.distance).toLocaleString("en-US"))} کیلومتر`
+                  ? `${toPersianDigits(Math.round(qibla.distance))} کیلومتر`
                   : "…"
               }
             />
