@@ -2,17 +2,15 @@
 
 import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Line, Html, Stars } from "@react-three/drei";
+import { Billboard, Line, OrbitControls, Stars, Text } from "@react-three/drei";
 import * as THREE from "three";
 import {
-  angularDistanceDeg,
   equatorCircle,
   greatArc,
   lonLatToCart,
   meridianCircle,
   parallelCircle,
   smallCircle,
-  sphericalAngleDeg,
   type Vec3,
 } from "@/lib/astronomy/sphereGeom";
 
@@ -39,18 +37,22 @@ type Props = {
 
 export function CelestialSphere({ state, className }: Props) {
   return (
-    <div className={className}>
+    <div className={`relative ${className ?? ""}`}>
       <Canvas
         camera={{ position: [2.4, 1.4, 2.4], fov: 42 }}
-        dpr={[1, 1.75]}
-        gl={{ antialias: true, alpha: true }}
+        dpr={[1, 1.5]}
+        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        onCreated={({ gl }) => {
+          gl.setClearColor(new THREE.Color("#070d18"), 1);
+          gl.domElement.addEventListener("webglcontextlost", (e) => e.preventDefault(), false);
+        }}
       >
-        <color attach="background" args={["#070d18"]} />
         <ambientLight intensity={0.55} />
         <directionalLight position={[4, 6, 2]} intensity={1.1} />
-        <Stars radius={40} depth={30} count={1200} factor={2} saturation={0} fade speed={0.4} />
+        <Stars radius={40} depth={30} count={900} factor={2} saturation={0} fade speed={0.25} />
         <SphereMesh state={state} />
         <OrbitControls
+          makeDefault
           enablePan={false}
           minDistance={1.6}
           maxDistance={5}
@@ -58,15 +60,28 @@ export function CelestialSphere({ state, className }: Props) {
           zoomSpeed={0.7}
         />
       </Canvas>
+      <div className="pointer-events-none absolute inset-x-0 top-3 flex justify-center">
+        <span className="sphere-label">N · قطب</span>
+      </div>
+      <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center">
+        <span className="sphere-label">S</span>
+      </div>
     </div>
   );
 }
 
 function SphereMesh({ state }: { state: SphereViewState }) {
   const globe = useRef<THREE.Mesh>(null);
-  useFrame((_, dt) => {
-    if (globe.current && !state.showTriangle) {
-      globe.current.rotation.y += dt * 0.03;
+  const dragging = useRef(false);
+
+  useFrame((ctx, dt) => {
+    const controls = ctx.controls as { enabled?: boolean; state?: number } | null;
+    // state 0 = NONE in OrbitControls internals when idle; avoid fighting user drag
+    if (controls && "state" in controls && typeof controls.state === "number") {
+      dragging.current = controls.state !== -1 && controls.state !== 0;
+    }
+    if (globe.current && !state.showTriangle && !dragging.current) {
+      globe.current.rotation.y += dt * 0.025;
     }
   });
 
@@ -93,12 +108,10 @@ function SphereMesh({ state }: { state: SphereViewState }) {
     [],
   );
   const horizon = useMemo(() => {
-    // Horizon pole = zenith at (0, observerLat) in lon=0 frame for demo
     const zenith = lonLatToCart(0, state.observerLat);
     return smallCircle(zenith, 90, 128);
   }, [state.observerLat]);
   const ecliptic = useMemo(() => {
-    // Tilted great circle ~23.4°
     const pole = lonLatToCart(90, 90 - 23.44);
     return smallCircle(pole, 90, 160);
   }, []);
@@ -114,16 +127,6 @@ function SphereMesh({ state }: { state: SphereViewState }) {
     }),
     [A, B, C],
   );
-
-  const metrics = useMemo(() => {
-    const a = angularDistanceDeg(B, C);
-    const b = angularDistanceDeg(A, C);
-    const c = angularDistanceDeg(A, B);
-    const angA = sphericalAngleDeg(B, A, C);
-    const angB = sphericalAngleDeg(A, B, C);
-    const angC = sphericalAngleDeg(A, C, B);
-    return { a, b, c, angA, angB, angC };
-  }, [A, B, C]);
 
   return (
     <group>
@@ -147,14 +150,7 @@ function SphereMesh({ state }: { state: SphereViewState }) {
         />
       </mesh>
 
-      {/* Axes hint */}
       <Line points={[[0, -1.15, 0], [0, 1.15, 0]]} color="#e6d39a" lineWidth={1.5} />
-      <Html position={[0, 1.22, 0]} center>
-        <span className="sphere-label">N</span>
-      </Html>
-      <Html position={[0, -1.22, 0]} center>
-        <span className="sphere-label">S</span>
-      </Html>
 
       {state.showEquator && (
         <PolyLine pts={equator} color="#c9a227" width={2} glow={state.highlight === "great"} />
@@ -174,12 +170,8 @@ function SphereMesh({ state }: { state: SphereViewState }) {
             glow={state.highlight === "small"}
           />
         ))}
-      {state.showHorizon && (
-        <PolyLine pts={horizon} color="#8b4557" width={2} />
-      )}
-      {state.showEcliptic && (
-        <PolyLine pts={ecliptic} color="#6f9e7a" width={2} />
-      )}
+      {state.showHorizon && <PolyLine pts={horizon} color="#8b4557" width={2} />}
+      {state.showEcliptic && <PolyLine pts={ecliptic} color="#6f9e7a" width={2} />}
       {state.showSmallDemo && (
         <PolyLine
           pts={smallDemo}
@@ -197,12 +189,6 @@ function SphereMesh({ state }: { state: SphereViewState }) {
           <PointMarker pos={A} label="A" color="#e6d39a" />
           <PointMarker pos={B} label="B" color="#e6d39a" />
           <PointMarker pos={C} label="C" color="#e6d39a" />
-          <Html position={[0, -1.45, 0]} center>
-            <div className="sphere-metrics">
-              a={fmt(metrics.a)} b={fmt(metrics.b)} c={fmt(metrics.c)} · A=
-              {fmt(metrics.angA)} B={fmt(metrics.angB)} C={fmt(metrics.angC)}
-            </div>
-          </Html>
         </>
       )}
     </group>
@@ -255,13 +241,18 @@ function PointMarker({
         <sphereGeometry args={[0.035, 16, 16]} />
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.4} />
       </mesh>
-      <Html distanceFactor={6} position={[0.06, 0.06, 0]}>
-        <span className="sphere-point">{label}</span>
-      </Html>
+      <Billboard position={[0.08, 0.08, 0]}>
+        <Text
+          fontSize={0.09}
+          color="#e6d39a"
+          anchorX="left"
+          anchorY="middle"
+          outlineWidth={0.006}
+          outlineColor="#070d18"
+        >
+          {label}
+        </Text>
+      </Billboard>
     </group>
   );
-}
-
-function fmt(n: number) {
-  return n.toFixed(1) + "°";
 }
