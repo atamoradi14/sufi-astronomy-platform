@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-gateway
+  namespace: sufi-astronomy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web-gateway
+  template:
+    metadata:
+      labels:
+        app: web-gateway
+    spec:
+      containers:
+        - name: web
+          image: sufi-astronomy/web-gateway:latest
+          ports:
+            - containerPort: 3847
+          env:
+            - name: PORT
+              value: "3847"
+            - name: SERVICE_ASTRO_TIME_URL
+              value: http://astro-time:8081
+            - name: SERVICE_SPHERE_MATH_URL
+              value: http://sphere-math:8082
+            - name: SERVICE_QIBLA_URL
+              value: http://qibla:8083
+            - name: SERVICE_CATALOG_URL
+              value: http://catalog:8084
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3847
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-gateway
+  namespace: sufi-astronomy
+spec:
+  selector:
+    app: web-gateway
+  ports:
+    - port: 80
+      targetPort: 3847
