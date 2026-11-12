@@ -1,42 +1,52 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { ProofAnimator } from "@/components/sphere/ProofAnimator";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Suspense } from "react";
+import { ProofAnimator } from "@/components/sphere/ProofAnimator";
+import { AreaProof } from "@/components/sphere/AreaProof";
+import { Button } from "@/components/ui/button";
 
 function ProofsInner() {
   const sp = useSearchParams();
   const kind = useMemo(() => {
     const k = sp.get("kind");
-    return k === "sine" ? "sine" : "cosine";
+    if (k === "sine" || k === "girard" || k === "cosine-polar") return k;
+    return "cosine";
   }, [sp]);
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 px-4 py-8">
       <header className="space-y-3">
-        <p className="text-sm text-[var(--teal)]">اثبات‌ها · Smart I.3–4 + هندسه کروی المپیاد</p>
+        <p className="text-sm text-[var(--teal)]">
+          Proofs · Smart I — English formulations + Persian guide
+        </p>
         <h1 className="font-[family-name:var(--font-display)] text-3xl text-[var(--gold-soft)] md:text-4xl">
-          اثبات قانون سینوس و کسینوس کروی
+          اثبات‌های گام‌به‌گام
         </h1>
         <p className="max-w-3xl text-sm leading-8 text-[var(--muted)]">
-          گام‌به‌گام با انیمیشن و آزمایش عددی. کسینوس‌ها با مختصات دکارتی (رویکرد تحلیلی Smart)، سینوس‌ها با ارتفاع کروی (رویکرد رایج جزوه‌های المپیاد ایران).
+          صورت‌های انگلیسی مطابق کتاب‌های مرجع (Smart و هندسهٔ کروی کلاسیک)، همراه توضیح فارسی و آزمایش عددی زنده.
         </p>
         <div className="flex flex-wrap gap-2">
           <Button asChild size="sm" variant={kind === "cosine" ? "default" : "secondary"}>
-            <Link href="/proofs?kind=cosine">قانون کسینوس‌ها</Link>
+            <Link href="/proofs?kind=cosine">Cosine (sides)</Link>
           </Button>
           <Button asChild size="sm" variant={kind === "sine" ? "default" : "secondary"}>
-            <Link href="/proofs?kind=sine">قانون سینوس‌ها</Link>
+            <Link href="/proofs?kind=sine">Sine law</Link>
+          </Button>
+          <Button asChild size="sm" variant={kind === "girard" ? "default" : "secondary"}>
+            <Link href="/proofs?kind=girard">Area / Girard</Link>
           </Button>
           <Button asChild size="sm" variant="outline">
-            <Link href="/lab">آزمایش روی کرهٔ سه‌بعدی</Link>
+            <Link href="/lab">کرهٔ سه‌بعدی</Link>
           </Button>
         </div>
       </header>
-      <ProofAnimator kind={kind} />
+      {kind === "girard" ? (
+        <AreaProof />
+      ) : (
+        <ProofAnimator kind={kind === "sine" ? "sine" : "cosine"} />
+      )}
     </div>
   );
 }
@@ -45,9 +55,7 @@ export default function ProofsPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-6xl px-4 py-16 text-[var(--muted)]">
-          بارگذاری اثبات…
-        </div>
+        <div className="mx-auto max-w-6xl px-4 py-16 text-[var(--muted)]">بارگذاری اثبات…</div>
       }
     >
       <ProofsInner />

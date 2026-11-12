@@ -8,13 +8,12 @@ import { useState } from "react";
 
 const NAV = [
   { href: "/", label: "خانه" },
-  { href: "/lab", label: "کرهٔ تعاملی" },
-  { href: "/proofs", label: "اثبات‌ها" },
-  { href: "/learn", label: "درس‌نامه" },
+  { href: "/lab", label: "کره" },
+  { href: "/sky", label: "آسمان زنده" },
+  { href: "/proofs", label: "اثبات" },
+  { href: "/learn", label: "دروس" },
   { href: "/problems", label: "مسائل" },
-  { href: "/sky", label: "آسمان‌نما" },
-  { href: "/charts", label: "زمان و نمودار" },
-  { href: "/compass", label: "قبله" },
+  { href: "/charts", label: "زمان" },
   { href: "/map", label: "نقشه" },
 ];
 

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { PROBLEMS } from "@/lib/content/problems";
 import { COURSES } from "@/lib/content/courses";
+import { SolutionSphere } from "@/components/problems/SolutionSphere";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toPersianDigits } from "@/lib/utils";
@@ -30,7 +31,7 @@ export function ProblemList() {
             active={filter === l.id}
             onClick={() => setFilter(l.id)}
           >
-            {l.title}
+            {l.titleFa}
           </FilterChip>
         ))}
       </div>
@@ -60,13 +61,12 @@ export function ProblemList() {
               </CardHeader>
               {open && (
                 <CardContent className="space-y-3 border-t border-[var(--border)] pt-4">
+                  <SolutionSphere mode={p.diagram} values={p.values} />
                   <div className="flex flex-wrap gap-2">
                     <Button
                       size="sm"
                       variant="secondary"
-                      onClick={() =>
-                        setShowHint((s) => ({ ...s, [p.id]: !s[p.id] }))
-                      }
+                      onClick={() => setShowHint((s) => ({ ...s, [p.id]: !s[p.id] }))}
                     >
                       {showHint[p.id] ? "پنهان کردن راهنما" : "نمایش راهنما"}
                     </Button>
@@ -89,9 +89,7 @@ export function ProblemList() {
                   {showSolution[p.id] && (
                     <div className="space-y-2 rounded-lg border border-[var(--gold)]/30 bg-[var(--gold)]/5 px-3 py-3 text-sm leading-7">
                       <p>{p.solution}</p>
-                      <p className="text-[var(--gold-soft)]">
-                        پاسخ نهایی: {p.answer}
-                      </p>
+                      <p className="text-[var(--gold-soft)]">پاسخ نهایی: {p.answer}</p>
                     </div>
                   )}
                 </CardContent>

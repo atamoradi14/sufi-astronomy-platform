@@ -1,0 +1,558 @@
+/** Generates comprehensive course JSON consumed by the app. Run: node scripts/gen-courses.mjs */
+import fs from "fs";
+
+const courses = [
+  {
+    id: "great-circles",
+    chapter: "Smart I §1–2",
+    titleFa: "دایره‌های عظیمه و صغیره",
+    titleEn: "Great and Small Circles",
+    level: "مقدماتی",
+    minutes: 40,
+    spherePreset: "circles",
+    olympiad: "هندسه کروی پایه",
+    summaryFa:
+      "تعریف دقیق دایرهٔ عظیمه/صغیره، قطب، محور، و فاصلهٔ کمانی — با تجسم سه‌بعدی.",
+    englishFormulas: [
+      "Great circle = intersection of the sphere with a plane through the centre O.",
+      "Small circle = intersection with a plane not through O; angular radius α from its pole satisfies n·r = cos α on the unit sphere.",
+      "Shortest path between two non-antipodal points = unique minor arc of the great circle through them.",
+    ],
+    sections: [
+      {
+        headingFa: "تعریف عظیمه (Smart)",
+        headingEn: "Definition of a great circle",
+        bodyFa:
+          "صفحهٔ گذرنده از مرکز کره، کره را در یک دایرهٔ عظیمه قطع می‌کند. هر دو نقطهٔ ناهم‌قطر دقیقاً یک عظیمهٔ یکتا می‌سازند.",
+        bodyEn:
+          "If a plane passes through the centre of a sphere, its intersection with the sphere is a great circle. Through any two points which are not antipodes there passes one and only one great circle.",
+        formula: "Plane: n·(r − O) = 0 with |n|=1, O = centre",
+      },
+      {
+        headingFa: "قطب و محور",
+        headingEn: "Poles and axis",
+        bodyFa:
+          "قطر عمود بر صفحهٔ عظیمه، کره را در دو قطب قطع می‌کند. هر نقطه روی عظیمه از هر قطب ۹۰° فاصله دارد.",
+        bodyEn:
+          "The diameter perpendicular to the plane of a great circle meets the sphere in the poles of that circle. Every point on the great circle is 90° from either pole.",
+        formula: "∠(pole, point on GC) = 90°",
+      },
+      {
+        headingFa: "دایرهٔ صغیره",
+        headingEn: "Small circles",
+        bodyFa:
+          "صفحهٔ ناگذر از مرکز، دایرهٔ صغیره می‌سازد. مدارهای میل ثابت و دوایر ارتفاع ثابت نمونه‌های نجومی‌اند.",
+        bodyEn:
+          "A plane not through the centre cuts the sphere in a small circle. Parallels of declination and parallels of altitude are astronomical small circles.",
+        formula: "n·r = cos α  (unit sphere)",
+      },
+    ],
+  },
+  {
+    id: "spherical-triangle",
+    chapter: "Smart I §2",
+    titleFa: "مثلث کروی",
+    titleEn: "The Spherical Triangle",
+    level: "مقدماتی",
+    minutes: 45,
+    spherePreset: "triangle",
+    olympiad: "تعاریف ضلع و زاویه",
+    summaryFa: "اضلاع به‌عنوان کمان عظیمه، زوایا به‌عنوان زاویهٔ صفحات، قراردادهای Smart.",
+    englishFormulas: [
+      "Sides a, b, c are great-circle arcs (angles at the centre), conventionally taken ≤ 180°.",
+      "Angle A at vertex A is the dihedral angle between the planes OAB and OAC (equivalently the angle between tangents to the sides at A).",
+      "A side is opposite the angle of the same letter: a opposite A, etc.",
+    ],
+    sections: [
+      {
+        headingFa: "ضلع",
+        headingEn: "Sides",
+        bodyFa: "ضلع a روبه‌روی رأس A فاصلهٔ زاویه‌ای رأس‌های B و C است.",
+        bodyEn:
+          "The side a opposite A is the angular distance BC measured along the great circle, i.e. the central angle BOC.",
+        formula: "a = ∠BOC",
+      },
+      {
+        headingFa: "زاویه",
+        headingEn: "Angles",
+        bodyFa: "زاویه در A برابر زاویهٔ بین دو صفحهٔ شامل اضلاع AB و AC است.",
+        bodyEn:
+          "The angle A is the angle between the planes of the great circles AB and AC.",
+        formula: "A = dihedral∠(plane OAB, plane OAC)",
+      },
+      {
+        headingFa: "مثلث نجومی PZX",
+        headingEn: "The astronomical triangle",
+        bodyFa:
+          "P قطب سماوی، Z سمت‌الرأس، X جرم. اضلاع: PZ=90°−φ، PX=90°−δ، ZX=90°−a (a ارتفاع).",
+        bodyEn:
+          "Vertices: elevated pole P, zenith Z, object X. Sides: PZ = 90°−φ, PX = 90°−δ, ZX = z = 90°−altitude.",
+        formula: "PZ = 90°−φ,  PX = 90°−δ,  ZX = z",
+      },
+    ],
+  },
+  {
+    id: "cosine-sides",
+    chapter: "Smart I §3",
+    titleFa: "قانون کسینوس‌ها برای اضلاع",
+    titleEn: "Cosine Formula for Sides",
+    level: "متوسط",
+    minutes: 50,
+    spherePreset: "triangle",
+    proofId: "cosine",
+    olympiad: "فاصلهٔ زاویه‌ای · مثلثات کروی",
+    summaryFa: "صورت اصلی Smart با اثبات مختصات دکارتی دقیق.",
+    englishFormulas: [
+      "cos c = cos a cos b + sin a sin b cos C",
+      "cos a = cos b cos c + sin b sin c cos A",
+      "cos b = cos c cos a + sin c sin a cos B",
+    ],
+    sections: [
+      {
+        headingFa: "صورت اصلی (Smart)",
+        headingEn: "Fundamental formula",
+        bodyFa: "برای دو ضلع a,b و زاویهٔ مشمول C، ضلع روبه‌رو c از رابطهٔ زیر به‌دست می‌آید.",
+        bodyEn:
+          "In any spherical triangle, the cosine of any side is equal to the product of the cosines of the other two sides plus the product of the sines of those sides and the cosine of their included angle.",
+        formula: "cos c = cos a cos b + sin a sin b cos C",
+      },
+      {
+        headingFa: "اثبات مختصاتی",
+        headingEn: "Coordinate proof (Smart-style)",
+        bodyFa:
+          "C را در قطب شمال موضعی (۰,۰,۱) بگذارید، B را در نصف‌النهار مرجع، A را با زاویهٔ C دوران دهید؛ آنگاه cos c = A·B.",
+        bodyEn:
+          "Place C at (0,0,1). Let B = (sin b, 0, cos b). Let A = (sin a cos C, sin a sin C, cos a). Then cos c = A·B expands to the cosine formula.",
+        formula: "A·B = sin a sin b cos C + cos a cos b",
+      },
+      {
+        headingFa: "کاربرد: فاصلهٔ دو ستاره",
+        headingEn: "Application: angular distance",
+        bodyFa: "با a=90°−δ₁، b=90°−δ₂، C=Δα در مثلث قطبی-ستاره‌ای.",
+        bodyEn:
+          "For two stars, cos d = sin δ₁ sin δ₂ + cos δ₁ cos δ₂ cos(Δα).",
+        formula: "cos d = sin δ₁ sin δ₂ + cos δ₁ cos δ₂ cos Δα",
+      },
+    ],
+  },
+  {
+    id: "cosine-angles",
+    chapter: "Smart I §3 (polar)",
+    titleFa: "قانون کسینوس‌ها برای زوایا",
+    titleEn: "Cosine Formula for Angles",
+    level: "متوسط",
+    minutes: 35,
+    spherePreset: "triangle",
+    proofId: "cosine-polar",
+    olympiad: "مثلث قطبی",
+    summaryFa: "از مثلث قطبی؛ صورت با علامت منفی مشخصهٔ هندسهٔ کروی.",
+    englishFormulas: [
+      "cos C = − cos A cos B + sin A sin B cos c",
+      "Polar triangle: sides a′ = π − A, angles A′ = π − a (and cyclic).",
+    ],
+    sections: [
+      {
+        headingFa: "مثلث قطبی",
+        headingEn: "The polar triangle",
+        bodyFa:
+          "قطب‌های اضلاع مثلث اصلی، رأس‌های مثلث قطبی‌اند. اضلاع و زوایای آن متمم‌اند.",
+        bodyEn:
+          "The poles of the sides of a spherical triangle are the vertices of the polar triangle. Then a′ = 180° − A, A′ = 180° − a, etc.",
+        formula: "a′ = π − A,   A′ = π − a",
+      },
+      {
+        headingFa: "صورت قطبی",
+        headingEn: "Polar cosine formula",
+        bodyFa: "اعمال قانون اضلاع روی مثلث قطبی، قانون زوایا را می‌دهد.",
+        bodyEn:
+          "Applying the side-cosine formula to the polar triangle yields the angle-cosine formula.",
+        formula: "cos C = −cos A cos B + sin A sin B cos c",
+      },
+    ],
+  },
+  {
+    id: "sine-law",
+    chapter: "Smart I §4",
+    titleFa: "قانون سینوس‌های کروی",
+    titleEn: "The Sine Formula",
+    level: "متوسط",
+    minutes: 45,
+    spherePreset: "triangle",
+    proofId: "sine",
+    olympiad: "سمت · نسبت سینوس‌ها",
+    summaryFa: "صورت Smart و اثبات با ارتفاع کروی.",
+    englishFormulas: [
+      "sin a / sin A = sin b / sin B = sin c / sin C",
+      "From altitude h to side a: sin h = sin b sin C = sin c sin B.",
+    ],
+    sections: [
+      {
+        headingFa: "صورت قانون",
+        headingEn: "Statement",
+        bodyFa: "نسبت سینوس هر ضلع به سینوس زاویهٔ روبه‌رو ثابت است.",
+        bodyEn:
+          "The sines of the sides of a spherical triangle are proportional to the sines of the opposite angles.",
+        formula: "sin a : sin b : sin c = sin A : sin B : sin C",
+      },
+      {
+        headingFa: "اثبات با ارتفاع",
+        headingEn: "Proof by altitude",
+        bodyFa:
+          "از A ارتفاع h به ضلع a رسم کنید. در دو مثلث قائم: sin h = sin c sin B = sin b sin C.",
+        bodyEn:
+          "Drop a perpendicular arc from A to side a at D. In the right triangles: sin h = sin c · sin B and sin h = sin b · sin C; eliminate h.",
+        formula: "sin b / sin B = sin c / sin C",
+      },
+    ],
+  },
+  {
+    id: "four-parts",
+    chapter: "Smart I §5",
+    titleFa: "فرمول چهار جزء (cotangent)",
+    titleEn: "Four-Parts Formula",
+    level: "المپیاد",
+    minutes: 40,
+    spherePreset: "triangle",
+    olympiad: "مسائل پیشرفته مثلثات کروی",
+    summaryFa: "برای زنجیرهٔ چهار جزء متوالی؛ پرکاربرد در مثلث نجومی.",
+    englishFormulas: [
+      "cos a cos C = sin a cot b − sin C cot B  (one standard arrangement)",
+      "Napier's analogies relate sums/differences of sides and angles.",
+    ],
+    sections: [
+      {
+        headingFa: "کاربرد",
+        headingEn: "Use",
+        bodyFa:
+          "وقتی سه جزء متوالی معلوم و جزء چهارم خواسته شود، فرمول چهار جزء یا قیاسی‌های نپر به‌کار می‌رود.",
+        bodyEn:
+          "When three consecutive parts are given, the four-parts (cotangent) formula or Napier's analogies determine the fourth.",
+        formula: "cot a sin b = cos b cos C + sin C cot A",
+      },
+    ],
+  },
+  {
+    id: "spherical-area",
+    chapter: "Smart I · Girard",
+    titleFa: "مساحت مثلث کروی و زیادی کروی",
+    titleEn: "Area and Spherical Excess",
+    level: "متوسط",
+    minutes: 55,
+    spherePreset: "area",
+    proofId: "girard",
+    olympiad: "زیادی کروی · مساحت",
+    summaryFa: "قضیهٔ ژیرار: مساحت روی کرهٔ واحد = زیادی زاویه‌ای E = A+B+C−π. اثبات با هلال‌ها.",
+    englishFormulas: [
+      "Spherical excess: E = A + B + C − π",
+      "Girard: Area (unit sphere) = E steradians",
+      "On sphere of radius R: Area = R² E",
+      "L'Huilier: tan(E/4) = √[tan(s/2) tan((s−a)/2) tan((s−b)/2) tan((s−c)/2)], s=(a+b+c)/2",
+    ],
+    sections: [
+      {
+        headingFa: "زیادی کروی",
+        headingEn: "Spherical excess",
+        bodyFa: "جمع زوایای مثلث کروی از π بیشتر است. اختلاف را زیادی E می‌نامند.",
+        bodyEn:
+          "The sum of the angles of a spherical triangle exceeds π. The excess E = A+B+C−π is the spherical excess.",
+        formula: "E = A + B + C − π",
+      },
+      {
+        headingFa: "قضیهٔ ژیرار — اثبات با هلال",
+        headingEn: "Girard's theorem — lune proof",
+        bodyFa:
+          "هلال با زاویهٔ A مساحت ۲A دارد (کرهٔ واحد). سه هلال کره را می‌پوشانند در حالی که مثلث و پادمثلث دوبار شمرده می‌شوند: ۲(A+B+C)=۲π+۲E ⇒ E=A+B+C−π = مساحت.",
+        bodyEn:
+          "A lune of angle A has area 2A on the unit sphere. The three lunes of angles A,B,C cover the sphere, counting the triangle and its antipode twice each: 2(A+B+C) = 2π + 2·Area, hence Area = A+B+C−π = E.",
+        formula: "Area = E = A + B + C − π",
+      },
+      {
+        headingFa: "فرمول لاهوئیلیه",
+        headingEn: "L'Huilier's formula",
+        bodyFa: "زیادی را مستقیماً از سه ضلع می‌دهد — مفید وقتی زوایا معلوم نیستند.",
+        bodyEn:
+          "Expresses E from the three sides alone; preferred for small triangles numerically.",
+        formula: "tan(E/4) = √[tan(s/2) tan((s−a)/2) tan((s−b)/2) tan((s−c)/2)]",
+      },
+    ],
+  },
+  {
+    id: "right-angled",
+    chapter: "Smart I §6",
+    titleFa: "مثلث قائم‌الزاویهٔ کروی و قواعد نپر",
+    titleEn: "Right-Angled Triangles & Napier's Rules",
+    level: "المپیاد",
+    minutes: 40,
+    spherePreset: "triangle",
+    olympiad: "قواعد نپر",
+    summaryFa: "وقتی یک زاویه ۹۰° است؛ دایرهٔ نپر برای حفظ فرمول‌ها.",
+    englishFormulas: [
+      "If C = 90°: cos c = cos a cos b,  sin a = sin A sin c,  tan a = cos B tan c, …",
+      "Napier's rule of circular parts organises the ten relations.",
+    ],
+    sections: [
+      {
+        headingFa: "صورت‌های اصلی",
+        headingEn: "Principal forms",
+        bodyFa: "با C=۹۰° قانون کسینوس و سینوس ساده می‌شوند.",
+        bodyEn: "Set C = 90° in the general formulae to obtain the right-angled set.",
+        formula: "cos c = cos a cos b   (C = 90°)",
+      },
+    ],
+  },
+  {
+    id: "celestial-sphere",
+    chapter: "Smart II",
+    titleFa: "کرهٔ سماوی",
+    titleEn: "The Celestial Sphere",
+    level: "متوسط",
+    minutes: 50,
+    spherePreset: "celestial",
+    olympiad: "مفاهیم پایهٔ نجوم کروی",
+    summaryFa: "استوا، قطب، نصف‌النهار، افق، سمت‌الرأس، دایرة‌البروج.",
+    englishFormulas: [
+      "Celestial equator: great circle 90° from the celestial poles.",
+      "Hour angle H = LST − α (in time or arc).",
+      "Observer's meridian: great circle through poles and zenith.",
+    ],
+    sections: [
+      {
+        headingFa: "تعاریف",
+        headingEn: "Definitions",
+        bodyFa: "جهات به نقاط روی کرهٔ واحد نگاشته می‌شوند؛ فاصله‌ها زاویه‌ای‌اند.",
+        bodyEn:
+          "Directions from the observer are represented by points on a unit sphere; separations are angles.",
+        formula: null,
+      },
+      {
+        headingFa: "استوا و قطب",
+        headingEn: "Equator and poles",
+        bodyFa: "محور جهان قطب‌های سماوی را می‌سازد؛ استوای سماوی عمود بر آن است.",
+        bodyEn:
+          "The celestial poles are the intersections of the Earth's axis with the celestial sphere; the celestial equator is the great circle midway between them.",
+        formula: "δ = 0 on the celestial equator",
+      },
+    ],
+  },
+  {
+    id: "horizontal",
+    chapter: "Smart II",
+    titleFa: "دستگاه افقی (سمت و ارتفاع)",
+    titleEn: "Horizontal Coordinates (Azimuth & Altitude)",
+    level: "متوسط",
+    minutes: 40,
+    spherePreset: "horizon",
+    olympiad: "مختصات ناظر",
+    summaryFa: "افق، سمت‌الرأس، نادیر، سمت از شمال، ارتفاع و سمت‌القدم.",
+    englishFormulas: [
+      "Altitude a: angular elevation above the horizon (−90°…+90°).",
+      "Zenith distance z = 90° − a.",
+      "Azimuth A: usually from north towards east (0°…360°) — confirm local convention.",
+    ],
+    sections: [
+      {
+        headingFa: "تعاریف",
+        headingEn: "Definitions",
+        bodyFa: "افق صفحهٔ عمود بر سمت‌الرأس است؛ ارتفاع زاویه از افق است.",
+        bodyEn:
+          "The celestial horizon is the great circle 90° from the zenith. Altitude is measured from the horizon along the vertical circle.",
+        formula: "z = 90° − a",
+      },
+    ],
+  },
+  {
+    id: "equatorial",
+    chapter: "Smart II",
+    titleFa: "دستگاه استوایی (بعد و میل)",
+    titleEn: "Equatorial Coordinates (RA & Dec)",
+    level: "متوسط",
+    minutes: 45,
+    spherePreset: "celestial",
+    olympiad: "α, δ",
+    summaryFa: "نقطهٔ حمل، بعد بر حسب ساعت، میل.",
+    englishFormulas: [
+      "Declination δ: from celestial equator along the hour circle (−90°…+90°).",
+      "Right ascension α: from the vernal equinox along the equator, 0ʰ…24ʰ (1ʰ = 15°).",
+      "Hour angle H = θ − α where θ is local sidereal time.",
+    ],
+    sections: [
+      {
+        headingFa: "بعد و میل",
+        headingEn: "RA and Dec",
+        bodyFa: "میل مانند عرض سماوی؛ بعد از نقطهٔ اعتدال بهاری به شرق اندازه‌گیری می‌شود.",
+        bodyEn:
+          "Declination is analogous to latitude. Right ascension is measured eastwards from the First Point of Aries along the equator.",
+        formula: "H = LST − α",
+      },
+    ],
+  },
+  {
+    id: "coord-transform",
+    chapter: "Smart II",
+    titleFa: "تبدیل استوایی ↔ افقی",
+    titleEn: "Equatorial ↔ Horizontal Transformation",
+    level: "المپیاد",
+    minutes: 55,
+    spherePreset: "astro-tri",
+    olympiad: "مثلث PZX · فرمول‌های تبدیل",
+    summaryFa: "کاربرد مستقیم مثلثات کروی روی مثلث نجومی.",
+    englishFormulas: [
+      "sin a = sin δ sin φ + cos δ cos φ cos H",
+      "cos a sin A = − cos δ sin H",
+      "cos a cos A = sin δ cos φ − cos δ sin φ cos H",
+      "(A = azimuth from north; sign conventions as in Smart.)",
+    ],
+    sections: [
+      {
+        headingFa: "ارتفاع",
+        headingEn: "Altitude from (φ, δ, H)",
+        bodyFa: "قانون کسینوس‌ها روی ضلع ZX با زاویه در P برابر H.",
+        bodyEn:
+          "Apply the cosine formula in triangle PZX to side ZX with included angle at P equal to the hour angle.",
+        formula: "sin a = sin δ sin φ + cos δ cos φ cos H",
+      },
+      {
+        headingFa: "سمت",
+        headingEn: "Azimuth",
+        bodyFa: "از قانون سینوس‌ها و کسینوس‌ها برای رفع ابهام ربع.",
+        bodyEn:
+          "Use the sine formula together with a cosine expression to place A in the correct quadrant.",
+        formula: "sin A = − cos δ sin H / cos a",
+      },
+    ],
+  },
+  {
+    id: "ecliptic",
+    chapter: "Smart II",
+    titleFa: "دستگاه دایرة‌البروجی",
+    titleEn: "Ecliptic Coordinates",
+    level: "المپیاد",
+    minutes: 40,
+    spherePreset: "ecliptic",
+    olympiad: "λ, β · میل دایرة‌البروج",
+    summaryFa: "صفحهٔ مدار زمین، نقطهٔ حمل مشترک، میل ε≈۲۳°۲۶′.",
+    englishFormulas: [
+      "Obliquity ε ≈ 23°26′ (epoch-dependent).",
+      "sin δ = sin ε sin λ  (sun; β=0)",
+      "cos δ sin α = cos ε sin λ,  cos δ cos α = cos λ  (sun).",
+    ],
+    sections: [
+      {
+        headingFa: "تعاریف",
+        headingEn: "Definitions",
+        bodyFa: "طول دایرة‌البروجی λ از نقطهٔ حمل روی دایرة‌البروج؛ عرض β از دایرة‌البروج.",
+        bodyEn:
+          "Celestial longitude λ is measured along the ecliptic from the equinox; latitude β from the ecliptic towards the ecliptic pole.",
+        formula: "β = 0 on the ecliptic",
+      },
+    ],
+  },
+  {
+    id: "time",
+    chapter: "Smart VI",
+    titleFa: "زمان خورشیدی و نجومی",
+    titleEn: "Solar and Sidereal Time",
+    level: "متوسط",
+    minutes: 50,
+    spherePreset: "celestial",
+    olympiad: "LST · معادلهٔ زمان",
+    summaryFa: "روز نجومی، GMST/LST، معادلهٔ زمان.",
+    englishFormulas: [
+      "Sidereal day ≈ 23ʰ56ᵐ04ˢ of mean solar time.",
+      "LST = GMST + λ_east (converted to time).",
+      "Equation of time E = apparent solar time − mean solar time.",
+    ],
+    sections: [
+      {
+        headingFa: "زمان نجومی محلی",
+        headingEn: "Local sidereal time",
+        bodyFa: "زاویهٔ ساعتی نقطهٔ حمل؛ برابر بعد اجرامی که در نصف‌النهارند.",
+        bodyEn:
+          "Local sidereal time is the hour angle of the vernal equinox; equal to the RA of objects on the observer's meridian.",
+        formula: "LST = GMST + λ/15ʰ",
+      },
+    ],
+  },
+  {
+    id: "rising-setting",
+    chapter: "Smart II / olympiad",
+    titleFa: "طلوع و غروب",
+    titleEn: "Rising and Setting",
+    level: "المپیاد",
+    minutes: 45,
+    spherePreset: "horizon",
+    olympiad: "ساعت زاویهٔ طلوع",
+    summaryFa: "شرط a=0؛ ساعت زاویه و سمت طلوع.",
+    englishFormulas: [
+      "At rising/setting (a=0): cos H = − tan δ tan φ",
+      "Duration above horizon: 2H (when |cos H|≤1).",
+      "Circumpolar if δ > 90°−φ (northern hemisphere).",
+    ],
+    sections: [
+      {
+        headingFa: "فرمول طلوع",
+        headingEn: "Rising hour angle",
+        bodyFa: "از sin a = 0 در فرمول ارتفاع.",
+        bodyEn: "Set altitude to zero in the altitude formula and solve for H.",
+        formula: "cos H₀ = − tan φ tan δ",
+      },
+    ],
+  },
+  {
+    id: "refraction-parallax",
+    chapter: "Smart III & IX (intro)",
+    titleFa: "مقدمهٔ شکست و اختلاف‌منظر",
+    titleEn: "Intro to Refraction & Parallax",
+    level: "المپیاد",
+    minutes: 35,
+    spherePreset: "horizon",
+    olympiad: "اصلاحات رصدی",
+    summaryFa: "شکست، ارتفاع ظاهری؛ اختلاف‌منظر روزانه‌ای ماه/خورشید.",
+    englishFormulas: [
+      "Approximate refraction: R ≈ 60″ cot a (rough; fails near horizon).",
+      "Geocentric parallax: sin p = (ρ/r) cos a′.",
+    ],
+    sections: [
+      {
+        headingFa: "شکست",
+        headingEn: "Refraction",
+        bodyFa: "جو ارتفاع ظاهری را می‌افزاید؛ در افق حدود ۳۴′ است.",
+        bodyEn:
+          "Atmospheric refraction increases apparent altitude; near the horizon the effect is about 34′.",
+        formula: "a_true ≈ a_app − R",
+      },
+    ],
+  },
+  {
+    id: "sufi-atlas",
+    chapter: "al-Ṣūfī · Book of Fixed Stars",
+    titleFa: "اطلس صوفی و قدر ستارگان",
+    titleEn: "al-Ṣūfī's Atlas & Magnitudes",
+    level: "مقدماتی",
+    minutes: 30,
+    spherePreset: "circles",
+    olympiad: "تاریخ نجوم · قدر",
+    summaryFa: "صور الکواکب؛ دو منظر کره و آسمان؛ قدرهای بازنگری‌شده.",
+    englishFormulas: [
+      "Magnitude m is a logarithmic brightness scale; Δm = 1 ≈ factor 2.512 in flux.",
+      "al-Ṣūfī revised Ptolemy's magnitudes and drew dual aspects of each constellation.",
+    ],
+    sections: [
+      {
+        headingFa: "روش صوفی",
+        headingEn: "al-Ṣūfī's method",
+        bodyFa: "هر صورت را چنان‌که بر کره و چنان‌که در آسمان دیده می‌شود نگاشت.",
+        bodyEn:
+          "Each constellation is figured as on the celestial globe and as seen in the sky, with revised star magnitudes.",
+        formula: null,
+      },
+    ],
+  },
+];
+
+fs.mkdirSync("src/lib/content", { recursive: true });
+fs.writeFileSync(
+  "src/lib/content/coursesData.json",
+  JSON.stringify({ generated: new Date().toISOString(), courses }, null, 2),
+);
+console.log("courses", courses.length);

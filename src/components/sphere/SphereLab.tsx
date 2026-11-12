@@ -8,11 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   angularDistanceDeg,
-  cosineLawSide,
   lonLatToCart,
-  sineLawRatio,
   sphericalAngleDeg,
 } from "@/lib/astronomy/sphereGeom";
+import { deg as trig } from "@/lib/astronomy/sphericalTrig";
 import { formatDeg, toPersianDigits } from "@/lib/utils";
 
 const CelestialSphere = dynamic(
@@ -29,8 +28,22 @@ const CelestialSphere = dynamic(
 
 const PRESETS: Array<{ id: string; label: string; patch: Partial<SphereViewState> }> = [
   {
+    id: "circles",
+    label: "عظیمه / صغیره",
+    patch: {
+      showEquator: true,
+      showMeridians: true,
+      showParallels: true,
+      showTriangle: false,
+      showSmallDemo: true,
+      showHorizon: false,
+      showEcliptic: false,
+      highlight: "small",
+    },
+  },
+  {
     id: "basics",
-    label: "دایره‌های عظیمه و صغیره",
+    label: "پایه",
     patch: {
       showEquator: true,
       showMeridians: true,
@@ -41,8 +54,40 @@ const PRESETS: Array<{ id: string; label: string; patch: Partial<SphereViewState
     },
   },
   {
+    id: "triangle",
+    label: "مثلث ABC",
+    patch: {
+      showEquator: true,
+      showMeridians: false,
+      showParallels: false,
+      showHorizon: false,
+      showEcliptic: false,
+      showTriangle: true,
+      showSmallDemo: false,
+      pointA: { lon: -20, lat: 55 },
+      pointB: { lon: 35, lat: 15 },
+      pointC: { lon: 80, lat: 45 },
+      highlight: "triangle",
+    },
+  },
+  {
+    id: "area",
+    label: "مساحت / زیادی",
+    patch: {
+      showEquator: false,
+      showMeridians: false,
+      showParallels: false,
+      showTriangle: true,
+      showSmallDemo: false,
+      pointA: { lon: 0, lat: 70 },
+      pointB: { lon: 80, lat: 10 },
+      pointC: { lon: -70, lat: 15 },
+      highlight: "triangle",
+    },
+  },
+  {
     id: "astro-tri",
-    label: "مثلث نجومی",
+    label: "مثلث نجومی PZX",
     patch: {
       showEquator: true,
       showMeridians: true,
@@ -57,8 +102,36 @@ const PRESETS: Array<{ id: string; label: string; patch: Partial<SphereViewState
     },
   },
   {
+    id: "horizon",
+    label: "افق ناظر",
+    patch: {
+      showEquator: true,
+      showHorizon: true,
+      showMeridians: true,
+      showParallels: false,
+      showEcliptic: false,
+      showTriangle: false,
+      showSmallDemo: false,
+      highlight: "great",
+    },
+  },
+  {
+    id: "celestial",
+    label: "کرهٔ سماوی",
+    patch: {
+      showEquator: true,
+      showMeridians: true,
+      showParallels: true,
+      showEcliptic: true,
+      showHorizon: false,
+      showTriangle: false,
+      showSmallDemo: false,
+      highlight: "great",
+    },
+  },
+  {
     id: "ecliptic",
-    label: "استوا و دایرة‌البروج",
+    label: "دایرة‌البروج",
     patch: {
       showEquator: true,
       showEcliptic: true,
@@ -116,9 +189,14 @@ function SphereLabInner() {
     const angA = sphericalAngleDeg(B, A, C);
     const angB = sphericalAngleDeg(A, B, C);
     const angC = sphericalAngleDeg(A, C, B);
-    const cFromCos = cosineLawSide(a, b, angC);
-    const sineCheck = sineLawRatio(a, angA) / sineLawRatio(b, angB);
-    return { a, b, c, angA, angB, angC, cFromCos, sineCheck };
+    const cFromCos = trig.cosineLawSide(a, b, angC);
+    const sineCheck =
+      Math.sin((a * Math.PI) / 180) /
+      Math.sin((angA * Math.PI) / 180) /
+      (Math.sin((b * Math.PI) / 180) / Math.sin((angB * Math.PI) / 180));
+    const E = trig.excess(angA, angB, angC);
+    const area = trig.areaUnit(angA, angB, angC);
+    return { a, b, c, angA, angB, angC, cFromCos, sineCheck, E, area };
   }, [state.pointA, state.pointB, state.pointC]);
 
   const set = (patch: Partial<SphereViewState>) =>
@@ -247,13 +325,23 @@ function SphereLabInner() {
             <Metric label="زاویه B" value={formatDeg(metrics.angB, 2)} />
             <Metric label="زاویه C" value={formatDeg(metrics.angC, 2)} />
             <Metric
-              label="c از قانون کسینوس‌ها"
+              label="c from cos-law"
               value={formatDeg(metrics.cFromCos, 2)}
             />
             <Metric
               label="(sin a/sin A)/(sin b/sin B)"
               value={toPersianDigits(metrics.sineCheck.toFixed(4))}
             />
+            <Metric label="E = A+B+C−180°" value={formatDeg(metrics.E, 2)} />
+            <Metric
+              label="Area (sr, R=1)"
+              value={toPersianDigits(metrics.area.toFixed(5))}
+            />
+            <div className="col-span-2 rounded-lg border border-[var(--teal)]/30 bg-[var(--teal)]/5 px-3 py-2 font-mono text-[10px] leading-5 text-[var(--muted)] dir-ltr text-left">
+              cos c = cos a cos b + sin a sin b cos C
+              <br />
+              Area = E = A+B+C−π (Girard, unit sphere)
+            </div>
           </CardContent>
         </Card>
       </div>
