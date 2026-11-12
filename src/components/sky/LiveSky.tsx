@@ -26,8 +26,32 @@ type Cons = {
   lines: Array<Array<[number, number]>>;
 };
 
-type StarCatalog = { count: number; stars: SkyStar[]; source: string };
+type StarCatalogCompact = {
+  count: number;
+  source: string;
+  id: number[];
+  ra: number[];
+  dec: number[];
+  mag: number[];
+  bv: number[];
+  names: Record<string, string>;
+};
 type ConsCatalog = { count: number; constellations: Cons[]; source: string };
+
+function expandStars(c: StarCatalogCompact): SkyStar[] {
+  const out: SkyStar[] = new Array(c.count);
+  for (let i = 0; i < c.count; i++) {
+    out[i] = {
+      id: c.id[i],
+      ra: c.ra[i],
+      dec: c.dec[i],
+      mag: c.mag[i],
+      bv: c.bv[i] === -99 ? null : c.bv[i],
+      n: c.names[String(i)] ?? null,
+    };
+  }
+  return out;
+}
 
 export function LiveSky() {
   const geo = useGeolocation(false);
@@ -39,7 +63,8 @@ export function LiveSky() {
   const [showLines, setShowLines] = useState(true);
   const [showNames, setShowNames] = useState(true);
   const [showHorizon, setShowHorizon] = useState(true);
-  const [catalog, setCatalog] = useState<StarCatalog | null>(null);
+  const [starsAll, setStarsAll] = useState<SkyStar[] | null>(null);
+  const [catalogMeta, setCatalogMeta] = useState<{ count: number; source: string } | null>(null);
   const [cons, setCons] = useState<ConsCatalog | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<SkyStar | null>(null);
@@ -67,7 +92,8 @@ export function LiveSky() {
     ])
       .then(([s, c]) => {
         if (!cancelled) {
-          setCatalog(s);
+          setStarsAll(expandStars(s as StarCatalogCompact));
+          setCatalogMeta({ count: s.count, source: s.source });
           setCons(c);
         }
       })
@@ -86,9 +112,9 @@ export function LiveSky() {
   }, [playing]);
 
   const stars = useMemo(() => {
-    if (!catalog) return [];
-    return catalog.stars.filter((s) => s.mag <= magLimit);
-  }, [catalog, magLimit]);
+    if (!starsAll) return [];
+    return starsAll.filter((s) => s.mag <= magLimit);
+  }, [starsAll, magLimit]);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -483,7 +509,7 @@ export function LiveSky() {
             onPointerUp={onPointerUp}
             onPointerCancel={onPointerUp}
           />
-          {!catalog && !error && (
+          {!starsAll && !error && (
             <div className="absolute inset-0 flex items-center justify-center bg-[var(--ink)]/70 text-[var(--muted)]">
               بارگذاری کاتالوگ (قدرت ≤ ۷)…
             </div>
@@ -539,7 +565,7 @@ export function LiveSky() {
           </CardDescription>
         </CardHeader>
         <CardContent className="text-xs leading-7 text-[var(--muted)]">
-          {catalog?.source} · {toPersianDigits(stars.length)} ستاره در نمای فعلی (فیلتر قدر)
+          {catalogMeta?.source} · {toPersianDigits(stars.length)} ستاره در نمای فعلی (فیلتر قدر)
         </CardContent>
       </Card>
     </div>
