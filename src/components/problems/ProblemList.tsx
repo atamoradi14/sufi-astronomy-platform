@@ -61,7 +61,7 @@ export function ProblemList() {
               </CardHeader>
               {open && (
                 <CardContent className="space-y-3 border-t border-[var(--border)] pt-4">
-                  <SolutionSphere mode={p.diagram} values={p.values} />
+                  <SolutionSphere diagram={p.diagram} />
                   <div className="flex flex-wrap gap-2">
                     <Button
                       size="sm"

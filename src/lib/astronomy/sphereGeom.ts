@@ -159,7 +159,7 @@ function clamp(x: number, lo: number, hi: number) {
   return Math.min(hi, Math.max(lo, x));
 }
 
-/** Spherical law of cosines for sides. */
+/** Spherical law of cosines for sides (degrees in/out). */
 export function cosineLawSide(a: number, b: number, C: number): number {
   const ar = a * DEG;
   const br = b * DEG;
@@ -180,4 +180,91 @@ export function cosineLawSide(a: number, b: number, C: number): number {
 /** Spherical law of sines: sin a / sin A */
 export function sineLawRatio(sideDeg: number, angleDeg: number): number {
   return Math.sin(sideDeg * DEG) / Math.sin(angleDeg * DEG);
+}
+
+/**
+ * Place spherical triangle from three sides (degrees).
+ * Vertex A at north pole; side c along lon=0; angle at A = longitude of C.
+ */
+export function placeTriangleFromSides(
+  a: number,
+  b: number,
+  c: number,
+): { A: Vec3; B: Vec3; C: Vec3; angleA: number } {
+  const angleA = sphericalAngleAtPole(b, c, a);
+  return {
+    A: lonLatToCart(0, 90),
+    B: lonLatToCart(0, 90 - c),
+    C: lonLatToCart(angleA, 90 - b),
+    angleA,
+  };
+}
+
+/** Angle at A when A is at the pole: cos a = cos b cos c + sin b sin c cos A */
+function sphericalAngleAtPole(b: number, c: number, a: number): number {
+  const br = b * DEG;
+  const cr = c * DEG;
+  const ar = a * DEG;
+  const cosA =
+    (Math.cos(ar) - Math.cos(br) * Math.cos(cr)) /
+    (Math.sin(br) * Math.sin(cr) + 1e-15);
+  return (Math.acos(clamp(cosA, -1, 1)) * 180) / Math.PI;
+}
+
+/** Two sides and included angle → third side, then place. */
+export function placeTriangleSAS(
+  b: number,
+  C: number,
+  a: number,
+): { A: Vec3; B: Vec3; C: Vec3; sideC: number } {
+  const sideC = cosineLawSide(a, b, C);
+  const placed = placeTriangleFromSides(a, b, sideC);
+  return { ...placed, sideC };
+}
+
+/**
+ * Napier analogy: tan(c/2) from a,b,A,B (degrees).
+ * Used after sine-law gets the second angle (SSA).
+ */
+export function sideFromNapier(
+  a: number,
+  b: number,
+  A: number,
+  B: number,
+): number {
+  const ar = a * DEG;
+  const br = b * DEG;
+  const Ar = A * DEG;
+  const Br = B * DEG;
+  const tanHalf =
+    (Math.tan((ar + br) / 2) * Math.cos((Ar + Br) / 2)) /
+    (Math.cos((Ar - Br) / 2) + 1e-15);
+  return (2 * Math.atan(tanHalf) * 180) / Math.PI;
+}
+
+/** Astronomical triangle PZX for observer latitude φ, star δ, hour angle H (all degrees). */
+export function placePZX(
+  phi: number,
+  delta: number,
+  H: number,
+): { P: Vec3; Z: Vec3; X: Vec3; PZ: number; PX: number; ZX: number } {
+  // Celestial sphere: NCP at +Y; observer meridian at lon=0.
+  // Zenith Z is at lat=φ on the meridian (lon=0).
+  // Star X: hour angle H measured west from meridian → lon = -H, lat = δ.
+  const P = lonLatToCart(0, 90);
+  const Z = lonLatToCart(0, phi);
+  const X = lonLatToCart(-H, delta);
+  return {
+    P,
+    Z,
+    X,
+    PZ: 90 - phi,
+    PX: 90 - delta,
+    ZX: angularDistanceDeg(Z, X),
+  };
+}
+
+/** Equilateral spherical triangle with given side length (degrees). */
+export function placeEquilateral(side: number) {
+  return placeTriangleFromSides(side, side, side);
 }
