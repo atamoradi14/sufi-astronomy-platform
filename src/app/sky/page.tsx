@@ -16,7 +16,7 @@ export default function SkyPage() {
           آسمان‌نما
         </h1>
         <p className="max-w-3xl text-sm leading-8 text-[var(--muted)]">
-          آسمان افقی زنده با بیش از ۱۵ هزار ستاره تا قدر ۷ (J2000) و خطوط IAU، به‌همراه نگارهٔ آموزشی صورت‌های صوفی.
+          نمای تعاملی به سبک Stellarium: بکشید تا بچرخید، اسکرول برای زوم، کلیک برای انتخاب ستاره — بیش از ۱۵ هزار ستاره تا قدر ۷ و خطوط IAU، به‌همراه اطلس صوفی.
         </p>
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant={tab === "live" ? "default" : "secondary"} onClick={() => setTab("live")}>
