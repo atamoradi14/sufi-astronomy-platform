@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Hero } from "@/components/home/Hero";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { COURSES } from "@/lib/content/courses";
-import { Box, BookOpen, Compass, Map, Orbit, PenLine, Stars } from "lucide-react";
+import { Box, BookOpen, Compass, Map, Orbit, PenLine, ScrollText, Stars } from "lucide-react";
 
 const FEATURES = [
   {
@@ -28,6 +28,12 @@ const FEATURES = [
     title: "آسمان زنده",
     desc: "۱۵k+ ستاره تا قدر ۷، خطوط IAU، به‌علاوه اطلس صوفی.",
     icon: Stars,
+  },
+  {
+    href: "/atlas",
+    title: "اطلس صور الکواکب",
+    desc: "۴۸ صورت با نگاره‌های واقعی نسخهٔ خطی و شرح فارسی.",
+    icon: ScrollText,
   },
   {
     href: "/problems",
