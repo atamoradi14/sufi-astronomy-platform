@@ -17,7 +17,7 @@ const HEMISPHERE_LABEL: Record<SuwarConstellation["hemisphere"], string> = {
   south: "جنوب",
 };
 
-type ViewKind = "globe" | "sky" | "table";
+type ViewKind = "globe" | "sky";
 
 export function SuwarAtlas() {
   const [hemi, setHemi] = useState<"all" | SuwarConstellation["hemisphere"]>("all");
@@ -31,12 +31,7 @@ export function SuwarAtlas() {
 
   const selected = SUWAR_CONSTELLATIONS.find((c) => c.id === id) ?? SUWAR_CONSTELLATIONS[0];
 
-  const plate =
-    view === "globe"
-      ? selected.globeImage
-      : view === "sky"
-        ? selected.skyImage
-        : (selected.tableImage ?? selected.globeImage);
+  const plate = view === "globe" ? selected.globeImage : selected.skyImage;
 
   return (
     <div className="space-y-8">
@@ -69,20 +64,6 @@ export function SuwarAtlas() {
                   />
                   <figcaption className="px-2 py-1.5 text-center text-[11px] text-[var(--muted)]">
                     {c.id === "cover" ? "جلد" : "فهرست صورت‌ها"}
-                  </figcaption>
-                </figure>
-              ))}
-              {SUWAR_META.partSamples.slice(0, 4).map((p) => (
-                <figure key={p.part} className="overflow-hidden rounded-lg border border-[var(--border)]">
-                  <Image
-                    src={p.src}
-                    alt={p.labelFa}
-                    width={400}
-                    height={560}
-                    className="h-40 w-full object-cover object-top"
-                  />
-                  <figcaption className="px-2 py-1.5 text-center text-[11px] text-[var(--muted)]">
-                    {p.labelFa.replace(/\d/g, (d) => toPersianDigits(d))}
                   </figcaption>
                 </figure>
               ))}
@@ -169,7 +150,6 @@ export function SuwarAtlas() {
                 [
                   ["globe", "بر کره"],
                   ["sky", "در آسمان"],
-                  ["table", "جدول ستارگان"],
                 ] as const
               ).map(([key, label]) => (
                 <Button
@@ -177,7 +157,7 @@ export function SuwarAtlas() {
                   size="sm"
                   variant={view === key ? "default" : "outline"}
                   onClick={() => setView(key)}
-                  disabled={key === "table" && !selected.tableImage}
+                  disabled={key === "sky" && !selected.skyImage}
                 >
                   {label}
                 </Button>
@@ -225,8 +205,7 @@ export function SuwarAtlas() {
               <li>
                 نگاره‌ها: کره
                 {selected.globeImage ? " ✓" : " —"} · آسمان
-                {selected.skyImage ? " ✓" : " —"} · جدول
-                {selected.tableImage ? " ✓" : " —"}
+                {selected.skyImage ? " ✓" : " —"}
               </li>
             </ul>
             <p className="rounded-lg border border-[var(--teal)]/30 bg-[var(--teal)]/10 px-3 py-2 text-xs leading-6">
