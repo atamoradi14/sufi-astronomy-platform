@@ -110,6 +110,11 @@ export const LESSONS_CH1: Lesson[] = [
     },
     exercises: [
       {
+        textFa: "سه نقطه در یک نیم‌کره را با عظیمه‌ها وصل کنید و اضلاع و زوایا را نام‌گذاری کنید (درس «مثلث کروی»).",
+        textEn: "Join three points of one hemisphere by great-circle arcs and name sides and angles (see the spherical-triangle lesson).",
+        source: "Smart I §2",
+      },
+      {
         textFa: "نشان دهید قطب هر عظیمه از تمام نقاط آن ۹۰° فاصله دارد.",
         textEn: "Show that either pole of a great circle is 90° from every point of it.",
         source: "Smart I §2",
@@ -119,6 +124,71 @@ export const LESSONS_CH1: Lesson[] = [
         textEn: "Why is FCD in Fig. 1 not a spherical triangle?",
         source: "Smart I §2",
         answer: "CD is a small-circle arc, not a great-circle side.",
+      },
+    ],
+  },
+  {
+    id: "spherical-triangle",
+    chapterId: "ch1",
+    titleFa: "مثلث کروی",
+    titleEn: "The spherical triangle",
+    level: "مقدماتی",
+    minutes: 35,
+    spherePreset: "triangle",
+    olympiad: "ضلع و زاویه · قرارداد ≤۱۸۰°",
+    summaryFa:
+      "بند ۲ اسمارت: سه نقطه در یک نیم‌کره که با کمان‌های عظیمه وصل شوند مثلث کروی می‌سازند. ضلع = زاویهٔ مرکزی؛ زاویه = زاویهٔ میان صفحات (یا مماس‌ها).",
+    summaryEn:
+      "Smart I §2: a spherical triangle is three points of one hemisphere joined by great-circle arcs. Sides are central angles; angles are dihedral (or tangent) angles.",
+    smart: {
+      chapter: "I",
+      sections: "§2",
+      pages: "2–3",
+      figures: ["1"],
+    },
+    figures: ["fig1", "fig5"],
+    englishFormulas: [
+      "Sides a, b, c are great-circle arcs (central angles), taken ≤ 180°.",
+      "Angle A is the dihedral angle of planes OAB and OAC, equal to the tangent angle at A.",
+      "Side a is opposite angle A.",
+    ],
+    formulas: [
+      {
+        display: "a = ∠BOC  (central angle, R = 1)",
+        nameFa: "ضلع به‌عنوان زاویهٔ مرکزی",
+        nameEn: "Side as central angle",
+      },
+      {
+        display: "A = dihedral∠(OAB, OAC) = tangent angle at A",
+        nameFa: "زاویهٔ کروی",
+        nameEn: "Spherical angle",
+      },
+    ],
+    sections: [
+      {
+        headingFa: "تعریف",
+        headingEn: "Definition",
+        bodyFa:
+          "اگر سه نقطه در یک نیم‌کره با کمان‌های عظیمه وصل شوند، شکل حاصل مثلث کروی است. اسمارت مثال می‌آورد که AXY در شکل ۱ چنین مثلثی است، اما FCD نیست چون CD صغیره است. هیچ ضلعی از ۱۸۰° بزرگ‌تر گرفته نمی‌شود.",
+        bodyEn:
+          "Three points of one hemisphere joined by great-circle arcs form a spherical triangle. In Fig. 1, AXY is such a triangle; FCD is not, because CD is a small-circle arc. Sides are taken ≤ 180°.",
+      },
+      {
+        headingFa: "ضلع و زاویه",
+        headingEn: "Side and angle",
+        bodyFa:
+          "ضلع a روبه‌روی A فاصلهٔ زاویه‌ای B و C است (∠BOC). زاویه در A زاویهٔ میان صفحات OAB و OAC است، برابر زاویهٔ مماس‌ها در A. مثلث نجومی PZX همین تعریف را روی کرهٔ سماوی به کار می‌برد: PZ = 90°−φ، PX = 90°−δ، ZX = z.",
+        bodyEn:
+          "Side a opposite A is the angular distance BC. Angle A is the angle of planes OAB and OAC. The astronomical triangle PZX is the same object: PZ = 90°−φ, PX = 90°−δ, ZX = z.",
+        formula: "PZ = 90°−φ,   PX = 90°−δ,   ZX = z",
+      },
+    ],
+    exercises: [
+      {
+        textFa: "برای φ = ۴۰°N و δ = +۱۰° اضلاع PZ و PX را بنویسید.",
+        textEn: "For φ = 40°N and δ = +10°, write PZ and PX.",
+        source: "Smart II + I §2",
+        answer: "PZ = 50°, PX = 80°",
       },
     ],
   },
