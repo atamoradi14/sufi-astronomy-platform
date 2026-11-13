@@ -1,20 +1,28 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { CONSTELLATIONS } from "@/lib/astronomy/constellations";
+import { SUWAR_CONSTELLATIONS } from "@/lib/content/suwarCatalog";
 import { equatorialToHorizontal } from "@/lib/astronomy/sphere";
 import { computeAstroClock } from "@/lib/astronomy/time";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { formatDeg, formatHours, toPersianDigits } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export function ConstellationViewer() {
   const [id, setId] = useState(CONSTELLATIONS[0].id);
   const [now, setNow] = useState<Date | null>(null);
+  const [plateView, setPlateView] = useState<"globe" | "sky">("globe");
   const geo = useGeolocation(false);
   const cons = CONSTELLATIONS.find((c) => c.id === id)!;
+  const suwar = SUWAR_CONSTELLATIONS.find((c) => c.id === id);
   const lon = geo.reading?.lon ?? 51.389;
   const lat = geo.reading?.lat ?? 35.6892;
+  const plate =
+    plateView === "globe" ? suwar?.globeImage : suwar?.skyImage;
 
   useEffect(() => {
     setNow(new Date());
@@ -66,11 +74,19 @@ export function ConstellationViewer() {
               {cons.nameFa}
               <span className="mr-2 text-sm text-[var(--muted)]">({cons.nameAr})</span>
             </h3>
-            <p className="mt-2 text-sm text-[var(--parchment)]/90">{cons.description}</p>
+            <p className="mt-2 text-sm text-[var(--parchment)]/90">
+              {suwar?.excerptFa ?? cons.description}
+            </p>
             <p className="mt-3 text-xs text-[var(--muted)]">
               LST ناظر: {clock ? formatHours(clock.lst, 3) : "…"} · عرض:{" "}
               {formatDeg(lat, 2)}
             </p>
+            <Link
+              href="/atlas"
+              className="mt-3 inline-block text-xs text-[var(--teal)] hover:text-[var(--gold-soft)]"
+            >
+              مشاهدهٔ اطلس کامل ۴۸ صورت ←
+            </Link>
           </div>
           <ul className="space-y-2 text-sm">
             {projected.map((s) => (
@@ -92,10 +108,44 @@ export function ConstellationViewer() {
 
       <Card>
         <CardHeader>
-          <CardTitle>نگارهٔ رصدی</CardTitle>
-          <CardDescription>طرح ستارگان و خطوط صورت به سبک نسخهٔ مصور</CardDescription>
+          <CardTitle>نگارهٔ نسخهٔ خطی</CardTitle>
+          <CardDescription>
+            تصویر واقعی صور الکواکب · {plateView === "globe" ? "بر کره" : "در آسمان"}
+          </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-3">
+          {suwar && (
+            <div className="flex flex-wrap gap-2">
+              <Button
+                size="sm"
+                variant={plateView === "globe" ? "default" : "outline"}
+                onClick={() => setPlateView("globe")}
+              >
+                بر کره
+              </Button>
+              <Button
+                size="sm"
+                variant={plateView === "sky" ? "default" : "outline"}
+                onClick={() => setPlateView("sky")}
+                disabled={!suwar.skyImage}
+              >
+                در آسمان
+              </Button>
+            </div>
+          )}
+          {plate ? (
+            <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--ink-deep)]">
+              <Image
+                src={plate}
+                alt={cons.nameFa}
+                width={720}
+                height={1000}
+                className="mx-auto h-auto max-h-[28rem] w-full object-contain"
+              />
+            </div>
+          ) : (
+            <ConstellationCanvas consId={id} />
+          )}
           <ConstellationCanvas consId={id} />
         </CardContent>
       </Card>

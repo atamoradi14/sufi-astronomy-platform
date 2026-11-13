@@ -1,0 +1,690 @@
+export type SuwarConstellation = {
+  id: string;
+  nameFa: string;
+  nameAr: string;
+  ptolemy: string;
+  hemisphere: "north" | "zodiac" | "south";
+  rank: number;
+  globeImage: string | null;
+  skyImage: string | null;
+  tableImage?: string | null;
+  titleFa: string;
+  excerptFa: string;
+};
+
+export const SUWAR_META = {
+  "titleFa": "صور الکواکب الثابته",
+  "titleEn": "Book of the Fixed Stars",
+  "authorFa": "عبدالرحمن صوفی",
+  "authorEn": "Abd al-Rahman al-Sufi",
+  "sourceNoteFa": "برگ‌های نسخه‌خطی بارگذاری‌شده در شش دفتر؛ نگاره‌ها برای وب به WebP فشرده شده‌اند.",
+  "covers": [
+    {
+      "id": "cover",
+      "src": "/atlas/plates/_meta-cover.webp"
+    },
+    {
+      "id": "intro-list",
+      "src": "/atlas/plates/_meta-intro-list.webp"
+    }
+  ],
+  "partSamples": [
+    {
+      "part": 1,
+      "src": "/atlas/plates/_part1-sample.webp",
+      "labelFa": "دفتر 1"
+    },
+    {
+      "part": 2,
+      "src": "/atlas/plates/_part2-sample.webp",
+      "labelFa": "دفتر 2"
+    },
+    {
+      "part": 3,
+      "src": "/atlas/plates/_part3-sample.webp",
+      "labelFa": "دفتر 3"
+    },
+    {
+      "part": 4,
+      "src": "/atlas/plates/_part4-sample.webp",
+      "labelFa": "دفتر 4"
+    },
+    {
+      "part": 5,
+      "src": "/atlas/plates/_part5-sample.webp",
+      "labelFa": "دفتر 5"
+    },
+    {
+      "part": 6,
+      "src": "/atlas/plates/_part6-sample.webp",
+      "labelFa": "دفتر 6"
+    }
+  ]
+} as const;
+
+export const SUWAR_CONSTELLATIONS: SuwarConstellation[] = [
+  {
+    "id": "ursa-minor",
+    "nameFa": "دب اصغر",
+    "nameAr": "الدب الأصغر",
+    "ptolemy": "Ursa Minor",
+    "hemisphere": "north",
+    "rank": 1,
+    "globeImage": "/atlas/plates/ursa-minor-globe.webp",
+    "skyImage": "/atlas/plates/ursa-minor-sky.webp",
+    "tableImage": "/atlas/plates/ursa-minor-table.webp",
+    "titleFa": "صورت دب اصغر بر کره و آسمان",
+    "excerptFa": "دب اصغر از صورت‌های قطبی شمال است و هفت ستارهٔ اصلی‌اش چون دیگچه‌ای کوچک در گرد قطب می‌گردند. صوفی آن را هم بر کره و هم چنان‌که در آسمان دیده می‌شود نقش کرد. ستارهٔ دنبالهٔ آن نزدیک قطب شمال سماوی راهنمای جهت‌یابی است. در سنت اسلامی این صورت را «بنات‌نعش صغری» نیز خوانده‌اند."
+  },
+  {
+    "id": "ursa-major",
+    "nameFa": "دب اکبر",
+    "nameAr": "الدب الأكبر",
+    "ptolemy": "Ursa Major",
+    "hemisphere": "north",
+    "rank": 2,
+    "globeImage": "/atlas/plates/ursa-major-globe.webp",
+    "skyImage": "/atlas/plates/ursa-major-sky.webp",
+    "tableImage": "/atlas/plates/ursa-major-table.webp",
+    "titleFa": "صورت دب اکبر",
+    "excerptFa": "دب اکبر بزرگ‌ترین صورت شمالی است و هفت ستارهٔ روشن «بنات‌نعش کبری» را در خود دارد. صوفی ستاره‌های درون صورت و بیرون آن را جداگانه برشمرد. این صورت در همهٔ فصل‌ها نزدیک افق شمال دیده می‌شود و برای یافتن قطب به کار می‌رود."
+  },
+  {
+    "id": "draco",
+    "nameFa": "تنین",
+    "nameAr": "التنين",
+    "ptolemy": "Draco",
+    "hemisphere": "north",
+    "rank": 3,
+    "globeImage": "/atlas/plates/draco-globe.webp",
+    "skyImage": "/atlas/plates/draco-sky.webp",
+    "tableImage": "/atlas/plates/draco-table.webp",
+    "titleFa": "صورت تنین (اژدها)",
+    "excerptFa": "تنین ماری پیچیده میان دو خرس است که سرش نزدیک «چوپان» و دم‌اش میان قطب‌ها می‌پیچد. صوفی حلقه‌های بدن را با نقطه‌های زر و سرخ نشان داد. این صورت از دید ناظر شمالی هرگز کاملاً غروب نمی‌کند."
+  },
+  {
+    "id": "cepheus",
+    "nameFa": "قیفاووس",
+    "nameAr": "قيفاوس",
+    "ptolemy": "Cepheus",
+    "hemisphere": "north",
+    "rank": 4,
+    "globeImage": "/atlas/plates/cepheus-globe.webp",
+    "skyImage": "/atlas/plates/cepheus-sky.webp",
+    "tableImage": "/atlas/plates/cepheus-table.webp",
+    "titleFa": "صورت قیفاووس",
+    "excerptFa": "قیفاووس شاه اتیوپی است با کلاهی نوک‌تیز و بازوانی گشاده. در سنت صوفی، ستاره‌های سر و پا و کمربند او جداگانه نام می‌گیرند. این صورت در نزدیکی ذات‌الکرسی و دجاجه جای دارد."
+  },
+  {
+    "id": "bootes",
+    "nameFa": "عوّا",
+    "nameAr": "العواء",
+    "ptolemy": "Boötes",
+    "hemisphere": "north",
+    "rank": 5,
+    "globeImage": "/atlas/plates/bootes-globe.webp",
+    "skyImage": "/atlas/plates/bootes-sky.webp",
+    "tableImage": "/atlas/plates/bootes-table.webp",
+    "titleFa": "صورت عوّا (نگهبان خرس)",
+    "excerptFa": "عوّا مردی با چوبدستی است که گویی خرس بزرگ را می‌راند. ستارهٔ نیر عوّا (سماک رامح / آرکتوروس) از درخشان‌ترین ستاره‌های شمال است. صوفی دو منظر کره و آسمان را برای تشخیص جهت بازوها رسم کرد."
+  },
+  {
+    "id": "corona-borealis",
+    "nameFa": "اکلیل شمالی",
+    "nameAr": "الفكّة",
+    "ptolemy": "Corona Borealis",
+    "hemisphere": "north",
+    "rank": 6,
+    "globeImage": "/atlas/plates/corona-borealis-globe.webp",
+    "skyImage": "/atlas/plates/corona-borealis-sky.webp",
+    "tableImage": "/atlas/plates/corona-borealis-table.webp",
+    "titleFa": "صورت الفکّة / اکلیل شمالی",
+    "excerptFa": "اکلیل شمالی چون کاسه‌ای شکسته یا تاجی نیم‌دایره میان عوّا و جاثی می‌درخشد. صوفی آن را «الفکّة» خواند و ستارهٔ نیر الفکّة را در میان قوس نشان داد. هر دو منظر کره و آسمان در یک صفحه آمده است."
+  },
+  {
+    "id": "hercules",
+    "nameFa": "جاثی",
+    "nameAr": "الجاثي",
+    "ptolemy": "Hercules",
+    "hemisphere": "north",
+    "rank": 7,
+    "globeImage": "/atlas/plates/hercules-globe.webp",
+    "skyImage": "/atlas/plates/hercules-sky.webp",
+    "tableImage": "/atlas/plates/hercules-table.webp",
+    "titleFa": "صورت جاثی بر رکبتیه",
+    "excerptFa": "جاثی یا هرکول مردی زانو‌زده است که چوبدستی بر دوش دارد. صوفی او را «جاثی علی رکبتیه» نامید و ستاره‌های سر و شانه و زانو را جدا فهرست کرد. این صورت میان اکلیل و شلیاق جای می‌گیرد."
+  },
+  {
+    "id": "lyra",
+    "nameFa": "شلیاق",
+    "nameAr": "الشلياق",
+    "ptolemy": "Lyra",
+    "hemisphere": "north",
+    "rank": 8,
+    "globeImage": "/atlas/plates/lyra-globe.webp",
+    "skyImage": "/atlas/plates/lyra-sky.webp",
+    "tableImage": "/atlas/plates/lyra-table.webp",
+    "titleFa": "صورت شلیاق (چنگ)",
+    "excerptFa": "شلیاق چنگی کوچک است با ستارهٔ بسیار درخشان نسر واقع (وگا). در نقش صوفی، قاب ساز با نقطه‌های زر مشخص می‌شود. این صورت از نشانه‌های تابستان در عرض‌های میانی است."
+  },
+  {
+    "id": "cygnus",
+    "nameFa": "دجاجه",
+    "nameAr": "الدجاجة",
+    "ptolemy": "Cygnus",
+    "hemisphere": "north",
+    "rank": 9,
+    "globeImage": "/atlas/plates/cygnus-globe.webp",
+    "skyImage": "/atlas/plates/cygnus-sky.webp",
+    "tableImage": "/atlas/plates/cygnus-table.webp",
+    "titleFa": "صورت دجاجه (مرغ/قو)",
+    "excerptFa": "دجاجه مرغی است بال‌گشوده که در کهکشان راه شیری پرواز می‌کند. صوفی آن را هم بر کره و هم در آسمان کشید تا جهت گردن و دم وارونه نشود. ستارهٔ دم آن نسر طائر را نباید با عقاب اشتباه گرفت."
+  },
+  {
+    "id": "cassiopeia",
+    "nameFa": "ذات‌الکرسی",
+    "nameAr": "ذات الكرسي",
+    "ptolemy": "Cassiopeia",
+    "hemisphere": "north",
+    "rank": 10,
+    "globeImage": "/atlas/plates/cassiopeia-globe.webp",
+    "skyImage": "/atlas/plates/cassiopeia-sky.webp",
+    "tableImage": "/atlas/plates/cassiopeia-table.webp",
+    "titleFa": "صورت ذات‌الکرسی",
+    "excerptFa": "ذات‌الکرسی بانویی بر تخت است که شکل W مانندی در شمال می‌سازد. صوفی ستارهٔ «الکف الخصیب» را بر دست او نشان داد. این صورت همواره در نزدیکی قطب شمال دیده می‌شود."
+  },
+  {
+    "id": "perseus",
+    "nameFa": "حامل رأس الغول",
+    "nameAr": "برشاوش",
+    "ptolemy": "Perseus",
+    "hemisphere": "north",
+    "rank": 11,
+    "globeImage": "/atlas/plates/perseus-globe.webp",
+    "skyImage": "/atlas/plates/perseus-sky.webp",
+    "tableImage": null,
+    "titleFa": "صورت برشاوش / حامل رأس الغول",
+    "excerptFa": "حامل رأس الغول پهلوانی است با شمشیر و سر بریدهٔ غول (رأس‌الغول / آلگول). صوفی ستاره‌های سر و پای و دست را با نقطه‌های زر و سرخ مشخص کرد. این صورت میان ذات‌الکرسی و ثور جای دارد."
+  },
+  {
+    "id": "auriga",
+    "nameFa": "ممسک‌العنان",
+    "nameAr": "ممسك الأعنة",
+    "ptolemy": "Auriga",
+    "hemisphere": "north",
+    "rank": 12,
+    "globeImage": "/atlas/plates/auriga-globe.webp",
+    "skyImage": "/atlas/plates/auriga-sky.webp",
+    "tableImage": "/atlas/plates/auriga-table.webp",
+    "titleFa": "صورت ممسک‌العنان",
+    "excerptFa": "ممسک‌العنان ارابه‌ران است که عنان را در دست دارد و ستارهٔ عیوق بر شانه‌اش می‌درخشد. در سنت صوفی، او را با عصا یا عنان نقش کرده‌اند. این صورت در زمستان نزدیک افق شمال‌شرقی بلند می‌شود."
+  },
+  {
+    "id": "ophiuchus",
+    "nameFa": "حوّا",
+    "nameAr": "الحوّاء",
+    "ptolemy": "Ophiuchus",
+    "hemisphere": "north",
+    "rank": 13,
+    "globeImage": "/atlas/plates/ophiuchus-globe.webp",
+    "skyImage": "/atlas/plates/ophiuchus-sky.webp",
+    "tableImage": "/atlas/plates/ophiuchus-table.webp",
+    "titleFa": "صورت الحوّاء والحیّة",
+    "excerptFa": "حوّا مارگیر است که بدن حیّه را در میان بازوان گرفته است. صوفی معمولاً این دو صورت را در یک نقش واحد کشید تا پیوند ستاره‌ها روشن بماند. ستارهٔ الراعی بر سر او از نشانه‌های تابستان است."
+  },
+  {
+    "id": "serpens",
+    "nameFa": "حیّه",
+    "nameAr": "الحيّة",
+    "ptolemy": "Serpens",
+    "hemisphere": "north",
+    "rank": 14,
+    "globeImage": "/atlas/plates/serpens-globe.webp",
+    "skyImage": "/atlas/plates/serpens-sky.webp",
+    "tableImage": "/atlas/plates/serpens-table.webp",
+    "titleFa": "صورت حیّه (همراه حوّا)",
+    "excerptFa": "حیّه ماری است که حوّا آن را نگاه می‌دارد؛ سر و دم مار در دو سوی بدن مرد جای می‌گیرد. در کتاب صوفی، ستاره‌های حیّه همراه جدول حوّا آمده‌اند. این صورت از معدود صورت‌هایی است که به دو بخش جدا تقسیم می‌شود."
+  },
+  {
+    "id": "sagitta",
+    "nameFa": "سهم",
+    "nameAr": "السهم",
+    "ptolemy": "Sagitta",
+    "hemisphere": "north",
+    "rank": 15,
+    "globeImage": "/atlas/plates/sagitta-globe.webp",
+    "skyImage": "/atlas/plates/sagitta-sky.webp",
+    "tableImage": "/atlas/plates/sagitta-table.webp",
+    "titleFa": "صورت سهم",
+    "excerptFa": "سهم پیکانی کوچک میان عقاب و دجاجه است. صوفی هر دو منظر کره و آسمان را در یک صفحه نقش کرد. با آن‌که ستاره‌های کمی دارد، شکل تیرمانندش در آسمان تابستان آسان شناخته می‌شود."
+  },
+  {
+    "id": "aquila",
+    "nameFa": "عقاب",
+    "nameAr": "العقاب",
+    "ptolemy": "Aquila",
+    "hemisphere": "north",
+    "rank": 16,
+    "globeImage": "/atlas/plates/aquila-globe.webp",
+    "skyImage": "/atlas/plates/aquila-sky.webp",
+    "tableImage": "/atlas/plates/aquila-table.webp",
+    "titleFa": "صورت عقاب",
+    "excerptFa": "عقاب پرنده‌ای بال‌گشوده است با ستارهٔ نسر طائر در قلبش. صوفی جهت بال و دم را در دو منظر کره و آسمان وارونه کرد تا اشتباه نشود. این صورت بر لبهٔ راه شیری در تابستان می‌درخشد."
+  },
+  {
+    "id": "delphinus",
+    "nameFa": "دلفین",
+    "nameAr": "الدلفين",
+    "ptolemy": "Delphinus",
+    "hemisphere": "north",
+    "rank": 17,
+    "globeImage": "/atlas/plates/delphinus-globe.webp",
+    "skyImage": "/atlas/plates/delphinus-sky.webp",
+    "tableImage": "/atlas/plates/delphinus-table.webp",
+    "titleFa": "صورت دلفین",
+    "excerptFa": "دلفین چهارگوشی کوچک نزدیک عقاب است که چون ماهی جهنده دیده می‌شود. صوفی خم بدن و دم را با نقطه‌های زر نشان داد. این صورت از زیباترین شکل‌های کوچک شمال است."
+  },
+  {
+    "id": "equuleus",
+    "nameFa": "فرس‌اصغر",
+    "nameAr": "قطعة الفرس",
+    "ptolemy": "Equuleus",
+    "hemisphere": "north",
+    "rank": 18,
+    "globeImage": "/atlas/plates/equuleus-globe.webp",
+    "skyImage": "/atlas/plates/equuleus-sky.webp",
+    "tableImage": null,
+    "titleFa": "صورت فرس اصغر / قطعة الفرس",
+    "excerptFa": "فرس‌اصغر تنها سر و گردن اسبی کوچک است کنار فرس‌اعظم. صوفی هر دو منظر را معمولاً در یک صفحه آورد. ستاره‌هایش کم‌نورند اما در فهرست بطلمیوس جایگاه دارند."
+  },
+  {
+    "id": "pegasus",
+    "nameFa": "فرس‌اعظم",
+    "nameAr": "الفرس الأعظم",
+    "ptolemy": "Pegasus",
+    "hemisphere": "north",
+    "rank": 19,
+    "globeImage": "/atlas/plates/pegasus-globe.webp",
+    "skyImage": "/atlas/plates/pegasus-sky.webp",
+    "tableImage": "/atlas/plates/pegasus-table.webp",
+    "titleFa": "صورت فرس اعظم",
+    "excerptFa": "فرس‌اعظم نیم‌اسب بالداری است که مربع بزرگ پاییزی را می‌سازد. صوفی سر و سینه و بال را با نقطه‌های زر مشخص کرد. ستارهٔ سره الفرس با اندرومدا مشترک است."
+  },
+  {
+    "id": "andromeda",
+    "nameFa": "امراه مسلسله",
+    "nameAr": "المرأة المسلسلة",
+    "ptolemy": "Andromeda",
+    "hemisphere": "north",
+    "rank": 20,
+    "globeImage": "/atlas/plates/andromeda-globe.webp",
+    "skyImage": "/atlas/plates/andromeda-sky.webp",
+    "tableImage": "/atlas/plates/andromeda-table.webp",
+    "titleFa": "صورت المرأة المسلسلة",
+    "excerptFa": "امراه مسلسله زن به زنجیر است که کنار فرس‌اعظم و ذات‌الکرسی جای دارد. صوفی او را با دستان گشاده و گاه همراه ماهی بزرگ عربی نقش کرد. در این ناحیه سحابی بزرگ اندرومدا نیز دیده می‌شود."
+  },
+  {
+    "id": "triangulum",
+    "nameFa": "مثلث",
+    "nameAr": "المثلث",
+    "ptolemy": "Triangulum",
+    "hemisphere": "north",
+    "rank": 21,
+    "globeImage": "/atlas/plates/triangulum-globe.webp",
+    "skyImage": "/atlas/plates/triangulum-sky.webp",
+    "tableImage": null,
+    "titleFa": "صورت مثلث",
+    "excerptFa": "مثلث سه یا چهار ستاره دارد که شکلی هندسی میان حمل و امراه مسلسله می‌سازند. صوفی هر دو منظر کره و آسمان را در یک قاب کشید. این صورت پلی میان صورت‌های شمالی و منطقهٔ‌البروج است."
+  },
+  {
+    "id": "aries",
+    "nameFa": "حمل",
+    "nameAr": "الحمل",
+    "ptolemy": "Aries",
+    "hemisphere": "zodiac",
+    "rank": 22,
+    "globeImage": "/atlas/plates/aries-globe.webp",
+    "skyImage": "/atlas/plates/aries-sky.webp",
+    "tableImage": "/atlas/plates/aries-table.webp",
+    "titleFa": "صورت حمل",
+    "excerptFa": "حمل قوچ بهار است و نخستین برج منطقهٔ‌البروج در ترتیب سنتی. صوفی سر و شاخ و پشت حیوان را با نقطه‌های زر نشان داد. نقطهٔ اعتدال بهاری در عهد بطلمیوس نزدیک این صورت بود."
+  },
+  {
+    "id": "taurus",
+    "nameFa": "ثور",
+    "nameAr": "الثور",
+    "ptolemy": "Taurus",
+    "hemisphere": "zodiac",
+    "rank": 23,
+    "globeImage": "/atlas/plates/taurus-globe.webp",
+    "skyImage": "/atlas/plates/taurus-sky.webp",
+    "tableImage": "/atlas/plates/taurus-table.webp",
+    "titleFa": "صورت ثور",
+    "excerptFa": "ثور نیم‌گاو شاخداری است با خوشهٔ پروین بر گردن و دیبران بر چشم. صوفی صورت را چنان کشید که جهت شاخ‌ها در کره و آسمان وارونه شود. این برج از درخشان‌ترین بخش‌های زمستان است."
+  },
+  {
+    "id": "gemini",
+    "nameFa": "جوزا",
+    "nameAr": "الجوزاء",
+    "ptolemy": "Gemini",
+    "hemisphere": "zodiac",
+    "rank": 24,
+    "globeImage": "/atlas/plates/gemini-globe.webp",
+    "skyImage": "/atlas/plates/gemini-sky.webp",
+    "tableImage": "/atlas/plates/gemini-table.webp",
+    "titleFa": "صورت جوزا (دوپیکر)",
+    "excerptFa": "جوزا دو پیکر همزادند که دست در دست ایستاده‌اند. صوفی ستاره‌های سر (رأس‌التوأم) و پاها را جدا برشمرد. این برج میان ثور و سرطان در آسمان زمستان و بهار دیده می‌شود."
+  },
+  {
+    "id": "cancer",
+    "nameFa": "سرطان",
+    "nameAr": "السرطان",
+    "ptolemy": "Cancer",
+    "hemisphere": "zodiac",
+    "rank": 25,
+    "globeImage": "/atlas/plates/cancer-globe.webp",
+    "skyImage": "/atlas/plates/cancer-sky.webp",
+    "tableImage": "/atlas/plates/cancer-table.webp",
+    "titleFa": "صورت سرطان",
+    "excerptFa": "سرطان خرچنگی است با چنگال‌های گشاده و ستاره‌های کم‌نورتر از همسایگانش. صوفی شکل جانور را از بالا کشید تا جای ستاره‌ها روشن باشد. در این ناحیه خرچنگ‌خانه (مهد) نیز جای دارد."
+  },
+  {
+    "id": "leo",
+    "nameFa": "اسد",
+    "nameAr": "الأسد",
+    "ptolemy": "Leo",
+    "hemisphere": "zodiac",
+    "rank": 26,
+    "globeImage": "/atlas/plates/leo-globe.webp",
+    "skyImage": "/atlas/plates/leo-sky.webp",
+    "tableImage": "/atlas/plates/leo-table.webp",
+    "titleFa": "صورت اسد",
+    "excerptFa": "اسد شیری با یال و دم دراز است و قلب‌الأسد (ریگولوس) بر سینه‌اش می‌درخشد. صوفی دو منظر کره و آسمان را برای تشخیص جهت سر و دم آورد. این برج نماد تابستان در عرض‌های شمالی است."
+  },
+  {
+    "id": "virgo",
+    "nameFa": "سنبله",
+    "nameAr": "السنبلة",
+    "ptolemy": "Virgo",
+    "hemisphere": "zodiac",
+    "rank": 27,
+    "globeImage": "/atlas/plates/virgo-globe.webp",
+    "skyImage": "/atlas/plates/virgo-sky.webp",
+    "tableImage": "/atlas/plates/virgo-table.webp",
+    "titleFa": "صورت سنبله",
+    "excerptFa": "سنبله دوشیزه‌ای بالدار است که خوشهٔ گندم در دست دارد و سماک اعزل بر آن می‌درخشد. صوفی او را با ردای بلند و بال‌های گسترده نقش کرد. این برج میان اسد و میزان کشیده شده است."
+  },
+  {
+    "id": "libra",
+    "nameFa": "میزان",
+    "nameAr": "الميزان",
+    "ptolemy": "Libra",
+    "hemisphere": "zodiac",
+    "rank": 28,
+    "globeImage": "/atlas/plates/libra-globe.webp",
+    "skyImage": "/atlas/plates/libra-sky.webp",
+    "tableImage": "/atlas/plates/libra-table.webp",
+    "titleFa": "صورت میزان",
+    "excerptFa": "میزان ترازویی با دو کفه است که ستاره‌های زر و سرخ در کفه‌ها جای گرفته‌اند. صوفی منظر کره را با عنوان «علی ما یری فی الکرة» نشان داد. این برج میان سنبله و عقرب تعادل پاییزی را یادآوری می‌کند."
+  },
+  {
+    "id": "scorpius",
+    "nameFa": "عقرب",
+    "nameAr": "العقرب",
+    "ptolemy": "Scorpius",
+    "hemisphere": "zodiac",
+    "rank": 29,
+    "globeImage": "/atlas/plates/scorpius-globe.webp",
+    "skyImage": "/atlas/plates/scorpius-sky.webp",
+    "tableImage": "/atlas/plates/scorpius-table.webp",
+    "titleFa": "صورت عقرب",
+    "excerptFa": "عقرب جانوری است با چنگال و دم کج و قلب‌العقرب (انتاپس) سرخ‌فام. صوفی پیچ دم و جای ستاره‌ها را دقیق کشید. این برج در تابستان نزدیک افق جنوب می‌درخشد."
+  },
+  {
+    "id": "sagittarius",
+    "nameFa": "قوس",
+    "nameAr": "القوس",
+    "ptolemy": "Sagittarius",
+    "hemisphere": "zodiac",
+    "rank": 30,
+    "globeImage": "/atlas/plates/sagittarius-globe.webp",
+    "skyImage": "/atlas/plates/sagittarius-sky.webp",
+    "tableImage": "/atlas/plates/sagittarius-table.webp",
+    "titleFa": "صورت قوس",
+    "excerptFa": "قوس کمانداری نیمه‌اسب است که تیر را به سوی عقرب نشانه می‌رود. صوفی کمان و بدن را با نقطه‌های زر پوشاند. مرکز کهکشان راه شیری در این ناحیه جای دارد."
+  },
+  {
+    "id": "capricornus",
+    "nameFa": "جدی",
+    "nameAr": "الجدي",
+    "ptolemy": "Capricornus",
+    "hemisphere": "zodiac",
+    "rank": 31,
+    "globeImage": "/atlas/plates/capricornus-globe.webp",
+    "skyImage": "/atlas/plates/capricornus-sky.webp",
+    "tableImage": "/atlas/plates/capricornus-table.webp",
+    "titleFa": "صورت جدی",
+    "excerptFa": "جدی بزماهی است با شاخ خمیده و بدن ماهی‌مانند در سنت کهن. صوفی او را بیشتر چون بزی شاخدار نقش کرد. این برج نقطهٔ انقلاب زمستانی قدیم را در خود داشت."
+  },
+  {
+    "id": "aquarius",
+    "nameFa": "دلو",
+    "nameAr": "ساكب الماء",
+    "ptolemy": "Aquarius",
+    "hemisphere": "zodiac",
+    "rank": 32,
+    "globeImage": "/atlas/plates/aquarius-globe.webp",
+    "skyImage": "/atlas/plates/aquarius-sky.webp",
+    "tableImage": "/atlas/plates/aquarius-table.webp",
+    "titleFa": "صورت ساکب‌الماء / دلو",
+    "excerptFa": "دلو یا ساکب‌الماء مردی است که آب را از سبویی فرو می‌ریزد. صوفی جریان آب را با زنجیرهٔ ستاره‌ها نشان داد. این برج در پاییز و زمستان در آسمان جنوب‌غربی دیده می‌شود."
+  },
+  {
+    "id": "pisces",
+    "nameFa": "حوت",
+    "nameAr": "السمكتين",
+    "ptolemy": "Pisces",
+    "hemisphere": "zodiac",
+    "rank": 33,
+    "globeImage": "/atlas/plates/pisces-globe.webp",
+    "skyImage": "/atlas/plates/pisces-sky.webp",
+    "tableImage": "/atlas/plates/pisces-table.webp",
+    "titleFa": "صورت السمکتین / حوت",
+    "excerptFa": "حوت دو ماهی است که با بندی دراز از دم به هم پیوسته‌اند. صوفی آن را «السمکتین» خواند و هر دو منظر کره و آسمان را کشید. این برج پایان دایرهٔ بروج است و به حمل بازمی‌پیوندد."
+  },
+  {
+    "id": "cetus",
+    "nameFa": "قیطس",
+    "nameAr": "قيطس",
+    "ptolemy": "Cetus",
+    "hemisphere": "south",
+    "rank": 34,
+    "globeImage": "/atlas/plates/cetus-globe.webp",
+    "skyImage": "/atlas/plates/cetus-sky.webp",
+    "tableImage": "/atlas/plates/cetus-table.webp",
+    "titleFa": "صورت قیطس",
+    "excerptFa": "قیطس هیولای دریایی است با سر درنده و بدنی دراز که در جنوب حمل و حوت جای دارد. صوفی دهان و دم و دست‌های او را با برچسب ستاره نشان داد. ستارهٔ فم قیطس از نشانه‌های این صورت است."
+  },
+  {
+    "id": "orion",
+    "nameFa": "جبار",
+    "nameAr": "الجبار",
+    "ptolemy": "Orion",
+    "hemisphere": "south",
+    "rank": 35,
+    "globeImage": "/atlas/plates/orion-globe.webp",
+    "skyImage": "/atlas/plates/orion-sky.webp",
+    "tableImage": "/atlas/plates/orion-table.webp",
+    "titleFa": "صورت الجبار",
+    "excerptFa": "جبار یا جوزا پهلوانی است با کمربند سه‌ستاره و شمشیر آویخته. صوفی او را «الجبار» خواند و منظر کره را با چوبدستی برافراشته کشید. این صورت از درخشان‌ترین نقش‌های آسمان زمستان است."
+  },
+  {
+    "id": "eridanus",
+    "nameFa": "نهر",
+    "nameAr": "النهر",
+    "ptolemy": "Eridanus",
+    "hemisphere": "south",
+    "rank": 36,
+    "globeImage": "/atlas/plates/eridanus-globe.webp",
+    "skyImage": "/atlas/plates/eridanus-sky.webp",
+    "tableImage": "/atlas/plates/eridanus-table.webp",
+    "titleFa": "صورت النهر",
+    "excerptFa": "نهر رودی پیچان است که از پای جبار به سوی جنوب می‌رود تا آخرالنهر. صوفی خم‌های رود را با ده‌ها نقطهٔ زر دنبال کرد. در سنت عربی، پایان رود با «الظلیم» نیز پیوند یافته است."
+  },
+  {
+    "id": "lepus",
+    "nameFa": "ارنب",
+    "nameAr": "الأرنب",
+    "ptolemy": "Lepus",
+    "hemisphere": "south",
+    "rank": 37,
+    "globeImage": "/atlas/plates/lepus-globe.webp",
+    "skyImage": "/atlas/plates/lepus-sky.webp",
+    "tableImage": "/atlas/plates/lepus-table.webp",
+    "titleFa": "صورت الأرنب",
+    "excerptFa": "ارنب خرگوشی است زیر پای جبار که هر دو منظر کره و آسمان در یک صفحه آمده است. صوفی گوش‌ها و پاها را با نقطه‌های زر نشان داد. این صورت کوچک اما در کنار جبار آسان شناخته می‌شود."
+  },
+  {
+    "id": "canis-major",
+    "nameFa": "کلب اکبر",
+    "nameAr": "الكلب الأكبر",
+    "ptolemy": "Canis Major",
+    "hemisphere": "south",
+    "rank": 38,
+    "globeImage": "/atlas/plates/canis-major-globe.webp",
+    "skyImage": "/atlas/plates/canis-major-sky.webp",
+    "tableImage": "/atlas/plates/canis-major-table.webp",
+    "titleFa": "صورت الکلب الأکبر",
+    "excerptFa": "کلب اکبر سگ بزرگ شکار جبار است با شعرهای یمانی (سیریوس)، درخشان‌ترین ستارهٔ شب. صوفی مرزم و عذاری را بر بدن حیوان برچسب زد. این صورت در زمستان در جنوب می‌درخشد."
+  },
+  {
+    "id": "canis-minor",
+    "nameFa": "کلب اصغر",
+    "nameAr": "الكلب الأصغر",
+    "ptolemy": "Canis Minor",
+    "hemisphere": "south",
+    "rank": 39,
+    "globeImage": "/atlas/plates/canis-minor-globe.webp",
+    "skyImage": "/atlas/plates/canis-minor-sky.webp",
+    "tableImage": null,
+    "titleFa": "صورت الکلب الأصغر",
+    "excerptFa": "کلب اصغر سگ کوچک‌تر است با شعرهای شامی (پروکیون) و مرزم. صوفی او را با تنها چند نقطهٔ زر نقش کرد. همراه کلب اکبر و جبار مثلث زمستانی را می‌سازد."
+  },
+  {
+    "id": "argo-navis",
+    "nameFa": "سفینه",
+    "nameAr": "السفينة",
+    "ptolemy": "Argo Navis",
+    "hemisphere": "south",
+    "rank": 40,
+    "globeImage": "/atlas/plates/argo-navis-globe.webp",
+    "skyImage": "/atlas/plates/argo-navis-sky.webp",
+    "tableImage": "/atlas/plates/argo-navis-table.webp",
+    "titleFa": "صورت السفینة",
+    "excerptFa": "سفینه کشتی بزرگ اسطوره‌ای آرگو است با پارو و سکان و بدنی پر از ستاره. صوفی منظر کره را صریحاً با عنوان «علی ما یری فی الکرة» نشان داد. بعدها این صورت به چند صورت جدید تقسیم شد."
+  },
+  {
+    "id": "hydra",
+    "nameFa": "شجاع",
+    "nameAr": "الشجاع",
+    "ptolemy": "Hydra",
+    "hemisphere": "south",
+    "rank": 41,
+    "globeImage": "/atlas/plates/hydra-globe.webp",
+    "skyImage": "/atlas/plates/hydra-sky.webp",
+    "tableImage": "/atlas/plates/hydra-table.webp",
+    "titleFa": "صورت الشجاع",
+    "excerptFa": "شجاع ماری دراز است که از کنار سرطان تا ترازو کشیده می‌شود. صوفی سر و حلقه‌های بدن را در دو منظر کره و آسمان کشید. این درازترین صورت آسمان در فهرست بطلمیوس است."
+  },
+  {
+    "id": "crater",
+    "nameFa": "کاسه",
+    "nameAr": "الباطية",
+    "ptolemy": "Crater",
+    "hemisphere": "south",
+    "rank": 42,
+    "globeImage": "/atlas/plates/crater-globe.webp",
+    "skyImage": "/atlas/plates/crater-sky.webp",
+    "tableImage": "/atlas/plates/crater-table.webp",
+    "titleFa": "صورت الباطیة / کاسه",
+    "excerptFa": "کاسه یا باطیه جامی پایه‌دار است که بر پشت شجاع نشسته است. صوفی هر دو منظر را در یک صفحه با هفت نقطهٔ زر آورد. این صورت کوچک میان شجاع و غراب جای دارد."
+  },
+  {
+    "id": "corvus",
+    "nameFa": "غراب",
+    "nameAr": "الغراب",
+    "ptolemy": "Corvus",
+    "hemisphere": "south",
+    "rank": 43,
+    "globeImage": "/atlas/plates/corvus-globe.webp",
+    "skyImage": "/atlas/plates/corvus-sky.webp",
+    "tableImage": "/atlas/plates/corvus-table.webp",
+    "titleFa": "صورت الغراب",
+    "excerptFa": "غراب کلاغی است بر دم شجاع با ستاره‌هایی بر منقار و جناح. صوفی منظر کره را با برچسب «المنقار» و «جناح الغراب» نشان داد. شکل چهارگوش کوچکش در بهار جنوب آسان دیده می‌شود."
+  },
+  {
+    "id": "centaurus",
+    "nameFa": "قنطورس",
+    "nameAr": "قنطورس",
+    "ptolemy": "Centaurus",
+    "hemisphere": "south",
+    "rank": 44,
+    "globeImage": "/atlas/plates/centaurus-globe.webp",
+    "skyImage": "/atlas/plates/centaurus-sky.webp",
+    "tableImage": "/atlas/plates/centaurus-table.webp",
+    "titleFa": "صورت قنطورس والسبع",
+    "excerptFa": "قنطورس نیمه‌انسان و نیمه‌اسب جنوب است که غالباً سبع را در دست گرفته است. صوفی هر دو را در یک نقش کره کشید. ستاره‌های پای او از درخشان‌ترین‌های نیمکرهٔ جنوب‌اند."
+  },
+  {
+    "id": "lupus",
+    "nameFa": "سبع",
+    "nameAr": "السبع",
+    "ptolemy": "Lupus",
+    "hemisphere": "south",
+    "rank": 45,
+    "globeImage": "/atlas/plates/lupus-globe.webp",
+    "skyImage": "/atlas/plates/lupus-sky.webp",
+    "tableImage": "/atlas/plates/lupus-table.webp",
+    "titleFa": "صورت السبع (همراه قنطورس)",
+    "excerptFa": "سبع ددی است که قنطورس آن را نگاه می‌دارد یا شکار کرده است. در نسخهٔ صوفی، ستاره‌های سبع بر بدن همان جانور سبزفام نشان داده شده‌اند. این صورت جداگانه در جدول نیز آمده است."
+  },
+  {
+    "id": "ara",
+    "nameFa": "مجمره",
+    "nameAr": "المجمرة",
+    "ptolemy": "Ara",
+    "hemisphere": "south",
+    "rank": 46,
+    "globeImage": "/atlas/plates/ara-globe.webp",
+    "skyImage": "/atlas/plates/ara-sky.webp",
+    "tableImage": "/atlas/plates/ara-table.webp",
+    "titleFa": "صورت المجمرة",
+    "excerptFa": "مجمره آتشدان یا بخوردانی سه‌پایه است با شعله‌هایی از ستاره بر فراز کاسه. صوفی منظر کره را با هفت نقطهٔ زر نقش کرد. این صورت در جنوب قوس و عقرب جای دارد."
+  },
+  {
+    "id": "corona-australis",
+    "nameFa": "تاج جنوبی",
+    "nameAr": "الإكليل الجنوبي",
+    "ptolemy": "Corona Australis",
+    "hemisphere": "south",
+    "rank": 47,
+    "globeImage": "/atlas/plates/corona-australis-globe.webp",
+    "skyImage": "/atlas/plates/corona-australis-sky.webp",
+    "tableImage": "/atlas/plates/corona-australis-table.webp",
+    "titleFa": "صورت الإکلیل الجنوبی",
+    "excerptFa": "تاج جنوبی حلقه‌ای از ستاره‌ها نزدیک قوس است، همتای جنوبی اکلیل شمالی. صوفی آن را چون تاج یا اکلیلی بیضی با نقطه‌های زر کشید و جدولش را در همان صفحه آورد."
+  },
+  {
+    "id": "piscis-austrinus",
+    "nameFa": "ماهی جنوبی",
+    "nameAr": "الحوت الجنوبي",
+    "ptolemy": "Piscis Austrinus",
+    "hemisphere": "south",
+    "rank": 48,
+    "globeImage": "/atlas/plates/piscis-austrinus-globe.webp",
+    "skyImage": "/atlas/plates/piscis-austrinus-sky.webp",
+    "tableImage": "/atlas/plates/piscis-austrinus-table.webp",
+    "titleFa": "صورت الحوت الجنوبی",
+    "excerptFa": "ماهی جنوبی تک‌ماهی است که آب دلو را می‌نوشد و فم‌الحوت (فمالهوت) بر دهانش می‌درخشد. صوفی هر دو منظر کره و آسمان را در یک صفحه آورد. این صورت پایان فهرست پانزده‌گانهٔ جنوب بطلمیوس است."
+  }
+];

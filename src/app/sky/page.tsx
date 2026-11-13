@@ -16,14 +16,18 @@ export default function SkyPage() {
           آسمان‌نما
         </h1>
         <p className="max-w-3xl text-sm leading-8 text-[var(--muted)]">
-          نمای تعاملی به سبک Stellarium: بکشید تا بچرخید، اسکرول برای زوم، کلیک برای انتخاب ستاره — بیش از ۱۵ هزار ستاره تا قدر ۷ و خطوط IAU، به‌همراه اطلس صوفی.
+          نمای تعاملی به سبک Stellarium: بکشید تا بچرخید، اسکرول برای زوم، کلیک برای انتخاب ستاره — بیش از ۱۵ هزار ستاره تا قدر ۷ و خطوط IAU؛ نگاره‌های واقعی صور الکواکب در زبانهٔ صوفی و صفحهٔ{" "}
+          <a href="/atlas" className="text-[var(--teal)] hover:text-[var(--gold-soft)]">
+            اطلس کامل
+          </a>
+          .
         </p>
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant={tab === "live" ? "default" : "secondary"} onClick={() => setTab("live")}>
             آسمان زنده (IAU)
           </Button>
           <Button size="sm" variant={tab === "sufi" ? "default" : "secondary"} onClick={() => setTab("sufi")}>
-            اطلس صوفی
+            صور صوفی
           </Button>
         </div>
       </header>

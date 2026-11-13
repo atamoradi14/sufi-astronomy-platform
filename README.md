@@ -41,7 +41,7 @@ Runs in the browser (including Android Chrome). Device **GPS** and **compass** a
 | **Curriculum** (`/learn`) | 17 bilingual courses (Smart I–II–VI + olympiad topics) |
 | **Problem bank** (`/problems`) | Sample olympiad/Smart problems; each solution opens a **3D sphere diagram** matched to the math (PZX, great/small circles, polar dual, etc.) |
 | **Live sky** (`/sky`) | Stellarium-style free-look sky: **15 544 stars to mag ≤ 7**, IAU constellation lines, time scrubbing, star pick |
-| **Sufi atlas** | Educational constellation figures in the spirit of *Ṣuwar al-Kawākib* |
+| **Sufi atlas** (`/atlas`) | All **48** Ptolemaic constellations with **real manuscript plates** (globe / sky / tables) from a six-part *Ṣuwar al-Kawākib* scan, plus Persian commentary |
 | **Compass & Qibla** (`/compass`) | Device heading + great-circle Qibla bearing/distance |
 | **Map** (`/map`) | Leaflet tracker with observer position |
 | **Charts** (`/charts`) | Time / altitude style plots (Recharts) |

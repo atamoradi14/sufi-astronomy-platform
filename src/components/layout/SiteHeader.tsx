@@ -10,6 +10,7 @@ const NAV = [
   { href: "/", label: "خانه" },
   { href: "/lab", label: "کره" },
   { href: "/sky", label: "آسمان زنده" },
+  { href: "/atlas", label: "اطلس صوفی" },
   { href: "/proofs", label: "اثبات" },
   { href: "/learn", label: "دروس" },
   { href: "/problems", label: "مسائل" },
