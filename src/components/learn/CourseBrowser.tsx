@@ -2,130 +2,122 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { COURSES } from "@/lib/content/courses";
+import { LESSONS, SMART_CHAPTERS, SMART_BOOK } from "@/lib/content/lessons";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toPersianDigits } from "@/lib/utils";
 
 export function CourseBrowser() {
-  const [lang, setLang] = useState<"fa" | "both">("both");
+  const [chapter, setChapter] = useState<string>("all");
   const [level, setLevel] = useState<string>("all");
 
   const list = useMemo(() => {
-    if (level === "all") return COURSES;
-    return COURSES.filter((c) => c.level === level);
-  }, [level]);
+    return LESSONS.filter((l) => {
+      if (chapter !== "all" && l.chapterId !== chapter) return false;
+      if (level !== "all" && l.level !== level) return false;
+      return true;
+    });
+  }, [chapter, level]);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <div className="rounded-xl border border-[var(--gold)]/25 bg-[var(--panel)]/80 p-4 text-sm leading-8">
         <p className="text-[var(--parchment)]">
-          مرجع اصلی فرمول‌ها:{" "}
+          منبع:{" "}
           <span className="text-[var(--gold-soft)] dir-ltr">
-            W.M. Smart, Textbook on Spherical Astronomy
+            {SMART_BOOK.author}, {SMART_BOOK.title} ({SMART_BOOK.part}, pp. {SMART_BOOK.pages})
           </span>
-          . مسیر المپیاد ایران (هندسه/مثلثات کروی، دستگاه‌ها، زمان) هم‌تراز شده است. هر درس به آزمایشگاه کره یا اثبات تعاملی وصل است.
+          . نه فصل، شماره‌گذاری فرمول‌ها و شکل‌های بازسازی‌شده؛ هر درس به آزمایشگاه کره یا اثبات وصل است.
         </p>
       </div>
 
+      <div className="flex flex-wrap gap-2">
+        <Button size="sm" variant={chapter === "all" ? "default" : "secondary"} onClick={() => setChapter("all")}>
+          همه دروس
+        </Button>
+        {SMART_CHAPTERS.map((c) => (
+          <Button
+            key={c.id}
+            size="sm"
+            variant={chapter === c.id ? "default" : "secondary"}
+            onClick={() => setChapter(c.id)}
+          >
+            {c.roman}
+          </Button>
+        ))}
+      </div>
       <div className="flex flex-wrap gap-2">
         {["all", "مقدماتی", "متوسط", "المپیاد"].map((lv) => (
           <Button
             key={lv}
             size="sm"
-            variant={level === lv ? "default" : "secondary"}
+            variant={level === lv ? "default" : "outline"}
             onClick={() => setLevel(lv)}
           >
             {lv === "all" ? "همه سطوح" : lv}
           </Button>
         ))}
-        <Button
-          size="sm"
-          variant="outline"
-          className="mr-auto"
-          onClick={() => setLang((l) => (l === "both" ? "fa" : "both"))}
-        >
-          {lang === "both" ? "فقط فارسی" : "فارسی + English"}
-        </Button>
       </div>
 
-      <div className="space-y-4">
-        {list.map((c, i) => (
-          <Card key={c.id} id={c.id} className="overflow-hidden">
+      {chapter === "all" && (
+        <div className="grid gap-3 md:grid-cols-2">
+          {SMART_CHAPTERS.map((c) => {
+            const n = LESSONS.filter((l) => l.chapterId === c.id).length;
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => setChapter(c.id)}
+                className="rounded-xl border border-[var(--border)] bg-[var(--panel)]/50 px-4 py-3 text-right hover:border-[var(--gold)]/45"
+              >
+                <p className="text-[11px] text-[var(--teal)] dir-ltr text-left">
+                  Chapter {c.roman} · pp. {c.pages}
+                </p>
+                <p className="mt-1 font-[family-name:var(--font-display)] text-lg text-[var(--gold-soft)]">
+                  {c.titleFa}
+                </p>
+                <p className="text-xs text-[var(--muted)] dir-ltr text-left">{c.titleEn}</p>
+                <p className="mt-1 text-[11px] text-[var(--muted)]">
+                  {toPersianDigits(n)} درس · {c.sections}
+                </p>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      <div className="space-y-3">
+        {list.map((l, i) => (
+          <Card key={l.id} id={l.id}>
             <CardHeader className="border-b border-[var(--border)] bg-[var(--ink)]/35">
               <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="min-w-0">
+                <div>
                   <p className="text-[11px] text-[var(--teal)] dir-ltr text-left">
-                    {c.chapter}
+                    Smart {l.smart.chapter} {l.smart.sections} · pp. {l.smart.pages}
                   </p>
                   <CardTitle className="mt-1">
-                    {toPersianDigits(i + 1)}. {c.titleFa}
+                    {toPersianDigits(i + 1)}. {l.titleFa}
                   </CardTitle>
-                  {lang === "both" && (
-                    <p className="mt-1 text-sm text-[var(--muted)] dir-ltr text-left">
-                      {c.titleEn}
-                    </p>
-                  )}
-                  <CardDescription className="mt-2">{c.summaryFa}</CardDescription>
-                  <p className="mt-1 text-[11px] text-[var(--muted)]">{c.olympiad}</p>
+                  <p className="mt-1 text-sm text-[var(--muted)] dir-ltr text-left">{l.titleEn}</p>
+                  <CardDescription className="mt-2">{l.summaryFa}</CardDescription>
                 </div>
-                <div className="flex flex-col items-end gap-1 text-[11px]">
-                  <span className="rounded-md border border-[var(--border)] px-2 py-1 text-[var(--gold-soft)]">
-                    {c.level}
-                  </span>
-                  <span className="text-[var(--muted)]">
-                    ≈ {toPersianDigits(c.minutes)} دقیقه
-                  </span>
-                </div>
+                <span className="rounded-md border border-[var(--border)] px-2 py-1 text-[11px] text-[var(--gold-soft)]">
+                  {l.level}
+                </span>
               </div>
             </CardHeader>
-            <CardContent className="space-y-5 pt-5">
-              <div>
-                <h4 className="mb-2 text-xs text-[var(--gold-soft)] dir-ltr text-left">
-                  Key formulae (English / Smart)
-                </h4>
-                <ul className="space-y-1.5">
-                  {c.englishFormulas.map((f) => (
-                    <li
-                      key={f}
-                      className="rounded-md border border-[var(--border)] bg-[var(--ink)]/40 px-3 py-2 font-mono text-[11px] leading-6 text-[var(--teal)] dir-ltr text-left"
-                    >
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {c.sections.map((s) => (
-                <div key={s.headingEn} className="space-y-2 border-t border-[var(--border)] pt-4">
-                  <h4 className="text-sm font-medium text-[var(--gold-soft)]">{s.headingFa}</h4>
-                  {lang === "both" && (
-                    <p className="text-xs text-[var(--muted)] dir-ltr text-left">{s.headingEn}</p>
-                  )}
-                  <p className="text-sm leading-8 text-[var(--parchment)]/90">{s.bodyFa}</p>
-                  {lang === "both" && (
-                    <p className="text-sm leading-7 text-[var(--muted)] dir-ltr text-left">
-                      {s.bodyEn}
-                    </p>
-                  )}
-                  {s.formula && (
-                    <p className="rounded-md border border-[var(--gold)]/30 bg-[var(--gold)]/5 px-3 py-2 font-mono text-xs text-[var(--gold-soft)] dir-ltr text-left">
-                      {s.formula}
-                    </p>
-                  )}
-                </div>
-              ))}
-
-              <div className="flex flex-wrap gap-2">
-                <Button asChild size="sm">
-                  <Link href={`/lab?preset=${c.spherePreset}`}>تجسم روی کره</Link>
+            <CardContent className="flex flex-wrap gap-2 pt-4">
+              <Button asChild size="sm">
+                <Link href={`/learn/${l.id}`}>متن کامل درس</Link>
+              </Button>
+              <Button asChild size="sm" variant="outline">
+                <Link href={`/lab?preset=${l.spherePreset}`}>کره</Link>
+              </Button>
+              {l.proofId && (
+                <Button asChild size="sm" variant="secondary">
+                  <Link href={`/proofs?kind=${l.proofId}`}>اثبات</Link>
                 </Button>
-                {c.proofId && (
-                  <Button asChild size="sm" variant="outline">
-                    <Link href={`/proofs?kind=${c.proofId}`}>اثبات تعاملی</Link>
-                  </Button>
-                )}
-              </div>
+              )}
             </CardContent>
           </Card>
         ))}

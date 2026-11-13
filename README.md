@@ -36,9 +36,9 @@ Runs in the browser (including Android Chrome). Device **GPS** and **compass** a
 | Area | What you get |
 |------|----------------|
 | **Interactive celestial sphere** (`/lab`) | OrbitControls pan/tilt, great & small circles, spherical triangles, live formula overlays |
-| **Smart English proofs** (`/proofs`) | Cosine law, sine law, Girard / spherical excess — English statements with animated geometry |
-| **Spherical area** | Girard theorem + L’Huilier; unit-sphere area = excess (steradians) |
-| **Curriculum** (`/learn`) | 17 bilingual courses (Smart I–II–VI + olympiad topics) |
+| **Smart proofs** (`/proofs`) | Formulae (A)(B)(C)(D), polar triangle, Napier, haversine, PZX, Delambre, Girard — reconstructed figures, live identities |
+| **Spherical area** | Girard + L’Huilier (olympiad supplement; not a numbered Smart I section) |
+| **Curriculum** (`/learn`) | Nine chapters of Smart *Textbook on Spherical Astronomy* Part 1 (pp. 1–222): sections, numbered formulae, reconstructed Figs. 1–22, worked examples (§12 great-circle, PZX, rising), end-of-chapter exercises |
 | **Problem bank** (`/problems`) | Sample olympiad/Smart problems; each solution opens a **3D sphere diagram** matched to the math (PZX, great/small circles, polar dual, etc.) |
 | **Live sky** (`/sky`) | Stellarium-style free-look sky: **15 544 stars to mag ≤ 7**, IAU constellation lines, time scrubbing, star pick |
 | **Sufi atlas** (`/atlas`) | All **48** Ptolemaic constellations with **real manuscript plates** (globe / sky / tables) from a six-part *Ṣuwar al-Kawākib* scan, plus Persian commentary |
@@ -73,7 +73,7 @@ Runs in the browser (including Android Chrome). Device **GPS** and **compass** a
 │   ├── hooks/               # useGeolocation, useCompass
 │   └── lib/
 │       ├── astronomy/       # sphericalTrig, sphereGeom, time, constellations
-│       ├── content/         # courses + olympiad problems
+│       ├── content/         # Smart Part 1 lessons (Ch. I–IX), proofs, problems
 │       ├── geo/             # Qibla
 │       └── sky/             # gnomonic projection / free-look
 ├── public/data/
@@ -81,7 +81,7 @@ Runs in the browser (including Android Chrome). Device **GPS** and **compass** a
 │   └── constellations-iau.json
 ├── services/                # Target microservice folders + Dockerfiles
 ├── deploy/k8s/              # Namespace, Deployments, Services, Ingress stubs
-├── scripts/gen-courses.mjs  # Course JSON generator
+├── scripts/gen-courses.mjs  # Legacy JSON generator (unused at runtime)
 ├── Dockerfile               # Multi-stage standalone Next.js image
 └── package.json
 ```
@@ -293,7 +293,7 @@ Today the product is a **Next.js BFF monolith**: React UI + Route Handlers + pur
 
 | Module | Role |
 |--------|------|
-| `src/lib/astronomy/sphericalTrig.ts` | Cosine/sine laws, Girard, L’Huilier (radians + `deg` helpers) |
+| `src/lib/astronomy/sphericalTrig.ts` | Cosine/sine laws, haversine, analogue, four-parts, PZX, Napier/Delambre, Girard (radians + `deg` wrappers) |
 | `src/lib/astronomy/sphereGeom.ts` | Great/small circles, PZX placement, triangle construction |
 | `src/lib/astronomy/time.ts` | JD, GMST, LST, solar approx, EoT |
 | `src/lib/astronomy/sphere.ts` | Equatorial ↔ horizontal |
@@ -413,8 +413,9 @@ curl "http://127.0.0.1:3847/api/catalog/constellations"
 |------|---------|
 | `/` | Brand hero + feature entry points |
 | `/lab` | Interactive teaching sphere |
-| `/proofs` | Smart English spherical trig proofs |
-| `/learn` | Course browser (bilingual) |
+| `/proofs` | Smart Part 1 step proofs |
+| `/learn` | Chapter index of Smart Part 1 |
+| `/learn/[id]` | Full lesson: formulae, reconstructed figures, example, exercises |
 | `/problems` | Olympiad/Smart bank + **3D solution spheres** |
 | `/sky` | Interactive all-sky (mag ≤ 7) |
 | `/compass` | Compass + Qibla |
@@ -430,7 +431,7 @@ curl "http://127.0.0.1:3847/api/catalog/constellations"
 
 - **Stars:** HYG / Hipparcos-derived selection, magnitude ≤ 7, ~15 544 objects, shipped as quantized base64 columns (`v: 2`) for smaller payload.
 - **IAU lines:** `public/data/constellations-iau.json` for stick figures on the sky canvas.
-- **Courses / problems:** `src/lib/content/coursesData.json`, `src/lib/content/problems.ts`.
+- **Courses / problems:** `src/lib/content/lessonsCh1.ts` … `lessonsLater.ts`, `src/lib/content/problems.ts`. Curriculum follows W.M. Smart, *Textbook on Spherical Astronomy*, Part 1.
 
 ---
 
@@ -451,11 +452,7 @@ curl "http://127.0.0.1:3847/api/catalog/constellations"
 
 ## Scripts
 
-```bash
-node scripts/gen-courses.mjs
-```
-
-Regenerates bilingual course content into `src/lib/content/coursesData.json` when you edit the generator.
+Curriculum source is `src/lib/content/lessonsCh1.ts`, `lessonsCh2.ts`, `lessonsLater.ts` (Smart Part 1 chapters, formulae, examples). `scripts/gen-courses.mjs` is a legacy generator and is not used at runtime.
 
 ---
 

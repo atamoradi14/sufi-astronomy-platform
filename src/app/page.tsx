@@ -14,13 +14,13 @@ const FEATURES = [
   {
     href: "/proofs",
     title: "اثبات‌ها",
-    desc: "Sine، Cosine، Girard — صورت انگلیسی Smart + راهنمای فارسی.",
+    desc: "صورت‌های (A)(B)(C)(D) اسمارت، مثلث قطبی، نپر، هاورساین، PZX و زمان نجومی با فرمول زنده.",
     icon: PenLine,
   },
   {
     href: "/learn",
     title: "درس‌نامه جامع",
-    desc: "۱۷ درس از هندسه تا زمان، طلوع، دایرة‌البروج و اطلس صوفی.",
+    desc: "نه فصل Part 1 اسمارت: مثلثات، کرهٔ سماوی، شکست، زمان، پدیده‌ها و اختلاف‌منظر.",
     icon: BookOpen,
   },
   {
@@ -86,7 +86,7 @@ export default function HomePage() {
           {COURSES.map((l, i) => (
             <Link
               key={l.id}
-              href={`/learn#${l.id}`}
+              href={`/learn/${l.id}`}
               className="flex gap-3 rounded-xl border border-[var(--border)] bg-[var(--panel)]/55 px-4 py-3 hover:border-[var(--gold)]/45"
             >
               <span className="text-[var(--gold)] font-[family-name:var(--font-display)]">

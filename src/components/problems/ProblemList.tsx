@@ -25,7 +25,7 @@ export function ProblemList() {
         <FilterChip active={filter === "all"} onClick={() => setFilter("all")}>
           همه
         </FilterChip>
-        {COURSES.map((l) => (
+        {COURSES.filter((l) => PROBLEMS.some((p) => p.lessonId === l.id)).map((l) => (
           <FilterChip
             key={l.id}
             active={filter === l.id}
