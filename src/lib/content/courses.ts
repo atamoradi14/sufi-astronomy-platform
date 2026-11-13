@@ -1,29 +1,17 @@
-import data from "./coursesData.json";
+import { LESSONS } from "./lessons";
+import type { Lesson } from "./lessonTypes";
 
-export type CourseSection = {
-  headingFa: string;
-  headingEn: string;
-  bodyFa: string;
-  bodyEn: string;
-  formula: string | null;
-};
+/** Compatibility view used by the home page and problem filters. */
+export type CourseSection = Lesson["sections"][number];
 
-export type Course = {
-  id: string;
+export type Course = Lesson & {
   chapter: string;
-  titleFa: string;
-  titleEn: string;
-  level: string;
-  minutes: number;
-  spherePreset: string;
-  proofId?: string;
-  olympiad: string;
-  summaryFa: string;
-  englishFormulas: string[];
-  sections: CourseSection[];
 };
 
-export const COURSES = data.courses as Course[];
+export const COURSES: Course[] = LESSONS.map((l) => ({
+  ...l,
+  chapter: `Smart ${l.smart.chapter} ${l.smart.sections} · pp. ${l.smart.pages}`,
+}));
 
 export function getCourse(id: string) {
   return COURSES.find((c) => c.id === id);

@@ -17,7 +17,7 @@ export function Hero() {
             صوفی‌آسمان
           </h1>
           <p className="mt-5 text-base leading-8 text-[var(--parchment)]/90 md:text-lg">
-            کرهٔ تعاملی، اثبات‌های Smart، آسمان زنده تا قدر ۷، اطلس واقعی صور الکواکب با نگاره‌های نسخهٔ خطی، و مسائل با شکل کروی — برای المپیاد و رصد آماتوری.
+            درس‌نامهٔ نه فصل Textbook on Spherical Astronomy (اسمارت، Part 1)، اثبات‌های (A)–(D)، آسمان زنده تا قدر ۷، اطلس صور الکواکب، و مسائل با شکل کروی.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild size="lg">
