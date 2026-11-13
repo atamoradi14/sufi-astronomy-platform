@@ -1,9 +1,18 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { CONSTELLATIONS } from "@/lib/astronomy/constellations";
 import { SUWAR_CONSTELLATIONS, SUWAR_META } from "@/lib/content/suwarCatalog";
+import { clientKey, rateLimit } from "@/lib/api/rateLimit";
 
 /** Catalog service — later extract to services/catalog */
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const rl = rateLimit(clientKey(req.headers, "catalog"), 30);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "rate limit exceeded" },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSec) } },
+    );
+  }
+
   return NextResponse.json({
     service: "catalog",
     source: SUWAR_META.titleFa,
@@ -20,7 +29,6 @@ export async function GET() {
       excerptFa: c.excerptFa,
       globeImage: c.globeImage,
       skyImage: c.skyImage,
-      tableImage: c.tableImage ?? null,
     })),
     interactiveSubset: CONSTELLATIONS.map((c) => ({
       id: c.id,

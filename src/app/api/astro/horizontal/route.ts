@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { equatorialToHorizontal } from "@/lib/astronomy/sphere";
 import { lstHours } from "@/lib/astronomy/time";
+import { clientKey, rateLimit } from "@/lib/api/rateLimit";
 
 /** Coordinate transform service — later extract to services/sphere-math */
 export async function GET(req: NextRequest) {
+  const rl = rateLimit(clientKey(req.headers, "astro-horizontal"));
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "rate limit exceeded" },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSec) } },
+    );
+  }
+
   const sp = req.nextUrl.searchParams;
   const ra = Number(sp.get("ra"));
   const dec = Number(sp.get("dec"));

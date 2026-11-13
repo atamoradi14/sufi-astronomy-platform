@@ -17,7 +17,7 @@ const HEMISPHERE_LABEL: Record<SuwarConstellation["hemisphere"], string> = {
   south: "جنوب",
 };
 
-type ViewKind = "globe" | "sky" | "table";
+type ViewKind = "globe" | "sky";
 
 export function SuwarAtlas() {
   const [hemi, setHemi] = useState<"all" | SuwarConstellation["hemisphere"]>("all");
@@ -31,12 +31,7 @@ export function SuwarAtlas() {
 
   const selected = SUWAR_CONSTELLATIONS.find((c) => c.id === id) ?? SUWAR_CONSTELLATIONS[0];
 
-  const plate =
-    view === "globe"
-      ? selected.globeImage
-      : view === "sky"
-        ? selected.skyImage
-        : (selected.tableImage ?? selected.globeImage);
+  const plate = view === "globe" ? selected.globeImage : selected.skyImage;
 
   return (
     <div className="space-y-8">
@@ -53,8 +48,8 @@ export function SuwarAtlas() {
           <CardContent className="space-y-4">
             <p className="text-sm leading-8 text-[var(--parchment)]/90">
               کتاب صور الکواکب ثابتة اثر عبدالرحمن صوفی (سدهٔ چهارم هجری) هر یک از چهل‌وهشت صورت بطلمیوسی
-              را با دو نگاره نشان می‌دهد: چنان‌که بر کرهٔ سماوی دیده می‌شود، و چنان‌که در آسمان ظاهر می‌گردد؛
-              همراه جدول نام‌ها، طول و عرض و اقدار. این اطلس برگ‌های واقعی نسخهٔ بارگذاری‌شده را با شرح فارسی آموزشی همراه کرده است.
+              را با دو نگاره نشان می‌دهد: چنان‌که بر کرهٔ سماوی دیده می‌شود، و چنان‌که در آسمان ظاهر می‌گردد.
+              این اطلس برگ‌های واقعی نسخهٔ بارگذاری‌شده را با شرح فارسی آموزشی همراه کرده است.
             </p>
             <p className="text-xs leading-6 text-[var(--muted)]">{SUWAR_META.sourceNoteFa}</p>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -72,20 +67,6 @@ export function SuwarAtlas() {
                   </figcaption>
                 </figure>
               ))}
-              {SUWAR_META.partSamples.slice(0, 4).map((p) => (
-                <figure key={p.part} className="overflow-hidden rounded-lg border border-[var(--border)]">
-                  <Image
-                    src={p.src}
-                    alt={p.labelFa}
-                    width={400}
-                    height={560}
-                    className="h-40 w-full object-cover object-top"
-                  />
-                  <figcaption className="px-2 py-1.5 text-center text-[11px] text-[var(--muted)]">
-                    {p.labelFa.replace(/\d/g, (d) => toPersianDigits(d))}
-                  </figcaption>
-                </figure>
-              ))}
             </div>
           </CardContent>
         </Card>
@@ -94,7 +75,7 @@ export function SuwarAtlas() {
           <CardHeader>
             <CardTitle>۴۸ صورت بطلمیوسی</CardTitle>
             <CardDescription>
-              فیلتر بر اساس نیم‌کره · انتخاب صورت برای دیدن نگارهٔ کره / آسمان / جدول
+              فیلتر بر اساس نیم‌کره · انتخاب صورت برای دیدن نگارهٔ کره / آسمان
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -169,7 +150,6 @@ export function SuwarAtlas() {
                 [
                   ["globe", "بر کره"],
                   ["sky", "در آسمان"],
-                  ["table", "جدول ستارگان"],
                 ] as const
               ).map(([key, label]) => (
                 <Button
@@ -177,7 +157,6 @@ export function SuwarAtlas() {
                   size="sm"
                   variant={view === key ? "default" : "outline"}
                   onClick={() => setView(key)}
-                  disabled={key === "table" && !selected.tableImage}
                 >
                   {label}
                 </Button>
@@ -225,8 +204,7 @@ export function SuwarAtlas() {
               <li>
                 نگاره‌ها: کره
                 {selected.globeImage ? " ✓" : " —"} · آسمان
-                {selected.skyImage ? " ✓" : " —"} · جدول
-                {selected.tableImage ? " ✓" : " —"}
+                {selected.skyImage ? " ✓" : " —"}
               </li>
             </ul>
             <p className="rounded-lg border border-[var(--teal)]/30 bg-[var(--teal)]/10 px-3 py-2 text-xs leading-6">
