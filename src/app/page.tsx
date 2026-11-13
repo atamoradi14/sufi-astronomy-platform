@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Hero } from "@/components/home/Hero";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { COURSES } from "@/lib/content/courses";
+import { LESSONS, SMART_CHAPTERS } from "@/lib/content/lessons";
 import { Box, BookOpen, Compass, Map, Orbit, PenLine, ScrollText, Stars } from "lucide-react";
 
 const FEATURES = [
@@ -82,24 +82,27 @@ export default function HomePage() {
             </span>
           </Link>
         </div>
-        <div className="mt-5 grid gap-2 md:grid-cols-2">
-          {COURSES.map((l, i) => (
-            <Link
-              key={l.id}
-              href={`/learn/${l.id}`}
-              className="flex gap-3 rounded-xl border border-[var(--border)] bg-[var(--panel)]/55 px-4 py-3 hover:border-[var(--gold)]/45"
-            >
-              <span className="text-[var(--gold)] font-[family-name:var(--font-display)]">
-                {i + 1}
-              </span>
-              <span className="min-w-0">
-                <span className="block text-[var(--parchment)]">{l.titleFa}</span>
-                <span className="mt-0.5 block text-[11px] text-[var(--muted)] dir-ltr text-left">
-                  {l.chapter} · {l.titleEn}
+        <div className="mt-5 grid gap-3 md:grid-cols-2">
+          {SMART_CHAPTERS.map((c) => {
+            const n = LESSONS.filter((l) => l.chapterId === c.id).length;
+            return (
+              <Link
+                key={c.id}
+                href="/learn"
+                className="rounded-xl border border-[var(--border)] bg-[var(--panel)]/55 px-4 py-3 hover:border-[var(--gold)]/45"
+              >
+                <span className="block text-[11px] text-[var(--teal)] dir-ltr text-left">
+                  Chapter {c.roman} · pp. {c.pages}
                 </span>
-              </span>
-            </Link>
-          ))}
+                <span className="mt-1 block font-[family-name:var(--font-display)] text-lg text-[var(--gold-soft)]">
+                  {c.titleFa}
+                </span>
+                <span className="mt-0.5 block text-xs text-[var(--muted)] dir-ltr text-left">
+                  {c.titleEn} · {n} lessons
+                </span>
+              </Link>
+            );
+          })}
         </div>
       </section>
     </>

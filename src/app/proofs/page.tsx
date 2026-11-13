@@ -37,7 +37,7 @@ function ProofsInner() {
               size="sm"
               variant={kind === p.kind ? "default" : "secondary"}
             >
-              <Link href={`/proofs?kind=${p.kind}`}>{p.titleEn}</Link>
+              <Link href={`/proofs?kind=${p.kind}`}>{p.titleFa}</Link>
             </Button>
           ))}
           <Button asChild size="sm" variant="outline">

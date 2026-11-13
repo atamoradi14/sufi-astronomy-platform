@@ -1,23 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { computeAstroClock } from "@/lib/astronomy/time";
 import { clientKey, rateLimit } from "@/lib/api/rateLimit";
+import { inRange, parseIso } from "@/lib/api/validate";
 
-/** Gateway-friendly clock service — later extract to services/astro-time */
 export async function GET(req: NextRequest) {
-  const rl = rateLimit(clientKey(req.headers, "astro-clock"));
-  if (!rl.ok) {
+  const limited = rateLimit(clientKey(req.headers, "astro-clock"));
+  if (!limited.ok) {
     return NextResponse.json(
-      { error: "rate limit exceeded" },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSec) } },
+      { error: "درخواست زیاد است" },
+      { status: 429, headers: { "Retry-After": String(limited.retryAfterSec) } },
     );
   }
-
   const sp = req.nextUrl.searchParams;
   const lon = Number(sp.get("lon") ?? "51.389");
   const lat = Number(sp.get("lat") ?? "35.6892");
-  const iso = sp.get("iso");
-  const date = iso ? new Date(iso) : new Date();
-  if (Number.isNaN(date.getTime()) || Number.isNaN(lon) || Number.isNaN(lat)) {
+  const date = parseIso(sp.get("iso"));
+  if (!date || !inRange(lat, -90, 90) || !inRange(lon, -180, 180)) {
     return NextResponse.json({ error: "پارامتر نامعتبر" }, { status: 400 });
   }
   const clock = computeAstroClock(date, lon);
