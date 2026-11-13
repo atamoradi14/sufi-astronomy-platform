@@ -77,8 +77,11 @@ export function CourseBrowser() {
                   {c.titleFa}
                 </p>
                 <p className="text-xs text-[var(--muted)] dir-ltr text-left">{c.titleEn}</p>
-                <p className="mt-1 text-[11px] text-[var(--muted)]">
-                  {toPersianDigits(n)} درس · {c.sections}
+                <p className="mt-2 text-[11px] text-[var(--gold-soft)]">
+                  {toPersianDigits(n)} درس
+                </p>
+                <p className="mt-0.5 text-[11px] leading-5 text-[var(--muted)] dir-ltr text-left">
+                  {c.sections}
                 </p>
               </button>
             );
