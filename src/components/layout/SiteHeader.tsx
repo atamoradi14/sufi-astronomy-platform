@@ -12,7 +12,7 @@ const NAV = [
   { href: "/lab", label: "کره" },
   { href: "/sky", label: "آسمان" },
   { href: "/atlas", label: "اطلس" },
-  { href: "/charts", label: "زمان" },
+  { href: "/charts", label: "زنده" },
   { href: "/map", label: "نقشه" },
 ];
 
