@@ -43,6 +43,7 @@ type IssState = {
   lat: number;
   lon: number;
   altKm: number | null;
+  velocityKmh?: number | null;
   velocityKms: number | null;
   visibility: string | null;
   source: string;
@@ -493,6 +494,21 @@ export function LiveChartsHub() {
                   value={iss.velocityKms == null ? "null" : iss.velocityKms.toFixed(5)}
                   display={
                     iss.velocityKms == null ? "—" : toPersianDigits(iss.velocityKms.toFixed(3))
+                  }
+                />
+                <CopyValue
+                  label="سرعت (km/h)"
+                  value={
+                    iss.velocityKmh == null && iss.velocityKms == null
+                      ? "null"
+                      : (iss.velocityKmh ?? (iss.velocityKms! * 3600)).toFixed(2)
+                  }
+                  display={
+                    iss.velocityKmh == null && iss.velocityKms == null
+                      ? "—"
+                      : toPersianDigits(
+                          (iss.velocityKmh ?? iss.velocityKms! * 3600).toFixed(1),
+                        )
                   }
                 />
                 <CopyValue label="منبع" value={iss.source} />

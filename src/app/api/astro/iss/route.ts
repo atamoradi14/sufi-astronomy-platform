@@ -8,6 +8,8 @@ type IssPayload = {
   lat: number;
   lon: number;
   altKm: number | null;
+  /** Speed from upstream (wheretheiss reports km/h). */
+  velocityKmh: number | null;
   velocityKms: number | null;
   visibility: string | null;
 };
@@ -33,7 +35,8 @@ async function fetchWheretheiss(): Promise<IssPayload | null> {
     lat: j.latitude,
     lon: j.longitude,
     altKm: j.altitude,
-    velocityKms: j.velocity,
+    velocityKmh: j.velocity,
+    velocityKms: j.velocity / 3600,
     visibility: j.visibility ?? null,
   };
 }
@@ -55,6 +58,7 @@ async function fetchOpenNotify(): Promise<IssPayload | null> {
     lat: Number(j.iss_position.latitude),
     lon: Number(j.iss_position.longitude),
     altKm: null,
+    velocityKmh: null,
     velocityKms: null,
     visibility: null,
   };
@@ -74,6 +78,7 @@ function sampleIss(now = Date.now()): IssPayload {
     lat,
     lon,
     altKm: 420,
+    velocityKmh: 27576,
     velocityKms: 7.66,
     visibility: null,
   };
