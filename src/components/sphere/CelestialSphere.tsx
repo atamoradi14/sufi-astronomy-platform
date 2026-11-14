@@ -6,6 +6,7 @@ import { Stars } from "@react-three/drei";
 import * as THREE from "three";
 import { GlobeCanvas } from "@/components/sphere/GlobeCanvas";
 import {
+  ArcLabel,
   AxisLine,
   GlobeShell,
   NativeLine,
@@ -118,13 +119,16 @@ function SphereMesh({ state }: { state: SphereViewState }) {
   return (
     <group ref={globe}>
       <GlobeShell />
-      <AxisLine />
+      <AxisLine poles />
 
       {state.showEquator && (
-        <NativeLine pts={equator} color={state.highlight === "great" ? "#f0d48a" : "#c9a227"} />
+        <>
+          <NativeLine pts={equator} color={state.highlight === "great" ? "#f0d48a" : "#ffd56a"} />
+          <ArcLabel pos={[1.08, 0.02, 0]} text="استوا EQ" />
+        </>
       )}
       {state.showMeridians &&
-        meridians.map((m, i) => <NativeLine key={i} pts={m} color="#8eb4d4" />)}
+        meridians.map((m, i) => <NativeLine key={i} pts={m} color="#9ec4e6" />)}
       {state.showParallels &&
         parallels.map((p, i) => (
           <NativeLine
@@ -134,8 +138,18 @@ function SphereMesh({ state }: { state: SphereViewState }) {
             dashed
           />
         ))}
-      {state.showHorizon && <NativeLine pts={horizon} color="#e08aa0" />}
-      {state.showEcliptic && <NativeLine pts={ecliptic} color="#8fd4a4" />}
+      {state.showHorizon && (
+        <>
+          <NativeLine pts={horizon} color="#ff9eb0" />
+          <ArcLabel pos={horizon[0]} text="افق" />
+        </>
+      )}
+      {state.showEcliptic && (
+        <>
+          <NativeLine pts={ecliptic} color="#8fd4a4" />
+          <ArcLabel pos={ecliptic[12]} text="دایرة‌البروج" />
+        </>
+      )}
       {state.showSmallDemo && (
         <NativeLine
           pts={smallDemo}
@@ -148,9 +162,12 @@ function SphereMesh({ state }: { state: SphereViewState }) {
           <NativeLine pts={arcs.ab} color="#ffe9a8" />
           <NativeLine pts={arcs.bc} color="#7ec8c8" />
           <NativeLine pts={arcs.ca} color="#8eb4d4" />
-          <PointMarker pos={A} label="A" color="#e6d39a" />
-          <PointMarker pos={B} label="B" color="#e6d39a" />
-          <PointMarker pos={C} label="C" color="#e6d39a" />
+          <ArcLabel pos={arcs.ab[Math.floor(arcs.ab.length / 2)]} text="c = AB" />
+          <ArcLabel pos={arcs.bc[Math.floor(arcs.bc.length / 2)]} text="a = BC" />
+          <ArcLabel pos={arcs.ca[Math.floor(arcs.ca.length / 2)]} text="b = CA" />
+          <PointMarker pos={A} label="A" color="#ffe9a8" sublabel="رأس" />
+          <PointMarker pos={B} label="B" color="#7ec8c8" sublabel="رأس" />
+          <PointMarker pos={C} label="C" color="#8eb4d4" sublabel="رأس" />
         </>
       )}
     </group>

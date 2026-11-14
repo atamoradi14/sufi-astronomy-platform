@@ -88,7 +88,10 @@ export type Problem = {
   title: string;
   prompt: string;
   hint: string;
+  /** Short summary kept for cards; prefer `steps` for teaching. */
   solution: string;
+  /** Ordered solution steps (Persian). */
+  steps?: string[];
   answer: string;
   difficulty: "آسان" | "متوسط" | "المپیاد";
   source: string;
@@ -105,9 +108,15 @@ export const PROBLEMS: Problem[] = [
     hint: "فاصله از قطب = ۹۰°−δ. صفحهٔ موازی استوا از مرکز نمی‌گذرد → صغیره.",
     solution:
       "موازی δ=+40° دایرهٔ صغیره است (صفحه موازی استوا، نه گذرنده از مرکز کرهٔ سماوی). شعاع زاویه‌ای از قطب شمال = ۹۰°−۴۰° = ۵۰°.",
+    steps: [
+      "استوا صفحهٔ گذرنده از مرکز کره است → دایرهٔ عظیمه.",
+      "مدار میل ثابت δ صفحهٔ موازی استوا دارد و از مرکز نمی‌گذرد → دایرهٔ صغیره.",
+      "قطب شمال سماوی قطب استواست؛ فاصلهٔ زاویه‌ای تا هر نقطهٔ موازی δ برابر ۹۰°−δ است.",
+      "برای δ=+۴۰°: شعاع زاویه‌ای از N = ۵۰°.",
+    ],
     answer: "صغیره · ۵۰°",
     difficulty: "آسان",
-    source: "هندسه کروی المپیاد",
+    source: "Smart I §§2–3",
     diagram: {
       kind: "small-circle",
       delta: 40,
@@ -122,6 +131,11 @@ export const PROBLEMS: Problem[] = [
     hint: "E = A+B+C−180° ؛ روی کرهٔ واحد Area = E (رادیان).",
     solution:
       "E = 72+80+95−180 = 67°. Area = 67·π/180 ≈ 1.169 sr (قضیهٔ ژیرار).",
+    steps: [
+      "زیادی کروی: E = A+B+C−۱۸۰° = ۷۲+۸۰+۹۵−۱۸۰ = ۶۷°.",
+      "قضیهٔ ژیرار روی کرهٔ واحد: Area = E (بر حسب رادیان).",
+      "Area = ۶۷·π/۱۸۰ ≈ ۱٫۱۶۹ sr.",
+    ],
     answer: "E=67° · Area≈1.169 sr",
     difficulty: "متوسط",
     source: "Girard · Smart I",
@@ -142,9 +156,15 @@ export const PROBLEMS: Problem[] = [
     hint: "cos d = sinδ₁sinδ₂ + cosδ₁cosδ₂ cosΔα ، با Δα=0.6ʰ=9°.",
     solution:
       "Δα=9°. cos d = sin(−8)sin7 + cos(−8)cos7 cos9 ≈ 0.9540 ⇒ d = arccos(0.9540) ≈ 17.48°.",
+    steps: [
+      "Δα = ۰٫۶ʰ = ۹°.",
+      "در مثلث قطبی دو ستاره، فرمول (A): cos d = sinδ₁ sinδ₂ + cosδ₁ cosδ₂ cosΔα.",
+      "جایگذاری: cos d = sin(−۸°)sin۷° + cos(−۸°)cos۷°cos۹° ≈ ۰٫۹۵۴۰.",
+      "d = arccos(۰٫۹۵۴۰) ≈ ۱۷٫۴۸° ≈ ۱۷٫۵°.",
+    ],
     answer: "d ≈ 17.5°",
     difficulty: "متوسط",
-    source: "Smart I.3",
+    source: "Smart I §5 (A)",
     diagram: {
       kind: "star-distance",
       ra1h: 5.0,
@@ -162,9 +182,15 @@ export const PROBLEMS: Problem[] = [
     hint: "sin B / sin b = sin A / sin a  ⇒  sin B = sin b · sin A / sin a. ربع را با کسینوس اضلاع تأیید کنید.",
     solution:
       "sin B = sin40°·sin120°/sin50° ≈ 0.7266 ⇒ B ≈ 46.55° یا ۱۳۳.۴۵°. با قانون کسینوس‌ها برای ضلع c و زاویه، ربع حاد (۴۶.۶°) سازگار است.",
+    steps: [
+      "صورت (B): sin B / sin b = sin A / sin a.",
+      "sin B = sin۴۰°·sin۱۲۰° / sin۵۰° ≈ ۰٫۷۲۶۶.",
+      "دو ربع: B ≈ ۴۶٫۵۵° یا ۱۳۳٫۴۵°.",
+      "با (A) برای ضلع سوم و سازگاری زوایا، شاخهٔ حاد B ≈ ۴۶٫۶° درست است.",
+    ],
     answer: "B ≈ 46.6°",
     difficulty: "المپیاد",
-    source: "Smart I.4",
+    source: "Smart I §6 (B)",
     diagram: {
       kind: "triangle-ssa",
       a: 50,
@@ -181,9 +207,15 @@ export const PROBLEMS: Problem[] = [
     hint: "sin a = sinδ sinφ + cosδ cosφ cos H  (ZX = z = ۹۰°−a).",
     solution:
       "sin a = sin20°sin35° + cos20°cos35°cos30° ≈ 0.8630 ⇒ a ≈ 59.63°. اضلاع: PZ=۵۵°, PX=۷۰°, ZX=۹۰°−a≈۳۰.۴°.",
+    steps: [
+      "اضلاع: PZ = ۹۰°−φ = ۵۵°، PX = ۹۰°−δ = ۷۰°، زاویه در P برابر H = ۳۰°.",
+      "فرمول II.(۳): cos z = sinφ sinδ + cosφ cosδ cos H.",
+      "معادل: sin a = sinδ sinφ + cosδ cosφ cos H با a = ۹۰°−z.",
+      "sin a ≈ ۰٫۸۶۳۰ ⇒ a ≈ ۵۹٫۶°، z ≈ ۳۰٫۴°.",
+    ],
     answer: "a ≈ 59.6°",
     difficulty: "المپیاد",
-    source: "Smart II · المپیاد",
+    source: "Smart II §23 (3)",
     diagram: {
       kind: "pzx",
       phi: 35,
@@ -200,9 +232,15 @@ export const PROBLEMS: Problem[] = [
     hint: "در افق a=0 ⇒ cos H₀ = −tanφ tanδ. مدت ≈ ۲H₀ بر حسب ساعت.",
     solution:
       "cos H₀ = −tan40°tan15° ≈ −0.2247 ⇒ H₀ ≈ 103.0°. مدت ≈ ۲H₀/۱۵ ≈ ۱۳.۷۳ʰ.",
+    steps: [
+      "روی افق بدون شکست: z = ۹۰° ⇒ a = ۰.",
+      "از II.(۳) با z=۹۰°: cos H₀ = −tan φ tan δ.",
+      "cos H₀ = −tan۴۰° tan۱۵° ≈ −۰٫۲۲۴۷ ⇒ H₀ ≈ ۱۰۳٫۰°.",
+      "مدت بالای افق ≈ ۲H₀ / ۱۵ ≈ ۱۳٫۷۳ʰ.",
+    ],
     answer: "H₀≈103° · ≈13.7ʰ",
     difficulty: "المپیاد",
-    source: "المپیاد نجوم",
+    source: "Smart II · rising",
     diagram: {
       kind: "pzx",
       phi: 40,
@@ -218,9 +256,15 @@ export const PROBLEMS: Problem[] = [
     prompt: "φ=40°N, δ=+10°. اضلاع PZ و PX؟",
     hint: "PZ = co-latitude = ۹۰°−φ ، PX = co-declination = ۹۰°−δ.",
     solution: "PZ = ۹۰°−۴۰° = ۵۰°. PX = ۹۰°−۱۰° = ۸۰°. (ZX به H بستگی دارد.)",
+    steps: [
+      "Z سمت‌الرأس ناظر است؛ P قطب مرتفع.",
+      "PZ = متمم عرض = ۹۰°−φ = ۵۰°.",
+      "PX = متمم میل = ۹۰°−δ = ۸۰°.",
+      "ZX = z به زاویهٔ ساعتی H بستگی دارد و در این داده معلوم نیست.",
+    ],
     answer: "PZ=50° · PX=80°",
     difficulty: "آسان",
-    source: "Smart II",
+    source: "Smart II §§18–23",
     diagram: {
       kind: "pzx",
       phi: 40,
@@ -237,9 +281,15 @@ export const PROBLEMS: Problem[] = [
     hint: "مثلث قطبی: a′=۱۸۰°−A و دور. کسینوس اضلاع روی قطبی → کسینوس زوایا روی اصلی.",
     solution:
       "از مثلث قطبی: cos C = −cos A cos B + sin A sin B cos c.",
+    steps: [
+      "مثلث قطبی: a′ = ۱۸۰°−A، b′ = ۱۸۰°−B، c′ = ۱۸۰°−C و برعکس برای زوایا.",
+      "صورت (A) را روی مثلث قطبی بنویسید.",
+      "با جایگذاری a′=۱۸۰°−A و … صورت کسینوس زوایا به‌دست می‌آید:",
+      "cos C = −cos A cos B + sin A sin B cos c.",
+    ],
     answer: "cos C = −cos A cos B + sin A sin B cos c",
     difficulty: "متوسط",
-    source: "Smart I.3 polar",
+    source: "Smart I §10–11",
     diagram: {
       kind: "polar-dual",
       a: 70,
@@ -256,9 +306,15 @@ export const PROBLEMS: Problem[] = [
     hint: "s=۹۰°. (s−a)/۲=۱۵°. tan(E/۴)=√[tan(s/۲) tan((s−a)/۲)³].",
     solution:
       "s=90°. tan(E/4)=√[tan45°·tan15°³]≈√0.01924≈0.1387 ⇒ E/4≈7.90° ⇒ E≈31.59°. از کسینوس اضلاع: cos A=(cos60−cos²60)/sin²60=1/3 ⇒ A=arccos(1/3)≈70.53°؛ E=3A−180≈31.59°.",
+    steps: [
+      "s = (a+b+c)/۲ = ۹۰°.",
+      "L'Huilier: tan(E/۴) = √[tan(s/۲) tan((s−a)/۲) tan((s−b)/۲) tan((s−c)/۲)].",
+      "با a=b=c: tan(E/۴) = √[tan۴۵° · tan۱۵°³] ≈ ۰٫۱۳۸۷ ⇒ E/۴ ≈ ۷٫۹۰° ⇒ E ≈ ۳۱٫۵۹°.",
+      "کنترل: از (A) برای زاویه، cos A = ۱/۳ ⇒ A ≈ ۷۰٫۵۳°؛ E = ۳A−۱۸۰ ≈ ۳۱٫۵۹°.",
+    ],
     answer: "E ≈ 31.6° · A≈70.5°",
     difficulty: "المپیاد",
-    source: "L'Huilier",
+    source: "L'Huilier · olympiad supplement",
     diagram: {
       kind: "triangle-equilateral",
       side: 60,
@@ -272,9 +328,14 @@ export const PROBLEMS: Problem[] = [
     prompt: "GMST=9.2ʰ ، λ=51°E. LST؟",
     hint: "LST = GMST + λ/۱۵ (λ شرقی مثبت).",
     solution: "λ/۱۵ = ۵۱/۱۵ = ۳.۴ʰ ⇒ LST = ۹.۲ + ۳.۴ = ۱۲.۶ʰ.",
+    steps: [
+      "زمان نجومی محلی = زمان نجومی گرینویچ + طول شرقی بر حسب ساعت.",
+      "λ/۱۵ = ۵۱/۱۵ = ۳٫۴ʰ.",
+      "LST = ۹٫۲ + ۳٫۴ = ۱۲٫۶ʰ.",
+    ],
     answer: "12.6ʰ",
     difficulty: "آسان",
-    source: "Smart VI",
+    source: "Smart II §27",
     diagram: {
       kind: "lst",
       gmst: 9.2,
@@ -289,9 +350,14 @@ export const PROBLEMS: Problem[] = [
     prompt: "در λ=90° (انقلاب)، با ε=23.44° میل خورشید؟",
     hint: "sin δ = sin ε sin λ",
     solution: "sin δ = sin23.44°·sin90° ⇒ δ = +23.44° (انقلاب تابستانی).",
+    steps: [
+      "رابطهٔ استاندارد: sin δ = sin ε sin λ.",
+      "در انقلاب تابستانی λ = ۹۰°، sin λ = ۱.",
+      "δ = ε = +۲۳٫۴۴°.",
+    ],
     answer: "δ = ε ≈ 23.44°",
     difficulty: "آسان",
-    source: "Smart II",
+    source: "Smart II §28",
     diagram: {
       kind: "ecliptic",
       epsilon: 23.44,
@@ -308,14 +374,99 @@ export const PROBLEMS: Problem[] = [
     hint: "از فرمول چهار جزء / ناپیر قائم: tan a = cos B · tan c ⇒ tan c = tan a / cos B.",
     solution:
       "tan c = tan30°/cos50° ≈ 0.57735/0.64279 ≈ 0.898 ⇒ c ≈ 41.94°.",
+    steps: [
+      "مثلث قائم در C؛ جزءهای حلقهٔ نپر را به‌یاد بیاورید یا از (D) استفاده کنید.",
+      "رابطهٔ قائم: tan a = cos B · tan c.",
+      "tan c = tan۳۰° / cos۵۰° ≈ ۰٫۵۷۷۳۵ / ۰٫۶۴۲۷۹ ≈ ۰٫۸۹۸.",
+      "c ≈ ۴۱٫۹°.",
+    ],
     answer: "c ≈ 41.9°",
     difficulty: "المپیاد",
-    source: "Smart I right-angled",
+    source: "Smart I §9 Napier",
     diagram: {
       kind: "triangle-right",
       a: 30,
       B: 50,
       caption: "قائم‌الزاویه در C · a=۳۰° · B=۵۰° · c≈۴۱.۹°",
+    },
+  },
+  {
+    id: "p13",
+    lessonId: "haversine-example",
+    title: "مثال بند ۱۲ اسمارت",
+    prompt:
+      "A: ۲۴°۱۸′N، ۱۳۳°۳۹′E و B: ۳۶°۴۷′N، ۱۲۵°۲۴′W. کمان عظیمهٔ AB چند درجه و چند مایل دریایی است؟ زاویه در A؟",
+    hint: "PA=۶۵°۴۲′، PB=۵۳°۱۳′، APB=۱۰۰°۵۷′. از (A) یا هاورساین (۲۳).",
+    solution:
+      "AB = ۸۳°۴۹′ = ۵۰۲۸٫۸ nmi؛ زاویه در A = ۵۲°۱۶′ (نتیجهٔ اسمارت §12).",
+    steps: [
+      "PA = ۹۰°−۲۴°۱۸′ = ۶۵°۴۲′؛ PB = ۹۰°−۳۶°۴۷′ = ۵۳°۱۳′.",
+      "Δλ کوتاه‌تر = ۱۰۰°۵۷′.",
+      "از (A): cos AB = cos PA cos PB + sin PA sin PB cos APB ⇒ AB = ۸۳°۴۹′.",
+      "۱° کمان عظیمه = ۶۰ مایل دریایی ⇒ AB = ۵۰۲۸٫۸ nmi.",
+      "زاویه در A از نیم‌زاویه (۱۱) = ۵۲°۱۶′.",
+    ],
+    answer: "AB=83°49′=5028.8 nmi · ∠A=52°16′",
+    difficulty: "المپیاد",
+    source: "Smart I §12",
+    diagram: {
+      kind: "star-distance",
+      ra1h: 133.65 / 15,
+      dec1: 24.3,
+      ra2h: (360 - 125.4) / 15,
+      dec2: 36.783,
+      caption: "مثلث قطبی PAB · AB=۸۳°۴۹′ · ∠A=۵۲°۱۶′",
+    },
+  },
+  {
+    id: "p14",
+    lessonId: "refraction-laws",
+    title: "سمت‌القدم حقیقی و ظاهری",
+    prompt: "اگر سمت‌القدم ظاهری ζ=۳۰° و شکست R=۱′٫۷ باشد، z حقیقی چیست؟ ارتفاع حقیقی؟",
+    hint: "ζ = z − R ⇒ z = ζ + R؛ a = ۹۰° − z.",
+    solution: "z = ۳۰° + ۱′٫۷ ≈ ۳۰°.۰۲۸؛ a_true ≈ ۵۹°.۹۷۲.",
+    steps: [
+      "تعریف: R = z − ζ با z حقیقی و ζ ظاهری.",
+      "z = ζ + R = ۳۰° + ۱′٫۷ ≈ ۳۰°.۰۲۸.",
+      "ارتفاع حقیقی a = ۹۰° − z ≈ ۵۹°.۹۷۲.",
+      "ارتفاع ظاهری از ارتفاع حقیقی بزرگ‌تر است (ستاره بالاتر دیده می‌شود).",
+    ],
+    answer: "z≈30°.028 · a≈59°.972",
+    difficulty: "آسان",
+    source: "Smart III §34",
+    diagram: {
+      kind: "pzx",
+      phi: 35,
+      delta: 20,
+      H: 20,
+      caption: "قائم محلی · z حقیقی > ζ ظاهری · R = z − ζ",
+    },
+  },
+  {
+    id: "p15",
+    lessonId: "refraction-cassini",
+    title: "صورت کسینی",
+    prompt:
+      "با A=۵۷″٫۸ و B=−۰″٫۰۷ و ζ=۶۰°، R را از R = A tan ζ + B tan³ ζ حساب کنید.",
+    hint: "tan60°=√3؛ tan³60°=3√3.",
+    solution:
+      "tan60=√3≈1.732؛ tan³≈5.196. R≈57.8×1.732 + (−0.07)×5.196 ≈ 100.1″ − 0.36″ ≈ 99.7″ ≈ 1′.66.",
+    steps: [
+      "صورت کسینی: R = A tan ζ + B tan³ ζ.",
+      "tan۶۰° = √۳ ≈ ۱٫۷۳۲؛ tan³۶۰° = ۳√۳ ≈ ۵٫۱۹۶.",
+      "A tan ζ ≈ ۵۷٫۸ × ۱٫۷۳۲ ≈ ۱۰۰٫۱″.",
+      "B tan³ ζ ≈ −۰٫۰۷ × ۵٫۱۹۶ ≈ −۰٫۳۶″.",
+      "R ≈ ۹۹٫۷″ ≈ ۱′٫۶۶.",
+    ],
+    answer: "R ≈ 99.7″ ≈ 1′.66",
+    difficulty: "متوسط",
+    source: "Smart III Cassini",
+    diagram: {
+      kind: "pzx",
+      phi: 40,
+      delta: 10,
+      H: 50,
+      caption: "ζ=۶۰° · R ≈ A tanζ + B tan³ζ ≈ ۱′٫۶۶",
     },
   },
 ];

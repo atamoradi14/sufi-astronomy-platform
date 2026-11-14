@@ -1,23 +1,34 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { PROBLEMS } from "@/lib/content/problems";
+import { PROBLEMS, type Problem } from "@/lib/content/problems";
 import { COURSES } from "@/lib/content/courses";
 import { SolutionSphere } from "@/components/problems/SolutionSphere";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toPersianDigits } from "@/lib/utils";
 
-export function ProblemList() {
+export function ProblemList({
+  problems,
+}: {
+  /** Defaults to the full bank; Course hub passes Chapters I–III only. */
+  problems?: Problem[];
+}) {
+  const bank = problems ?? PROBLEMS;
   const [filter, setFilter] = useState<string>("all");
   const [openId, setOpenId] = useState<string | null>(null);
   const [showSolution, setShowSolution] = useState<Record<string, boolean>>({});
   const [showHint, setShowHint] = useState<Record<string, boolean>>({});
 
   const list = useMemo(() => {
-    if (filter === "all") return PROBLEMS;
-    return PROBLEMS.filter((p) => p.lessonId === filter);
-  }, [filter]);
+    if (filter === "all") return bank;
+    return bank.filter((p) => p.lessonId === filter);
+  }, [filter, bank]);
+
+  const lessonChips = useMemo(
+    () => COURSES.filter((l) => bank.some((p) => p.lessonId === l.id)),
+    [bank],
+  );
 
   return (
     <div className="space-y-4">
@@ -25,7 +36,7 @@ export function ProblemList() {
         <FilterChip active={filter === "all"} onClick={() => setFilter("all")}>
           همه
         </FilterChip>
-        {COURSES.filter((l) => PROBLEMS.some((p) => p.lessonId === l.id)).map((l) => (
+        {lessonChips.map((l) => (
           <FilterChip
             key={l.id}
             active={filter === l.id}
@@ -88,7 +99,15 @@ export function ProblemList() {
                   )}
                   {showSolution[p.id] && (
                     <div className="space-y-2 rounded-lg border border-[var(--gold)]/30 bg-[var(--gold)]/5 px-3 py-3 text-sm leading-7">
-                      <p>{p.solution}</p>
+                      {p.steps && p.steps.length > 0 ? (
+                        <ol className="list-decimal space-y-2 pr-5">
+                          {p.steps.map((st) => (
+                            <li key={st}>{st}</li>
+                          ))}
+                        </ol>
+                      ) : (
+                        <p>{p.solution}</p>
+                      )}
                       <p className="text-[var(--gold-soft)]">پاسخ نهایی: {p.answer}</p>
                     </div>
                   )}

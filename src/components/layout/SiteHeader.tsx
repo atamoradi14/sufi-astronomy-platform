@@ -8,12 +8,10 @@ import { useState } from "react";
 
 const NAV = [
   { href: "/", label: "خانه" },
+  { href: "/course", label: "درس‌نامه" },
   { href: "/lab", label: "کره" },
-  { href: "/sky", label: "آسمان زنده" },
-  { href: "/atlas", label: "اطلس صوفی" },
-  { href: "/proofs", label: "اثبات" },
-  { href: "/learn", label: "دروس" },
-  { href: "/problems", label: "مسائل" },
+  { href: "/sky", label: "آسمان" },
+  { href: "/atlas", label: "اطلس" },
   { href: "/charts", label: "زمان" },
   { href: "/map", label: "نقشه" },
 ];
@@ -46,7 +44,8 @@ export function SiteHeader() {
               href={item.href}
               className={cn(
                 "rounded-md px-3 py-2 text-sm transition-colors",
-                pathname === item.href
+                pathname === item.href ||
+                  (item.href !== "/" && pathname.startsWith(item.href))
                   ? "bg-[var(--gold)]/15 text-[var(--gold-soft)]"
                   : "text-[var(--muted)] hover:text-[var(--parchment)]",
               )}

@@ -788,17 +788,40 @@ export const LESSONS_CH1: Lesson[] = [
       findEn: "AB, angle at A, highest latitude on AB.",
       steps: [
         {
-          fa: "PA = ۶۵°۴۲′، PB = ۵۳°۱۳′، APB = ۱۰۰°۵۷′.",
-          en: "PA = 65°42′, PB = 53°13′, APB = 100°57′.",
+          fa: "متمم عرض‌ها: PA = ۹۰°−۲۴°۱۸′ = ۶۵°۴۲′، PB = ۹۰°−۳۶°۴۷′ = ۵۳°۱۳′.",
+          en: "Colatitudes: PA = 90°−24°18′ = 65°42′, PB = 90°−36°47′ = 53°13′.",
         },
         {
-          fa: "فرمول (A) برای AB.",
-          en: "Formula (A) for AB.",
+          fa: "اختلاف طول کوتاه‌تر: از ۱۳۳°۳۹′E تا ۱۲۵°۲۴′W = ۱۰۰°۵۷′ (نه کمان بلند).",
+          en: "Shorter Δλ from 133°39′E to 125°24′W = 100°57′ (not the long way).",
+          formula: "∠APB = 100°57′",
+        },
+        {
+          fa: "فرمول کسینوس (A) برای ضلع AB روبه‌روی زاویه در قطب.",
+          en: "Cosine formula (A) for side AB opposite the polar angle.",
           formula: "cos AB = cos PA cos PB + sin PA sin PB cos APB",
         },
+        {
+          fa: "اسمارت با لگاریتم پنج‌رقمی: cos AB = ۰٫۱۰۷۷۶ ⇒ AB = ۸۳°۴۸′٫۸ ≈ ۸۳°۴۹′ = ۵۰۲۸٫۸ مایل دریایی.",
+          en: "Smart’s five-figure logs: cos AB = 0.10776 ⇒ AB = 83°48′.8 ≈ 83°49′ = 5028.8 nmi.",
+        },
+        {
+          fa: "زاویه در A از نیم‌زاویه (۱۱) یا از قانون کسینوس برای زاویه: ≈ ۵۲°۱۶′.",
+          en: "Angle at A from half-angle (11) / cosine-for-angles ≈ 52°16′.",
+          formula: "∠PAB ≈ 52°16′",
+        },
+        {
+          fa: "شمالی‌ترین نقطه C جایی است که نصف‌النهار بر AB عمود است: sin PC = sin PA sin PAC ⇒ عرض C = ۴۳°۵۳′N.",
+          en: "Highest latitude C: meridian ⊥ AB ⇒ sin PC = sin PA sin PAC ⇒ lat C = 43°53′N.",
+        },
+        {
+          fa: "بازتولید با هاورساین (۲۳): همان AB = ۸۳°۴۹′ از جداول Inman.",
+          en: "Haversine (23) recovers the same AB = 83°49′ with Inman’s tables.",
+          formula: "hav AB = hav(PA−PB) + sin PA sin PB hav APB",
+        },
       ],
-      resultFa: "AB ≈ ۸۳°۴۹′ · ۵۰۲۹ مایل دریایی · A ≈ ۵۲°۱۶′ · عرض C ≈ ۴۳°۵۳′N",
-      resultEn: "AB ≈ 83°49′ · 5029 nmi · A ≈ 52°16′ · lat C ≈ 43°53′N",
+      resultFa: "AB = ۸۳°۴۹′ = ۵۰۲۸٫۸ nmi · ∠A = ۵۲°۱۶′ · عرض C = ۴۳°۵۳′N",
+      resultEn: "AB = 83°49′ = 5028.8 nmi · ∠A = 52°16′ · lat C = 43°53′N",
       widget: "gc-distance",
     },
     exercises: [

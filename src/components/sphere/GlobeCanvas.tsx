@@ -29,7 +29,7 @@ export function GlobeCanvas({
           onCreated={({ gl }) => {
             gl.toneMapping = THREE.NoToneMapping;
             gl.outputColorSpace = THREE.SRGBColorSpace;
-            gl.setClearColor("#081426", 1);
+            gl.setClearColor("#0a1628", 1);
             gl.domElement.addEventListener(
               "webglcontextlost",
               (e) => e.preventDefault(),
@@ -40,13 +40,14 @@ export function GlobeCanvas({
             width: "100%",
             height: "100%",
             display: "block",
-            background: "#081426",
+            background: "#0a1628",
           }}
         >
-          <color attach="background" args={["#081426"]} />
-          <ambientLight intensity={1.4} />
-          <directionalLight position={[3.5, 4.5, 2.5]} intensity={2.2} />
-          <hemisphereLight args={["#9eb6d4", "#1a1020", 0.6]} />
+          <color attach="background" args={["#0a1628"]} />
+          <ambientLight intensity={1.65} />
+          <directionalLight position={[3.5, 4.5, 2.5]} intensity={2.6} />
+          <directionalLight position={[-2.5, -1.5, -3]} intensity={0.55} />
+          <hemisphereLight args={["#c5d8ef", "#142033", 0.75]} />
           {children}
           <OrbitControls
             makeDefault

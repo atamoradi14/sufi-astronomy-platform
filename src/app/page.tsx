@@ -2,26 +2,26 @@ import Link from "next/link";
 import { Hero } from "@/components/home/Hero";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LESSONS, SMART_CHAPTERS } from "@/lib/content/lessons";
-import { Box, BookOpen, Compass, Map, Orbit, PenLine, ScrollText, Stars } from "lucide-react";
+import { Box, BookOpen, Map, Orbit, PenLine, ScrollText, Stars } from "lucide-react";
 
 const FEATURES = [
   {
-    href: "/lab",
+    href: "/course",
+    title: "درس‌نامهٔ متمرکز",
+    desc: "فصل‌های ۱–۳ اسمارت در یک فهرست: مسیر، دروس، مثال‌ها، مسائل، اثبات‌ها و کره.",
+    icon: BookOpen,
+  },
+  {
+    href: "/course?tab=lab",
     title: "کرهٔ تعاملی",
-    desc: "عظیمه، صغیره، مثلث، زیادی کروی، فرمول‌های زنده روی اندازه‌گیری.",
+    desc: "عظیمه، صغیره، مثلث، برچسب کامل، اندازه‌گیری زنده.",
     icon: Box,
   },
   {
-    href: "/proofs",
+    href: "/course?tab=proofs",
     title: "اثبات‌ها",
-    desc: "صورت‌های (A)(B)(C)(D) اسمارت، هاورساین، PZX و ژیرار با شکل بازسازی‌شده.",
+    desc: "صورت‌های (A)(B)(C)(D)، هاورساین، PZX و ژیرار گام‌به‌گام.",
     icon: PenLine,
-  },
-  {
-    href: "/learn",
-    title: "درس‌نامه جامع",
-    desc: "نه فصل Part 1 اسمارت: بندها، فرمول‌ها، شکل‌ها، مثال عددی و تمرین.",
-    icon: BookOpen,
   },
   {
     href: "/sky",
@@ -36,9 +36,9 @@ const FEATURES = [
     icon: ScrollText,
   },
   {
-    href: "/problems",
+    href: "/course?tab=problems",
     title: "مسائل با شکل",
-    desc: "راه‌حل‌ها با نمودار کروی و ارجاع Smart/المپیاد.",
+    desc: "راه‌حل‌های تشریحی با کرهٔ سه‌بعدی دقیق.",
     icon: Orbit,
   },
   {
@@ -74,21 +74,19 @@ export default function HomePage() {
 
         <div className="mt-14 flex items-end justify-between gap-4">
           <h2 className="font-[family-name:var(--font-display)] text-2xl text-[var(--gold-soft)]">
-            فهرست دروس
+            مسیر فصل‌های ۱–۳
           </h2>
-          <Link href="/compass" className="text-sm text-[var(--muted)] hover:text-[var(--gold-soft)]">
-            <span className="inline-flex items-center gap-1">
-              <Compass className="h-3.5 w-3.5" /> قبله
-            </span>
+          <Link href="/course" className="text-sm text-[var(--muted)] hover:text-[var(--gold-soft)]">
+            ورود به درس‌نامه
           </Link>
         </div>
-        <div className="mt-5 grid gap-3 md:grid-cols-2">
-          {SMART_CHAPTERS.map((c) => {
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {SMART_CHAPTERS.filter((c) => ["ch1", "ch2", "ch3"].includes(c.id)).map((c) => {
             const n = LESSONS.filter((l) => l.chapterId === c.id).length;
             return (
               <Link
                 key={c.id}
-                href="/learn"
+                href="/course?tab=path"
                 className="rounded-xl border border-[var(--border)] bg-[var(--panel)]/55 px-4 py-3 hover:border-[var(--gold)]/45"
               >
                 <span className="block text-[11px] text-[var(--teal)] dir-ltr text-left">

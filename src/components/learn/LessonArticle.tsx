@@ -7,6 +7,7 @@ import { chapterOf } from "@/lib/content/lessons";
 import { SMART_BOOK } from "@/lib/content/smart";
 import { BookFigure } from "./BookFigures";
 import { ExampleWidget } from "./ExampleWidgets";
+import { LessonSphereEmbed } from "./LessonSphereEmbed";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toPersianDigits } from "@/lib/utils";
@@ -52,7 +53,10 @@ export function LessonArticle({ lesson }: { lesson: Lesson }) {
             </Button>
           )}
           <Button asChild size="sm" variant="secondary">
-            <Link href="/learn">فهرست فصل‌ها</Link>
+            <Link href="/course?tab=path">مسیر درس‌نامه</Link>
+          </Button>
+          <Button asChild size="sm" variant="outline">
+            <Link href={`/course?tab=problems`}>مسائل مرتبط</Link>
           </Button>
           <Button size="sm" variant="outline" onClick={() => setLang((l) => (l === "both" ? "fa" : "both"))}>
             {lang === "both" ? "فقط فارسی" : "فارسی + English"}
@@ -81,6 +85,8 @@ export function LessonArticle({ lesson }: { lesson: Lesson }) {
           <p className="text-[var(--muted)]">{SMART_BOOK.noteFa}</p>
         </CardContent>
       </Card>
+
+      <LessonSphereEmbed lessonId={lesson.id} />
 
       {lesson.figures.length > 0 && (
         <div className="grid gap-4 md:grid-cols-2">
