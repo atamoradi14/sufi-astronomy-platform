@@ -676,6 +676,54 @@ function median(values: number[]) {
   return s[Math.floor(s.length / 2)];
 }
 
+function cross(a: Vec3, b: Vec3): Vec3 {
+  return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+}
+
+function signedArea(
+  a: { x: number; y: number },
+  b: { x: number; y: number },
+  c: { x: number; y: number },
+) {
+  return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+}
+
+/** True when the pixel order of matched stars is a mirror of their sky order. */
+function patternIsMirrored(stars: SolvedStar[], bore: Vec3): boolean {
+  const matched = stars.filter((s) => s.matched).sort((a, b) => b.flux - a.flux);
+  const limit = Math.min(matched.length, 10);
+  let best = 0;
+  let pick: [SolvedStar, SolvedStar, SolvedStar] | null = null;
+  for (let i = 0; i < limit; i++) {
+    for (let j = i + 1; j < limit; j++) {
+      for (let k = j + 1; k < limit; k++) {
+        const area = Math.abs(signedArea(matched[i], matched[j], matched[k]));
+        if (area > best) {
+          best = area;
+          pick = [matched[i], matched[j], matched[k]];
+        }
+      }
+    }
+  }
+  if (!pick || best < 40) return false;
+  let ref: Vec3 = [0, 0, 1];
+  const along =
+    ref[0] * bore[0] + ref[1] * bore[1] + ref[2] * bore[2];
+  if (Math.abs(along) > 0.95) ref = [1, 0, 0];
+  const east = vunit(cross(ref, bore));
+  const south = vunit(cross(east, bore));
+  const tangent = (s: SolvedStar) => {
+    const v = radecToVec(s.raDeg, s.decDeg);
+    return {
+      x: east[0] * v[0] + east[1] * v[1] + east[2] * v[2],
+      y: south[0] * v[0] + south[1] * v[1] + south[2] * v[2],
+    };
+  };
+  const sky = signedArea(tangent(pick[0]), tangent(pick[1]), tangent(pick[2]));
+  const image = signedArea(pick[0], pick[1], pick[2]);
+  return image * sky < 0;
+}
+
 function rollOf(cam: Camera, beta: Vec3 | null) {
   const north = beta ? addAberration([0, 0, 1], beta) : ([0, 0, 1] as Vec3);
   const n = matVec(transpose(cam.R), north);
@@ -828,7 +876,7 @@ export function solvePlate(
     rollDeg: rollOf(camF, beta),
     inliers: pairs.length,
     detections: dets.length,
-    mirrored: camF.mirror,
+    mirrored: patternIsMirrored(stars, pixelToIcrs(camF, (width - 1) / 2, (height - 1) / 2, beta)),
     constellations,
     stars,
     beta,

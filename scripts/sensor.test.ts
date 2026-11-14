@@ -105,6 +105,7 @@ test("lost-in-space solve recovers the plate to a few arcseconds", () => {
   const center = radecToVec(solved.raDeg, solved.decDeg);
   const expect = radecToVec(78.4, 8.6);
   const err = sepArcsec(center, expect);
+  assert.equal(solved.mirrored, false);
   assert.ok(err < 5, `center error ${err.toFixed(2)}″ rms ${solved.rmsArcsec.toFixed(2)}″ inliers ${solved.inliers}`);
   assert.ok(solved.rmsArcsec < 8, `rms ${solved.rmsArcsec}`);
   assert.ok(Math.abs(solved.camera.k1 + 0.06) < 0.03, `k1 ${solved.camera.k1}`);
@@ -169,6 +170,7 @@ test("detector plus solver on a rendered plate stays within a few arcseconds", (
     radecToVec(solved.raDeg, solved.decDeg),
     radecToVec(56, 24),
   );
+  assert.equal(solved.mirrored, false);
   assert.ok(err < 12, `center ${err.toFixed(2)}″ scale ${solved.plateScaleArcsec.toFixed(1)}″/px inliers ${solved.inliers}`);
   let worst = 0;
   for (const star of plate.truth.slice(0, 15)) {
@@ -179,6 +181,23 @@ test("detector plus solver on a rendered plate stays within a few arcseconds", (
     if (nearest.d < 1) worst = Math.max(worst, Math.sqrt(nearest.d));
   }
   assert.ok(worst < 0.75, `centroid ${worst.toFixed(3)} px`);
+});
+
+test("a mirrored plate is labeled mirrored and keeps the center", () => {
+  const width = 960;
+  const height = 720;
+  const f = height / 2 / Math.tan(((46 * Math.PI) / 180) / 2);
+  const truth = cameraFromBoresight(84, -2, 18, f, width, height, -0.05, 0.01);
+  truth.mirror = true;
+  const ctx = { jd: cat.epochJd };
+  const plate = renderPlate(cat, truth, ctx, width, height, 6.1);
+  addNoise(plate.gray, 1.5, 11);
+  const solved = solvePlate(cat, detectStars(plate.gray, width, height), width, height, ctx);
+  assert.equal(solved.ok, true);
+  if (!solved.ok) return;
+  assert.equal(solved.mirrored, true);
+  const err = sepArcsec(radecToVec(solved.raDeg, solved.decDeg), radecToVec(84, -2));
+  assert.ok(err < 30, `mirrored center ${err.toFixed(2)}″`);
 });
 
 test("apparent altitude includes refraction and differs from the J2000 horizon shortcut", () => {
