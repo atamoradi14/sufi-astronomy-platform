@@ -16,6 +16,17 @@ function clamp(x: number, lo = -1, hi = 1) {
   return Math.min(hi, Math.max(lo, x));
 }
 
+/** Domain of an ordinary convex minor-arc triangle; radians. */
+export function isOrdinaryTriangle(a: number, b: number, c: number): boolean {
+  return (
+    [a, b, c].every((v) => Number.isFinite(v) && v > 0 && v < Math.PI) &&
+    a + b > c &&
+    b + c > a &&
+    c + a > b &&
+    a + b + c < 2 * Math.PI
+  );
+}
+
 /** Smart (A): cos a = cos b cos c + sin b sin c cos A */
 export function cosineLawSide(a: number, b: number, C: number): number {
   return Math.acos(
@@ -32,9 +43,10 @@ export function cosineLawAngle(A: number, B: number, c: number): number {
 
 /** Angle A from three sides — rearrangement of (A), Smart (9). */
 export function angleFromSides(a: number, b: number, c: number): number {
+  if (!isOrdinaryTriangle(a, b, c)) return NaN;
   return Math.acos(
     clamp(
-      (Math.cos(a) - Math.cos(b) * Math.cos(c)) / (Math.sin(b) * Math.sin(c) + 1e-15),
+      (Math.cos(a) - Math.cos(b) * Math.cos(c)) / (Math.sin(b) * Math.sin(c)),
     ),
   );
 }
@@ -51,7 +63,7 @@ export function haversineSide(b: number, c: number, A: number): number {
   return 2 * Math.asin(clamp(Math.sqrt(Math.max(0, h))));
 }
 
-/** Smart (B): sin a / sin A = sin b / sin B */
+/** Principal arcsine branch only; SSA callers must also check the supplementary candidate. */
 export function sineLawAngle(a: number, A: number, b: number): number {
   return Math.asin(clamp((Math.sin(b) * Math.sin(A)) / (Math.sin(a) + 1e-15)));
 }
@@ -59,8 +71,14 @@ export function sineLawAngle(a: number, A: number, b: number): number {
 /** Smart (C), analogue formula:
  *  sin a cos B = cos b sin c − sin b cos c cos A
  */
-export function analogueCosB(a: number, b: number, c: number, A: number): number {
-  const num = Math.cos(b) * Math.sin(c) - Math.sin(b) * Math.cos(c) * Math.cos(A);
+export function analogueCosB(
+  a: number,
+  b: number,
+  c: number,
+  A: number,
+): number {
+  const num =
+    Math.cos(b) * Math.sin(c) - Math.sin(b) * Math.cos(c) * Math.cos(A);
   return num / (Math.sin(a) + 1e-15);
 }
 
@@ -69,33 +87,49 @@ export function analogueCosB(a: number, b: number, c: number, A: number): number
  *  Memory: cos(inner side)·cos(inner angle)
  *         = sin(inner side)·cot(other side) − sin(inner angle)·cot(other angle)
  */
-export function fourPartsCosC(a: number, b: number, B: number, C: number): number {
+export function fourPartsCosC(
+  a: number,
+  b: number,
+  B: number,
+  C: number,
+): number {
   return (
-    Math.sin(a) * (1 / Math.tan(b)) - Math.sin(C) * (1 / Math.tan(B))
-  ) / (Math.cos(a) + 1e-15);
+    (Math.sin(a) * (1 / Math.tan(b)) - Math.sin(C) * (1 / Math.tan(B))) /
+    (Math.cos(a) + 1e-15)
+  );
 }
 
 /** Half-angle formulae Smart (11)–(13). s = (a+b+c)/2 */
 export function halfAngleSine(a: number, b: number, c: number): number {
-  const s = (a + b + c) / 2;
-  return Math.sqrt(
-    Math.max(0, (Math.sin(s - b) * Math.sin(s - c)) / (Math.sin(b) * Math.sin(c) + 1e-15)),
-  );
-}
-
-export function halfAngleCosine(a: number, b: number, c: number): number {
-  const s = (a + b + c) / 2;
-  return Math.sqrt(
-    Math.max(0, (Math.sin(s) * Math.sin(s - a)) / (Math.sin(b) * Math.sin(c) + 1e-15)),
-  );
-}
-
-export function halfAngleTan(a: number, b: number, c: number): number {
+  if (!isOrdinaryTriangle(a, b, c)) return NaN;
   const s = (a + b + c) / 2;
   return Math.sqrt(
     Math.max(
       0,
-      (Math.sin(s - b) * Math.sin(s - c)) / (Math.sin(s) * Math.sin(s - a) + 1e-15),
+      (Math.sin(s - b) * Math.sin(s - c)) / (Math.sin(b) * Math.sin(c) + 1e-15),
+    ),
+  );
+}
+
+export function halfAngleCosine(a: number, b: number, c: number): number {
+  if (!isOrdinaryTriangle(a, b, c)) return NaN;
+  const s = (a + b + c) / 2;
+  return Math.sqrt(
+    Math.max(
+      0,
+      (Math.sin(s) * Math.sin(s - a)) / (Math.sin(b) * Math.sin(c) + 1e-15),
+    ),
+  );
+}
+
+export function halfAngleTan(a: number, b: number, c: number): number {
+  if (!isOrdinaryTriangle(a, b, c)) return NaN;
+  const s = (a + b + c) / 2;
+  return Math.sqrt(
+    Math.max(
+      0,
+      (Math.sin(s - b) * Math.sin(s - c)) /
+        (Math.sin(s) * Math.sin(s - a) + 1e-15),
     ),
   );
 }
@@ -122,6 +156,7 @@ export function sphericalExcess(A: number, B: number, C: number): number {
 
 /** L'Huilier: tan(E/4) from three sides. */
 export function excessLHuilier(a: number, b: number, c: number): number {
+  if (!isOrdinaryTriangle(a, b, c)) return NaN;
   const s = (a + b + c) / 2;
   const t = Math.sqrt(
     Math.max(
@@ -139,7 +174,12 @@ export function triangleArea(A: number, B: number, C: number, R = 1): number {
   return R * R * sphericalExcess(A, B, C);
 }
 
-export function sineLawCheck(a: number, A: number, b: number, B: number): number {
+export function sineLawCheck(
+  a: number,
+  A: number,
+  b: number,
+  B: number,
+): number {
   return Math.sin(a) / Math.sin(A) - Math.sin(b) / Math.sin(B);
 }
 
@@ -157,7 +197,8 @@ export function parallelArc(equatorialArc: number, latitude: number): number {
 export function zenithDistance(phi: number, delta: number, H: number): number {
   return Math.acos(
     clamp(
-      Math.sin(phi) * Math.sin(delta) + Math.cos(phi) * Math.cos(delta) * Math.cos(H),
+      Math.sin(phi) * Math.sin(delta) +
+        Math.cos(phi) * Math.cos(delta) * Math.cos(H),
     ),
   );
 }
@@ -183,7 +224,14 @@ export function napierSumSides(A: number, B: number, c: number): number {
 }
 
 /** Delambre (45): sin ½c sin ½(A−B) = cos ½C sin ½(a−b) */
-export function delambreCheck(a: number, b: number, c: number, A: number, B: number, C: number) {
+export function delambreCheck(
+  a: number,
+  b: number,
+  c: number,
+  A: number,
+  B: number,
+  C: number,
+) {
   const left = Math.sin(c / 2) * Math.sin((A - B) / 2);
   const right = Math.cos(C / 2) * Math.sin((a - b) / 2);
   return left - right;
@@ -217,5 +265,6 @@ export const deg = {
   smallCircleArc: (great: number, polarDist: number) =>
     r2d(smallCircleArc(d2r(great), d2r(polarDist))),
   parallelArc: (eq: number, lat: number) => r2d(parallelArc(d2r(eq), d2r(lat))),
-  rightHypotenuse: (a: number, b: number) => r2d(rightHypotenuse(d2r(a), d2r(b))),
+  rightHypotenuse: (a: number, b: number) =>
+    r2d(rightHypotenuse(d2r(a), d2r(b))),
 };

@@ -8,6 +8,7 @@ export type BookRef = {
 
 export type Formula = {
   display: string;
+  tex?: string;
   number?: string;
   nameFa: string;
   nameEn: string;

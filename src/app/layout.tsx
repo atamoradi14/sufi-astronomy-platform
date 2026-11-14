@@ -1,20 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Amiri, Vazirmatn } from "next/font/google";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import "./globals.css";
-
-const display = Amiri({
-  variable: "--font-display",
-  subsets: ["arabic", "latin"],
-  weight: ["400", "700"],
-});
-
-const body = Vazirmatn({
-  variable: "--font-body",
-  subsets: ["arabic", "latin"],
-  weight: ["300", "400", "500", "700"],
-});
+import "katex/dist/katex.min.css";
+import "@fontsource-variable/vazirmatn";
+import "@fontsource/amiri/arabic-400.css";
+import "@fontsource/amiri/arabic-700.css";
+import "@fontsource/amiri/latin-400.css";
 
 export const metadata: Metadata = {
   title: "صوفی‌آسمان | آموزش ریاضیات کروی و نجوم",
@@ -35,7 +27,6 @@ export const viewport: Viewport = {
   themeColor: "#0c1424",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
   viewportFit: "cover",
 };
 
@@ -46,7 +37,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa" dir="rtl" data-scroll-behavior="smooth">
-      <body className={`${display.variable} ${body.variable} antialiased`}>
+      <body className="antialiased">
         <div className="app-shell flex min-h-dvh flex-col">
           <SiteHeader />
           <main className="flex-1">{children}</main>

@@ -124,7 +124,7 @@ export const PROBLEMS: Problem[] = [
       "E = 72+80+95−180 = 67°. Area = 67·π/180 ≈ 1.169 sr (قضیهٔ ژیرار).",
     answer: "E=67° · Area≈1.169 sr",
     difficulty: "متوسط",
-    source: "Girard · Smart I",
+    source: "Girard · olympiad supplement",
     diagram: {
       kind: "triangle-angles",
       A: 72,
@@ -144,7 +144,7 @@ export const PROBLEMS: Problem[] = [
       "Δα=9°. cos d = sin(−8)sin7 + cos(−8)cos7 cos9 ≈ 0.9540 ⇒ d = arccos(0.9540) ≈ 17.48°.",
     answer: "d ≈ 17.5°",
     difficulty: "متوسط",
-    source: "Smart I.3",
+    source: "Adaptation of Smart I §5",
     diagram: {
       kind: "star-distance",
       ra1h: 5.0,
@@ -161,10 +161,10 @@ export const PROBLEMS: Problem[] = [
     prompt: "a=50°, A=120°, b=40°. زاویهٔ B را بیابید (ربع درست).",
     hint: "sin B / sin b = sin A / sin a  ⇒  sin B = sin b · sin A / sin a. ربع را با کسینوس اضلاع تأیید کنید.",
     solution:
-      "sin B = sin40°·sin120°/sin50° ≈ 0.7266 ⇒ B ≈ 46.55° یا ۱۳۳.۴۵°. با قانون کسینوس‌ها برای ضلع c و زاویه، ربع حاد (۴۶.۶°) سازگار است.",
+      "sin B = sin40°·sin120°/sin50° ≈ 0.7267 ⇒ B ≈ 46.6089° یا ۱۳۳.۳۹۱۱°. چون a > b، در مثلث معمول A > B است؛ نامزد ۱۳۳٫۳۹۱۱ درجه از A = ۱۲۰ درجه بزرگ‌تر است و رد می‌شود. نامزد ۴۶٫۶۰۸۹ درجه با قانون کسینوس سازگار است.",
     answer: "B ≈ 46.6°",
     difficulty: "المپیاد",
-    source: "Smart I.4",
+    source: "Adaptation of Smart I §6",
     diagram: {
       kind: "triangle-ssa",
       a: 50,
@@ -239,7 +239,7 @@ export const PROBLEMS: Problem[] = [
       "از مثلث قطبی: cos C = −cos A cos B + sin A sin B cos c.",
     answer: "cos C = −cos A cos B + sin A sin B cos c",
     difficulty: "متوسط",
-    source: "Smart I.3 polar",
+    source: "Adaptation of Smart I §5 polar",
     diagram: {
       kind: "polar-dual",
       a: 70,
@@ -307,7 +307,7 @@ export const PROBLEMS: Problem[] = [
       "در مثلث قائم C=90° با a=30°, B=50°، ضلع c را از روابط قائم بیابید (tan a = cos B tan c).",
     hint: "از فرمول چهار جزء / ناپیر قائم: tan a = cos B · tan c ⇒ tan c = tan a / cos B.",
     solution:
-      "tan c = tan30°/cos50° ≈ 0.57735/0.64279 ≈ 0.898 ⇒ c ≈ 41.94°.",
+      "tan c = tan30°/cos50° ≈ 0.57735/0.64279 ≈ 0.898 ⇒ c ≈ 41.9301°.",
     answer: "c ≈ 41.9°",
     difficulty: "المپیاد",
     source: "Smart I right-angled",

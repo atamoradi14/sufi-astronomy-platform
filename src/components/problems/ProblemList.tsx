@@ -4,7 +4,13 @@ import { useMemo, useState } from "react";
 import { PROBLEMS } from "@/lib/content/problems";
 import { COURSES } from "@/lib/content/courses";
 import { SolutionSphere } from "@/components/problems/SolutionSphere";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toPersianDigits } from "@/lib/utils";
 
@@ -25,15 +31,17 @@ export function ProblemList() {
         <FilterChip active={filter === "all"} onClick={() => setFilter("all")}>
           همه
         </FilterChip>
-        {COURSES.filter((l) => PROBLEMS.some((p) => p.lessonId === l.id)).map((l) => (
-          <FilterChip
-            key={l.id}
-            active={filter === l.id}
-            onClick={() => setFilter(l.id)}
-          >
-            {l.titleFa}
-          </FilterChip>
-        ))}
+        {COURSES.filter((l) => PROBLEMS.some((p) => p.lessonId === l.id)).map(
+          (l) => (
+            <FilterChip
+              key={l.id}
+              active={filter === l.id}
+              onClick={() => setFilter(l.id)}
+            >
+              {l.titleFa}
+            </FilterChip>
+          ),
+        )}
       </div>
 
       <div className="space-y-3">
@@ -41,13 +49,28 @@ export function ProblemList() {
           const open = openId === p.id;
           return (
             <Card key={p.id}>
-              <CardHeader className="cursor-pointer" onClick={() => setOpenId(open ? null : p.id)}>
+              <CardHeader
+                role="button"
+                tabIndex={0}
+                aria-expanded={open}
+                aria-controls={`problem-${p.id}`}
+                className="cursor-pointer"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setOpenId(open ? null : p.id);
+                  }
+                }}
+                onClick={() => setOpenId(open ? null : p.id)}
+              >
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
                     <CardTitle className="text-lg">
                       {toPersianDigits(idx + 1)}. {p.title}
                     </CardTitle>
-                    <CardDescription className="mt-1">{p.prompt}</CardDescription>
+                    <CardDescription className="mt-1">
+                      {p.prompt}
+                    </CardDescription>
                   </div>
                   <div className="flex flex-col items-end gap-1">
                     <span className="rounded-md border border-[var(--border)] px-2 py-1 text-[11px] text-[var(--gold-soft)]">
@@ -60,13 +83,18 @@ export function ProblemList() {
                 </div>
               </CardHeader>
               {open && (
-                <CardContent className="space-y-3 border-t border-[var(--border)] pt-4">
+                <CardContent
+                  id={`problem-${p.id}`}
+                  className="space-y-3 border-t border-[var(--border)] pt-4"
+                >
                   <SolutionSphere diagram={p.diagram} />
                   <div className="flex flex-wrap gap-2">
                     <Button
                       size="sm"
                       variant="secondary"
-                      onClick={() => setShowHint((s) => ({ ...s, [p.id]: !s[p.id] }))}
+                      onClick={() =>
+                        setShowHint((s) => ({ ...s, [p.id]: !s[p.id] }))
+                      }
                     >
                       {showHint[p.id] ? "پنهان کردن راهنما" : "نمایش راهنما"}
                     </Button>
@@ -82,14 +110,18 @@ export function ProblemList() {
                   </div>
                   {showHint[p.id] && (
                     <div className="rounded-lg border border-[var(--teal)]/40 bg-[var(--teal)]/10 px-3 py-2 text-sm leading-7">
-                      <strong className="text-[var(--gold-soft)]">راهنما: </strong>
+                      <strong className="text-[var(--gold-soft)]">
+                        راهنما:{" "}
+                      </strong>
                       {p.hint}
                     </div>
                   )}
                   {showSolution[p.id] && (
                     <div className="space-y-2 rounded-lg border border-[var(--gold)]/30 bg-[var(--gold)]/5 px-3 py-3 text-sm leading-7">
                       <p>{p.solution}</p>
-                      <p className="text-[var(--gold-soft)]">پاسخ نهایی: {p.answer}</p>
+                      <p className="text-[var(--gold-soft)]">
+                        پاسخ نهایی: {p.answer}
+                      </p>
                     </div>
                   )}
                 </CardContent>

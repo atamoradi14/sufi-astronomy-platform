@@ -53,14 +53,12 @@ function dot(a: Vec3, b: Vec3) {
 /** Camera basis for look direction (handles near-zenith). */
 export function lookBasis(look: Look): { forward: Vec3; right: Vec3; up: Vec3 } {
   const forward = azAltToVec(look.az, look.alt);
-  const worldUp: Vec3 = Math.abs(forward[2]) > 0.98 ? [0, 1, 0] : [0, 0, 1];
-  const right = norm(cross(forward, worldUp));
-  // Recalculate up for orthonormal frame (sky "up" on screen)
+  // Analytic eastward screen basis stays continuous through the zenith.
+  const a = look.az * DEG;
+  const right: Vec3 = [Math.cos(a), -Math.sin(a), 0];
   const up = norm(cross(right, forward));
   // Prefer world-up projected for more Stellarium-like roll near horizon
-  const up2 = norm(cross(right, forward));
-  void up;
-  return { forward, right, up: up2 };
+  return { forward, right, up };
 }
 
 /**
@@ -81,7 +79,8 @@ export function projectAzAlt(
   const half = Math.tan((look.fov * DEG) / 2);
   const x = dx / depth / half;
   const y = dy / depth / half;
-  const visible = Math.hypot(x, y) < 1.35;
+  // Canvas performs rectangular clipping; never impose a circular FOV mask.
+  const visible = Number.isFinite(x) && Number.isFinite(y);
   return { x, y, visible, depth };
 }
 
@@ -110,7 +109,7 @@ export function projectStar(
     y: -p.y, // canvas Y down
     az,
     alt,
-    visible: p.visible && alt > -5,
+    visible: p.visible && alt >= 0,
   };
 }
 
@@ -125,7 +124,7 @@ export function panLook(
   let az = look.az - dxPx * degPerPx;
   let alt = look.alt + dyPx * degPerPx;
   az = ((az % 360) + 360) % 360;
-  alt = Math.max(-85, Math.min(85, alt));
+  alt = Math.max(-85, Math.min(90, alt));
   return { ...look, az, alt };
 }
 

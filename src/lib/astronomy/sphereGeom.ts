@@ -60,6 +60,15 @@ export function greatArc(a: Vec3, b: Vec3, steps = 64): Vec3[] {
   const cosθ = clamp(dot(A, B), -1, 1);
   const θ = Math.acos(cosθ);
   if (θ < 1e-8) return [A, B];
+  // Antipodes have infinitely many connecting semicircles. Choose a stable
+  // perpendicular direction instead of dividing by sin(pi).
+  if (Math.PI - θ < 1e-7) {
+    const u = orthogonal(A);
+    return Array.from({ length: steps + 1 }, (_, i) => {
+      const t = Math.PI * i / steps;
+      return normalize(A.map((v, j) => v * Math.cos(t) + u[j] * Math.sin(t)) as Vec3);
+    });
+  }
   const pts: Vec3[] = [];
   for (let i = 0; i <= steps; i++) {
     const t = i / steps;
@@ -117,12 +126,14 @@ export function parallelCircle(latDeg: number, steps = 96): Vec3[] {
 }
 
 export function angularDistanceDeg(a: Vec3, b: Vec3): number {
-  return (Math.acos(clamp(dot(normalize(a), normalize(b)), -1, 1)) * 180) / Math.PI;
+  const A = normalize(a), B = normalize(b);
+  return Math.atan2(Math.hypot(...cross(A, B)), dot(A, B)) * 180 / Math.PI;
 }
 
 /** Spherical angle at B between points A-B-C (degrees). */
 export function sphericalAngleDeg(A: Vec3, B: Vec3, C: Vec3): number {
   const b = normalize(B);
+  if (Math.hypot(...cross(A, b)) < 1e-10 || Math.hypot(...cross(C, b)) < 1e-10) return NaN;
   const ta = normalize(reject(normalize(A), b));
   const tc = normalize(reject(normalize(C), b));
   return (Math.acos(clamp(dot(ta, tc), -1, 1)) * 180) / Math.PI;

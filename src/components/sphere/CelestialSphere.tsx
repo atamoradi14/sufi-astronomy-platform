@@ -1,8 +1,13 @@
 "use client";
 
-import { useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Billboard, Line, OrbitControls, Stars, Text } from "@react-three/drei";
+import { Suspense, useMemo, useEffect, useRef } from "react";
+import {
+  Canvas,
+  useThree,
+  useFrame,
+  type ThreeEvent,
+} from "@react-three/fiber";
+import { Line, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import {
   equatorCircle,
@@ -11,6 +16,8 @@ import {
   meridianCircle,
   parallelCircle,
   smallCircle,
+  normalize,
+  cartToLonLat,
   type Vec3,
 } from "@/lib/astronomy/sphereGeom";
 
@@ -27,64 +34,69 @@ export type SphereViewState = {
   pointA: { lon: number; lat: number };
   pointB: { lon: number; lat: number };
   pointC: { lon: number; lat: number };
+  vertexLabels?: [string, string, string];
   highlight: "none" | "great" | "small" | "triangle";
 };
-
 type Props = {
   state: SphereViewState;
   className?: string;
+  onPlace?: (point: { lon: number; lat: number }) => void;
+  resetKey?: number;
 };
-
-export function CelestialSphere({ state, className }: Props) {
+const COLORS = { a: "#79d5ca", b: "#91b9ff", c: "#f1cf7b" };
+export function CelestialSphere({
+  state,
+  className,
+  onPlace,
+  resetKey = 0,
+}: Props) {
   return (
-    <div className={`relative ${className ?? ""}`}>
+    <div
+      className={`relative ${className ?? ""}`}
+      role="img"
+      aria-label="Interactive unit sphere: drag to orbit, scroll or pinch to zoom. Select a vertex, then click the surface to place it."
+    >
       <Canvas
-        camera={{ position: [2.4, 1.4, 2.4], fov: 42 }}
-        dpr={[1, 1.5]}
-        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-        onCreated={({ gl }) => {
-          gl.setClearColor(new THREE.Color("#070d18"), 1);
-          gl.domElement.addEventListener("webglcontextlost", (e) => e.preventDefault(), false);
-        }}
+        key={resetKey}
+        camera={{ position: [2.1, 1.45, 2.5], fov: 40 }}
+        dpr={[1, 2]}
+        frameloop="demand"
+        gl={{ antialias: true, alpha: false }}
+        onCreated={({ gl }) => gl.setClearColor("#081322", 1)}
       >
-        <ambientLight intensity={0.55} />
-        <directionalLight position={[4, 6, 2]} intensity={1.1} />
-        <Stars radius={40} depth={30} count={900} factor={2} saturation={0} fade speed={0.25} />
-        <SphereMesh state={state} />
+        <ambientLight intensity={1.4} />
+        <directionalLight position={[3, 5, 4]} intensity={1.8} />
+        <Suspense fallback={null}>
+          <SphereMesh state={state} onPlace={onPlace} />
+        </Suspense>
+        <FitCamera />
         <OrbitControls
           makeDefault
           enablePan={false}
-          minDistance={1.6}
-          maxDistance={5}
-          rotateSpeed={0.75}
-          zoomSpeed={0.7}
+          minDistance={2}
+          maxDistance={6}
+          rotateSpeed={0.65}
+          zoomSpeed={0.65}
+          enableDamping
+          dampingFactor={0.12}
         />
       </Canvas>
-      <div className="pointer-events-none absolute inset-x-0 top-3 flex justify-center">
-        <span className="sphere-label">N · قطب</span>
-      </div>
-      <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center">
-        <span className="sphere-label">S</span>
+      <div className="pointer-events-none absolute start-4 top-4 rounded-lg bg-[#07121fe6] px-3 py-2 text-xs text-[#a9bdd1]">
+        R = 1 ·{" "}
+        {onPlace
+          ? "برای جای‌گذاری روی سطح کلیک کنید"
+          : "نمای بیرونی · External view"}
       </div>
     </div>
   );
 }
-
-function SphereMesh({ state }: { state: SphereViewState }) {
-  const globe = useRef<THREE.Mesh>(null);
-  const dragging = useRef(false);
-
-  useFrame((ctx, dt) => {
-    const controls = ctx.controls as { enabled?: boolean; state?: number } | null;
-    // state 0 = NONE in OrbitControls internals when idle; avoid fighting user drag
-    if (controls && "state" in controls && typeof controls.state === "number") {
-      dragging.current = controls.state !== -1 && controls.state !== 0;
-    }
-    if (globe.current && !state.showTriangle && !dragging.current) {
-      globe.current.rotation.y += dt * 0.025;
-    }
-  });
-
+function SphereMesh({
+  state,
+  onPlace,
+}: {
+  state: SphereViewState;
+  onPlace?: Props["onPlace"];
+}) {
   const A = useMemo(
     () => lonLatToCart(state.pointA.lon, state.pointA.lat),
     [state.pointA],
@@ -97,162 +109,268 @@ function SphereMesh({ state }: { state: SphereViewState }) {
     () => lonLatToCart(state.pointC.lon, state.pointC.lat),
     [state.pointC],
   );
-
-  const equator = useMemo(() => equatorCircle(160), []);
-  const meridians = useMemo(
-    () => [0, 45, 90, 135].map((λ) => meridianCircle(λ, 120)),
-    [],
-  );
-  const parallels = useMemo(
-    () => [-60, -30, 30, 60].map((φ) => parallelCircle(φ, 96)),
-    [],
-  );
-  const horizon = useMemo(() => {
-    const zenith = lonLatToCart(0, state.observerLat);
-    return smallCircle(zenith, 90, 128);
-  }, [state.observerLat]);
-  const ecliptic = useMemo(() => {
-    const pole = lonLatToCart(90, 90 - 23.44);
-    return smallCircle(pole, 90, 160);
-  }, []);
-  const smallDemo = useMemo(
-    () => smallCircle(A, state.smallRadius, 120),
-    [A, state.smallRadius],
-  );
   const arcs = useMemo(
-    () => ({
-      ab: greatArc(A, B, 72),
-      bc: greatArc(B, C, 72),
-      ca: greatArc(C, A, 72),
-    }),
+    () => [greatArc(B, C), greatArc(C, A), greatArc(A, B)],
     [A, B, C],
   );
-
+  const Z = useMemo(
+    () => lonLatToCart(0, state.observerLat),
+    [state.observerLat],
+  );
+  const ecliptic = useMemo(
+    () => smallCircle(lonLatToCart(90, 66.56), 90, 192),
+    [],
+  );
+  const surface = useMemo(() => {
+    const positions: number[] = [];
+    const n = 24;
+    const point = (i: number, j: number) =>
+      normalize(
+        A.map(
+          (v, k) => (1 - (i + j) / n) * v + (i / n) * B[k] + (j / n) * C[k],
+        ) as Vec3,
+      ).map((v) => v * 1.006);
+    for (let i = 0; i < n; i++)
+      for (let j = 0; j < n - i; j++) {
+        positions.push(...point(i, j), ...point(i + 1, j), ...point(i, j + 1));
+        if (i + j < n - 1)
+          positions.push(
+            ...point(i + 1, j),
+            ...point(i + 1, j + 1),
+            ...point(i, j + 1),
+          );
+      }
+    return new Float32Array(positions);
+  }, [A, B, C]);
+  const place = (e: ThreeEvent<MouseEvent>) => {
+    if (!onPlace || e.delta > 4) return;
+    e.stopPropagation();
+    onPlace(cartToLonLat([e.point.x, e.point.y, e.point.z]));
+  };
   return (
     <group>
-      <mesh ref={globe}>
-        <sphereGeometry args={[0.995, 64, 64]} />
-        <meshStandardMaterial
-          color="#121c30"
-          transparent
-          opacity={0.55}
-          metalness={0.15}
-          roughness={0.85}
-        />
+      <mesh onClick={place}>
+        <sphereGeometry args={[0.998, 80, 64]} />
+        <meshStandardMaterial color="#152940" roughness={0.95} />
       </mesh>
-      <mesh>
-        <sphereGeometry args={[1.002, 48, 48]} />
-        <meshBasicMaterial
-          color="#c9a227"
-          wireframe
-          transparent
-          opacity={0.08}
-        />
-      </mesh>
-
-      <Line points={[[0, -1.15, 0], [0, 1.15, 0]]} color="#e6d39a" lineWidth={1.5} />
-
+      <Line
+        points={[
+          [0, -1.2, 0],
+          [0, 1.2, 0],
+        ]}
+        color="#6b819c"
+        lineWidth={1}
+        dashed
+        dashSize={0.04}
+        gapSize={0.03}
+      />
+      {state.vertexLabels?.[0] !== "P" && (
+        <SphereMarker pos={[0, 1.08, 0]} label="P · N" color="#c8d9ea" />
+      )}
+      <SphereMarker pos={[0, -1.08, 0]} label="P′ · S" color="#c8d9ea" />
       {state.showEquator && (
-        <PolyLine pts={equator} color="#c9a227" width={2} glow={state.highlight === "great"} />
+        <Curve points={equatorCircle(192)} color="#f1cf7b" width={2} />
       )}
       {state.showMeridians &&
-        meridians.map((m, i) => (
-          <PolyLine key={i} pts={m} color="#5b7c99" width={1} />
-        ))}
-      {state.showParallels &&
-        parallels.map((p, i) => (
-          <PolyLine
-            key={i}
-            pts={p}
-            color="#3d7a7a"
-            width={1.25}
-            dashed
-            glow={state.highlight === "small"}
+        [0, 30, 60, 90, 120, 150].map((l) => (
+          <Curve
+            key={l}
+            points={meridianCircle(l)}
+            color="#52708c"
+            width={0.7}
           />
         ))}
-      {state.showHorizon && <PolyLine pts={horizon} color="#8b4557" width={2} />}
-      {state.showEcliptic && <PolyLine pts={ecliptic} color="#6f9e7a" width={2} />}
-      {state.showSmallDemo && (
-        <PolyLine
-          pts={smallDemo}
-          color="#e6d39a"
-          width={2.5}
-          glow={state.highlight === "small"}
-        />
+      {state.showParallels &&
+        [-60, -30, 30, 60].map((l) => (
+          <Curve
+            key={l}
+            points={parallelCircle(l)}
+            color="#528a91"
+            width={0.8}
+            dashed
+          />
+        ))}
+      {state.showEcliptic && (
+        <Curve points={ecliptic} color="#ad9bff" width={2.5} />
       )}
-
+      {state.showHorizon && (
+        <>
+          <Curve points={smallCircle(Z, 90, 192)} color="#ed94aa" width={2.7} />
+          <SphereMarker
+            pos={Z.map((v) => v * 1.04) as Vec3}
+            label="Z"
+            color="#ed94aa"
+          />
+          <Line
+            points={[[0, 0, 0], Z]}
+            color="#ed94aa"
+            dashed
+            dashSize={0.04}
+            gapSize={0.03}
+          />
+        </>
+      )}
+      {state.showSmallDemo && (
+        <>
+          <Curve
+            points={smallCircle(A, state.smallRadius, 192)}
+            color="#b2a5ff"
+            width={2.5}
+          />
+          {!state.showTriangle && (
+            <SphereMarker pos={A} label="A · pole" color="#b2a5ff" />
+          )}
+        </>
+      )}
       {state.showTriangle && (
         <>
-          <PolyLine pts={arcs.ab} color="#e6d39a" width={3} glow={state.highlight === "triangle"} />
-          <PolyLine pts={arcs.bc} color="#3d7a7a" width={3} glow={state.highlight === "triangle"} />
-          <PolyLine pts={arcs.ca} color="#5b7c99" width={3} glow={state.highlight === "triangle"} />
-          <PointMarker pos={A} label="A" color="#e6d39a" />
-          <PointMarker pos={B} label="B" color="#e6d39a" />
-          <PointMarker pos={C} label="C" color="#e6d39a" />
+          <mesh>
+            <bufferGeometry>
+              <bufferAttribute
+                attach="attributes-position"
+                args={[surface, 3]}
+              />
+            </bufferGeometry>
+            <meshBasicMaterial
+              color="#6dd0c4"
+              transparent
+              opacity={0.12}
+              depthWrite={false}
+              side={THREE.DoubleSide}
+            />
+          </mesh>
+          {arcs.map((p, i) => (
+            <Curve
+              key={i}
+              points={p}
+              color={Object.values(COLORS)[i]}
+              width={3}
+            />
+          ))}
+          {[A, B, C].map((p, i) => (
+            <SphereMarker
+              key={i}
+              pos={p}
+              label={(state.vertexLabels ?? ["A", "B", "C"])[i]}
+              color={Object.values(COLORS)[i]}
+            />
+          ))}
+          {arcs.map((p, i) => (
+            <SphereMarker
+              key={i}
+              pos={p[Math.floor(p.length / 2)]}
+              label={["a", "b", "c"][i]}
+              color={Object.values(COLORS)[i]}
+              small
+            />
+          ))}
         </>
       )}
     </group>
   );
 }
-
-function PolyLine({
-  pts,
+function Curve({
+  points,
   color,
   width = 1.5,
-  dashed,
-  glow,
+  dashed = false,
 }: {
-  pts: Vec3[];
+  points: Vec3[];
   color: string;
   width?: number;
   dashed?: boolean;
-  glow?: boolean;
 }) {
-  const points = useMemo(
-    () => pts.map((p) => new THREE.Vector3(p[0], p[1], p[2])),
-    [pts],
-  );
   return (
     <Line
-      points={points}
+      points={points.map((p) => p.map((v) => v * 1.009) as Vec3)}
       color={color}
-      lineWidth={glow ? width + 1.5 : width}
+      lineWidth={width}
       dashed={dashed}
-      dashSize={0.05}
-      gapSize={0.04}
-      transparent
-      opacity={glow ? 1 : 0.92}
+      dashSize={0.035}
+      gapSize={0.025}
     />
   );
 }
-
-function PointMarker({
+export function SphereMarker({
   pos,
   label,
   color,
+  small = false,
 }: {
   pos: Vec3;
   label: string;
   color: string;
+  small?: boolean;
 }) {
+  const sprite = useRef<THREE.Sprite>(null);
+  useFrame(({ camera, size }) => {
+    if (sprite.current && camera instanceof THREE.PerspectiveCamera) {
+      const height =
+        (24 * 2 * Math.tan((camera.fov * Math.PI) / 360)) /
+        Math.max(1, size.height);
+      sprite.current.scale.set(height * texture.ratio, height, 1);
+    }
+  });
+  const texture = useMemo(() => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d")!;
+    ctx.font = "600 24px sans-serif";
+    const width = Math.ceil(ctx.measureText(label).width) + 24;
+    canvas.width = width * 2;
+    canvas.height = 72;
+    ctx.scale(2, 2);
+    ctx.font = "600 24px sans-serif";
+    ctx.fillStyle = "#07121f";
+    ctx.beginPath();
+    ctx.roundRect(0, 0, width, 36, 7);
+    ctx.fill();
+    ctx.strokeStyle = "#8298b055";
+    ctx.stroke();
+    ctx.fillStyle = color;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(label, width / 2, 19);
+    const map = new THREE.CanvasTexture(canvas);
+    map.colorSpace = THREE.SRGBColorSpace;
+    return { map, ratio: width / 36 };
+  }, [label, color]);
+  useEffect(() => () => texture.map.dispose(), [texture]);
   return (
-    <group position={pos}>
-      <mesh>
-        <sphereGeometry args={[0.035, 16, 16]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.4} />
-      </mesh>
-      <Billboard position={[0.08, 0.08, 0]}>
-        <Text
-          fontSize={0.09}
-          color="#e6d39a"
-          anchorX="left"
-          anchorY="middle"
-          outlineWidth={0.006}
-          outlineColor="#070d18"
-        >
-          {label}
-        </Text>
-      </Billboard>
+    <group position={pos.map((v) => v * 1.025) as Vec3}>
+      {!small && (
+        <mesh>
+          <sphereGeometry args={[0.017, 16, 12]} />
+          <meshBasicMaterial color={color} />
+        </mesh>
+      )}
+      <sprite
+        ref={sprite}
+        position={pos.map((v) => v * 0.055) as Vec3}
+        scale={[0.09 * texture.ratio, 0.09, 1]}
+      >
+        <spriteMaterial
+          map={texture.map}
+          sizeAttenuation={false}
+          transparent
+          depthWrite={false}
+          depthTest
+          alphaTest={0.01}
+        />
+      </sprite>
     </group>
   );
+}
+
+function FitCamera() {
+  const { camera, size, invalidate } = useThree();
+  useEffect(() => {
+    if (camera instanceof THREE.PerspectiveCamera) {
+      const ratio = Math.min(1, size.width / Math.max(1, size.height));
+      camera.fov =
+        (2 * Math.atan(Math.tan((20 * Math.PI) / 180) / ratio) * 180) / Math.PI;
+      camera.updateProjectionMatrix();
+      invalidate();
+    }
+  }, [camera, size.width, size.height, invalidate]);
+  return null;
 }

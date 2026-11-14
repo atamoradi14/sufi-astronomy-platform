@@ -1,5 +1,4 @@
 import type { Lesson } from "./lessonTypes";
-
 export const LESSONS_CH1: Lesson[] = [
   {
     id: "great-circles",
@@ -10,8 +9,10 @@ export const LESSONS_CH1: Lesson[] = [
     minutes: 45,
     spherePreset: "circles",
     olympiad: "هندسهٔ کروی پایه · قطب یک عظیمه",
-    summaryFa: "فصل اول اسمارت جهت‌ها روی کرهٔ سماوی را می‌گذارد: عظیمه، صغیره، قطب‌ها و زاویهٔ کروی از شکل ۱.",
-    summaryEn: "Smart I §§1–3: directions on the celestial sphere, great and small circles, poles, and the spherical angle (Fig. 1).",
+    summaryFa:
+      "برای یک ناظر ثابت، هر خط دید نقطه‌ای روی کره تعیین می‌کند. شعاع انتخابی فاصلهٔ واقعی ستاره نیست. تغییر شعاع، زاویه‌ها را ثابت نگه می‌دارد ولی طول کمان‌ها را تغییر می‌دهد.",
+    summaryEn:
+      "For a fixed observer, each line of sight determines a point on a sphere. The chosen radius is not the star’s physical distance. Changing radius preserves angles and scales arc lengths.",
     smart: {
       chapter: "I",
       sections: "§§1–3",
@@ -19,48 +20,59 @@ export const LESSONS_CH1: Lesson[] = [
       formulae: ["(1)"],
       figures: ["1"],
     },
-    figures: ["fig1"],
+    figures: ["geometry-circles"],
     englishFormulas: [
-      "Great circle = intersection of the sphere with a plane through the centre O.",
-      "Small circle = intersection with a plane not through O.",
-      "CD = AB sin PC   (Smart 1) — arc of a small circle from the polar distance of its pole.",
+      "\\ell_{\\rm great}=R\\sigma",
+      "\\ell_{\\rm small}=R\\sin\\theta\\,|\\Delta\\lambda|",
     ],
     formulas: [
-      { display: "AY = R × ∠AOY  (radians)", nameFa: "طول کمان عظیمه", nameEn: "Great-circle arc length" },
-      { display: "CD = AB · sin PC", number: "(1)", nameFa: "طول کمان صغیره", nameEn: "Small-circle arc (Smart 1)" },
+      {
+        display: "\\ell_{\\rm great}=R\\sigma",
+        tex: "\\ell_{\\rm great}=R\\sigma",
+        nameFa: "طول عظیمه؛ σ رادیانی",
+        nameEn: "Great-circle length; σ in radians",
+      },
+      {
+        display: "\\ell_{\\rm small}=R\\sin\\theta\\,|\\Delta\\lambda|",
+        tex: "\\ell_{\\rm small}=R\\sin\\theta\\,|\\Delta\\lambda|",
+        nameFa: "طول مسیر صغیره",
+        nameEn: "Small-circle path length",
+      },
     ],
     sections: [
       {
-        headingFa: "کرهٔ سماوی به عنوان کرهٔ جهت‌ها",
-        headingEn: "The celestial sphere as a sphere of directions",
-        bodyFa: "اسمارت در بند ۱ می‌گوید چشم فاصلهٔ ستارگان را نمی‌سنجد؛ نجوم کروی با جهت‌ها سر و کار دارد. جایگاه ستاره تقاطع خط دید با کره‌ای به مرکز ناظر است — کرهٔ سماوی — که شعاعش دلخواه است.",
-        bodyEn: "Smart §1: the eye gives no indication of stellar distances. Spherical astronomy is concerned with directions. A star’s position is the intersection of the line of sight with a sphere centred on the observer — the celestial sphere — whose radius is arbitrary.",
+        headingFa: "کره، مدل جهت است",
+        headingEn: "A sphere models directions",
+        bodyFa:
+          "برای یک ناظر ثابت، هر خط دید نقطه‌ای روی کره تعیین می‌کند. شعاع انتخابی فاصلهٔ واقعی ستاره نیست. تغییر شعاع، زاویه‌ها را ثابت نگه می‌دارد ولی طول کمان‌ها را تغییر می‌دهد.",
+        bodyEn:
+          "For a fixed observer, each line of sight determines a point on a sphere. The chosen radius is not the star’s physical distance. Changing radius preserves angles and scales arc lengths.",
       },
       {
-        headingFa: "عظیمه و صغیره (شکل ۱)",
-        headingEn: "Great and small circles (Fig. 1)",
-        bodyFa: "هر صفحه از مرکز O کره را در یک عظیمه قطع می‌کند (EAB). هر صفحهٔ دیگر صغیره می‌سازد (FCD). قطری عمود بر صفحهٔ عظیمه کره را در قطب‌های P و Q قطع می‌کند. هر نقطهٔ عظیمه از هر قطب ۹۰° فاصله دارد.",
-        bodyEn: "A plane through the centre cuts the sphere in a great circle; any other plane yields a small circle. The diameter perpendicular to the plane of a great circle meets the sphere in its poles P, Q. Every point of the great circle is 90° from either pole.",
+        headingFa: "صفحه، قطب و دایره",
+        headingEn: "Planes, poles, and circles",
+        bodyFa:
+          "صفحهٔ گذرنده از مرکز عظیمه می‌سازد. صفحهٔ با فاصلهٔ d از مرکز، برای قدرمطلق d کمتر از R، صغیره‌ای به شعاع ریشهٔ R² − d² می‌سازد. دو جهت عمود بر صفحه قطب‌های پادپا هستند.",
+        bodyEn:
+          "A plane through the centre cuts a great circle. A plane at distance d, with |d| < R, cuts a small circle of radius √(R²−d²). The two plane-normal directions give antipodal poles.",
+        formula: "\\rho=R\\sin\\theta,\\quad d=R\\cos\\theta",
       },
       {
-        headingFa: "زاویهٔ کروی",
-        headingEn: "The spherical angle",
-        bodyFa: "زاویهٔ کروی میان دو عظیمه در P برابر زاویهٔ مماس‌ها در P است — برابر زاویهٔ صفحه‌ای AOB. زاویهٔ کروی فقط برای دو عظیمهٔ متقاطع تعریف می‌شود، نه برای صغیره‌ها.",
-        bodyEn: "The spherical angle at P between great circles PA and PB is the angle of the tangents at P (equal to the plane angle AOB). A spherical angle is defined only with reference to two intersecting great circles.",
+        headingFa: "زاویهٔ رأس و زاویهٔ مرکزی",
+        headingEn: "Vertex angle versus central angle",
+        bodyFa:
+          "زاویهٔ کروی در P زاویهٔ مماس‌های دو کمان عظیمه در P است. تنها اگر A و B روی استوای قطب P باشند این زاویه با AOB برابر است. میان منحنی‌های دیگر هم زاویهٔ مماسی تعریف می‌شود، اما ضلع مثلث کروی معمول از عظیمه است.",
+        bodyEn:
+          "A spherical angle at P is the angle between the tangents to its great-circle arcs. It equals central angle AOB only if A and B lie on the equator of P. Other curves also have tangent angles, but ordinary spherical triangles use great-circle sides.",
       },
       {
-        headingFa: "مثلث کروی و طول ضلع",
-        headingEn: "The spherical triangle and length of a side",
-        bodyFa: "سه نقطه از یک نیم‌کره که با کمان‌های عظیمه به هم وصل شوند مثلث کروی می‌سازند. با R=1 ضلع همان زاویهٔ مرکزی است. اسمارت اضلاع ≤ ۱۸۰° می‌گیرد. کمان صغیره مانند CD ضلع مثلث کروی نیست.",
-        bodyEn: "Three points of one hemisphere joined by great-circle arcs form a spherical triangle. With R = 1 a side is the central angle. Smart takes sides ≤ 180°. A small-circle arc such as CD is not a side of a spherical triangle.",
-        formula: "AY = ∠AOY  (R = 1)",
-      },
-      {
-        headingFa: "طول کمان صغیره — فرمول (۱)",
-        headingEn: "Length of a small-circle arc — formula (1)",
-        bodyFa: "برای صغیرهٔ CD موازی عظیمهٔ AB، با P قطب AB، CD = AB sin PC. چون PA = 90°، معادل CD = AB cos AC. موازی‌های میل و ارتفاع از همین رابطه پیروی می‌کنند.",
-        bodyEn: "For small circle CD parallel to great circle AB, with P the pole of AB, CD = AB sin PC. Since PA = 90°, equivalently CD = AB cos AC. Parallels of declination and of altitude obey this relation.",
-        formula: "CD = AB sin PC = AB cos AC    … (1)",
+        headingFa: "طول صغیره از کدام زاویه؟",
+        headingEn: "Which angle measures the small-circle path?",
+        bodyFa:
+          "برای چرخش Δλ حول قطب با فاصلهٔ قطبی θ، طول مسیر R sin θ ضرب در قدرمطلق Δλ است؛ Δλ باید رادیانی باشد. این طول با جدایی عظیمهٔ دو انتها برابر نیست.",
+        bodyEn:
+          "A rotation Δλ about a pole at polar distance θ gives path length R sin θ |Δλ|, with Δλ in radians. This differs from the great-circle separation of the endpoints.",
+        formula: "\\ell_{\\rm small}=R\\sin\\theta\\,|\\Delta\\lambda|",
       },
     ],
     example: {
@@ -69,28 +81,38 @@ export const LESSONS_CH1: Lesson[] = [
       titleEn: "Arc along the parallel of 50° N",
       source: "Smart I §§3–4, formulae (1)–(2)",
       givenFa: "روی موازی عرض ۵۰°، اختلاف طول جغرافیایی ۲۰°.",
-      givenEn: "Along the parallel of latitude 50°, a difference of longitude of 20°.",
+      givenEn:
+        "Along the parallel of latitude 50°, a difference of longitude of 20°.",
       findFa: "طول کمان موازی بر حسب کمان استوایی.",
       findEn: "The parallel arc in terms of the equatorial arc.",
       steps: [
-          { fa: "کمان استوایی متناظر LY = ۲۰°.", en: "The corresponding equatorial arc LY is 20°." },
-          { fa: "فرمول (۲): HX = LY cos θ با θ = ۵۰°.", en: "Smart (2): HX = LY cos θ with θ = 50°.", formula: "HX = 20° · cos 50° ≈ 12°.86" },
+        {
+          fa: "اختلاف طول را به رادیان می‌بریم و در شعاع موازی ضرب می‌کنیم.",
+          en: "Convert the longitude sweep to radians and multiply by the parallel radius.",
+          formula: "\\ell/R=(20\\pi/180)\\cos50^\\circ\\simeq0.2243752",
+        },
       ],
-      resultFa: "کمان موازی ≈ ۱۲°.۸۶ یا به مایل دریایی ≈ ۷۷۲ مایل.",
-      resultEn: "Parallel arc ≈ 12°.86 ≈ 772 nautical miles.",
+      resultFa:
+        "طول مسیر ۰٫۲۲۴۳۷۵۲R است؛ زاویهٔ معادل عظیمه ۱۲٫۸۵۵۷۵ درجه است، نه جدایی عظیمهٔ دو انتها.",
+      resultEn:
+        "Path length is 0.2243752R, equivalent to 12.85575° on a great circle, not the endpoint great-circle separation.",
       widget: "small-circle",
     },
     exercises: [
       {
-        textFa: "نشان دهید هر قطب یک عظیمه از همهٔ نقاط آن ۹۰° فاصله دارد.",
-        textEn: "Show that either pole of a great circle is 90° from every point of it.",
-        source: "Smart I §2",
+        textFa:
+          "صغیره‌ای با فاصلهٔ قطبی ۳۰ درجه و شعاع کرهٔ ۲ داریم. شعاع صغیره و طول یک دور کامل آن چیست؟",
+        textEn:
+          "A small circle has polar distance 30° on a sphere of radius 2. Find its radius and circumference.",
+        answer: "\\rho=2\\sin30^\\circ=1,\\quad L=2\\pi",
+        source: "Original exercise based on Smart / تمرین تألیفی",
       },
       {
-        textFa: "چرا FCD در شکل ۱ مثلث کروی نیست؟",
-        textEn: "Why is FCD in Fig. 1 not a spherical triangle?",
-        source: "Smart I §2",
-        answer: "CD is a small-circle arc, not a great-circle side.",
+        textFa:
+          "فرض‌ها و دامنهٔ اعتبار روابط این درس را بنویسید و یک حالت ویژه را با جایگذاری مستقیم بررسی کنید.",
+        textEn:
+          "State the assumptions and domain of the identities in this lesson. Verify a special case by direct substitution.",
+        source: "Original learning check / تمرین تألیفی",
       },
     ],
   },
@@ -103,47 +125,107 @@ export const LESSONS_CH1: Lesson[] = [
     minutes: 20,
     spherePreset: "triangle",
     olympiad: "اضلاع PZ و PX در مثلث نجومی",
-    summaryFa: "درس کوتاه هم‌تراز بندهای ۱–۳: مثلث کروی از سه کمان عظیمه در یک نیم‌کره ساخته می‌شود. مسائل بانک هنوز به این شناسه ارجاع می‌دهند.",
-    summaryEn: "Short Ch. I companion: a spherical triangle is three great-circle arcs in one hemisphere. Kept so problems.ts lessonId spherical-triangle still resolves.",
+    summaryFa:
+      "سه رأس متمایز، غیرپادپا و غیرواقع بر یک عظیمه در یک نیم‌کرهٔ باز، با کمان‌های کوتاه عظیمه مثلث محدب می‌سازند. هم‌مکانی یا هم‌خطی کروی، حالت منحط است.",
+    summaryEn:
+      "Distinct, non-antipodal vertices not on one great circle and contained in an open hemisphere define an ordinary convex triangle through their minor arcs. Coincidence or great-circle collinearity is degenerate.",
     smart: {
       chapter: "I",
       sections: "§§2–3",
       pages: "2–4",
       figures: ["1"],
     },
-    figures: ["fig1"],
-    englishFormulas: [
-      "A spherical triangle is formed by three points of one hemisphere joined by great-circle arcs.",
-      "Sides and angles of a spherical triangle lie between 0° and 180°.",
-      "PZ = 90°−φ, PX = 90°−δ on the astronomical triangle (Smart II).",
-    ],
+    figures: ["geometry-triangle"],
+    englishFormulas: ["0<a,b,c,A,B,C<\\pi", "\\pi<A+B+C<3\\pi"],
     formulas: [
-      { display: "0° < a,b,c,A,B,C < 180°", nameFa: "حدود اضلاع و زوایا", nameEn: "Range of parts" },
-      { display: "PZ = 90°−φ,  PX = 90°−δ", nameFa: "اضلاع مثلث نجومی", nameEn: "Astronomical-triangle sides" },
+      {
+        display: "0<a,b,c,A,B,C<\\pi",
+        tex: "0<a,b,c,A,B,C<\\pi",
+        nameFa: "دامنهٔ اجزا",
+        nameEn: "Part ranges",
+      },
+      {
+        display: "\\pi<A+B+C<3\\pi",
+        tex: "\\pi<A+B+C<3\\pi",
+        nameFa: "مجموع زوایا",
+        nameEn: "Angle sum",
+      },
     ],
     sections: [
       {
-        headingFa: "سه کمان عظیمه",
-        headingEn: "Three great-circle arcs",
-        bodyFa: "اسمارت مثلث را از سه نقطه در یک نیم‌کره می‌سازد. ضلع، کمان عظیمه میان دو رأس است نه کمان صغیره. زاویه فقط میان دو عظیمه در رأس تعریف می‌شود.",
-        bodyEn: "Smart builds the triangle from three points in one hemisphere. A side is the great-circle arc joining two vertices, never a small-circle arc. An angle is defined only by two great circles at a vertex.",
+        headingFa: "مثلث معمول و شرایط وجود",
+        headingEn: "Ordinary triangles and existence",
+        bodyFa:
+          "سه رأس متمایز، غیرپادپا و غیرواقع بر یک عظیمه در یک نیم‌کرهٔ باز، با کمان‌های کوتاه عظیمه مثلث محدب می‌سازند. هم‌مکانی یا هم‌خطی کروی، حالت منحط است.",
+        bodyEn:
+          "Distinct, non-antipodal vertices not on one great circle and contained in an open hemisphere define an ordinary convex triangle through their minor arcs. Coincidence or great-circle collinearity is degenerate.",
       },
       {
-        headingFa: "پیوند با مثلث PZX",
-        headingEn: "Link to triangle PZX",
-        bodyFa: "در فصل دوم همان تعریف روی کرهٔ سماوی می‌نشیند: P قطب، Z سمت‌الرأس، X ستاره. اضلاع PZ و PX متمم عرض و میل‌اند — همان پرسشی که مسئلهٔ بانک با این شناسه می‌پرسد.",
-        bodyEn: "Chapter II plants the same definition on the celestial sphere: P the pole, Z the zenith, X the star. Sides PZ and PX are co-latitude and co-declination — the bank problem that still uses this lesson id.",
+        headingFa: "قرارداد اضلاع مقابل",
+        headingEn: "Opposite-side notation",
+        bodyFa:
+          "a فاصلهٔ زاویه‌ای B تا C و A زاویهٔ مماس‌ها در رأس A است؛ همین قرارداد چرخه‌ای ادامه دارد. ضلع و زاویهٔ هم‌نام لزوماً برابر نیستند.",
+        bodyEn:
+          "Side a is the angular distance B to C; A is the tangent angle at A, with cyclic notation. A side and its opposite angle need not be equal.",
+        formula:
+          "a=\\widehat{BC},\\quad b=\\widehat{CA},\\quad c=\\widehat{AB}",
+      },
+      {
+        headingFa: "پیش از معکوس مثلثاتی",
+        headingEn: "Before inverse trigonometry",
+        bodyFa:
+          "هر ضلع باید بین صفر و π، از مجموع دو ضلع دیگر کوچک‌تر و مجموع اضلاع کمتر از ۲π باشد. محدود کردن ورودی arccos دادهٔ نامعتبر را معتبر نمی‌کند.",
+        bodyEn:
+          "Every side must lie in (0,π), be less than the sum of the other two, and the perimeter must be below 2π. Clamping an arccos argument cannot validate invalid side data.",
+        formula: "|b-c|<a<\\min(b+c,2\\pi-b-c)",
       },
     ],
-
     exercises: [
       {
-        textFa: "برای φ=40°N و δ=+10° اضلاع PZ و PX را بنویسید.",
-        textEn: "For φ=40°N and δ=+10° write PZ and PX.",
-        source: "problems.ts p7",
-        answer: "PZ=50° · PX=80°",
+        textFa:
+          "آیا اضلاع ۲۰، ۳۰، ۶۰ درجه مثلث معمول می‌سازند؟ اضلاع ۹۰، ۹۰، ۹۰ درجه چطور؟",
+        textEn:
+          "Do sides 20°,30°,60° define an ordinary triangle? What about 90°,90°,90°?",
+        answer:
+          "20+30<60:\\ \\text{invalid};\\quad(90^\\circ,90^\\circ,90^\\circ):\\ \\text{valid octant}",
+        source: "Original exercise based on Smart / تمرین تألیفی",
+      },
+      {
+        textFa:
+          "فرض‌ها و دامنهٔ اعتبار روابط این درس را بنویسید و یک حالت ویژه را با جایگذاری مستقیم بررسی کنید.",
+        textEn:
+          "State the assumptions and domain of the identities in this lesson. Verify a special case by direct substitution.",
+        source: "Original learning check / تمرین تألیفی",
       },
     ],
+    example: {
+      id: "check-spherical-triangle",
+      titleFa: "مثال حل‌شده و کنترل نتیجه",
+      titleEn: "Worked check",
+      source: "Original worked application / کاربرد تألیفی",
+      givenFa:
+        "آیا اضلاع ۲۰، ۳۰، ۶۰ درجه مثلث معمول می‌سازند؟ اضلاع ۹۰، ۹۰، ۹۰ درجه چطور؟",
+      givenEn:
+        "Do sides 20°,30°,60° define an ordinary triangle? What about 90°,90°,90°?",
+      findFa: "نتیجه را با روابط همین درس و کنترل واحدها به دست آورید.",
+      findEn: "Use this lesson’s identities and check the units.",
+      steps: [
+        {
+          fa: "ابتدا قرارداد علامت‌ها و داده‌های معلوم را مشخص کنید؛ سپس رابطهٔ متناسب را انتخاب کنید.",
+          en: "Identify the sign conventions and given parts, then select the corresponding identity.",
+        },
+        {
+          fa: "پس از جایگذاری و ساده‌سازی، نتیجهٔ زیر به دست می‌آید. شرایط وجود و ربع را نیز کنترل کنید.",
+          en: "Substitute and simplify to obtain the result below; check existence and quadrant conditions.",
+          formula:
+            "20+30<60:\\ \\text{invalid};\\quad(90^\\circ,90^\\circ,90^\\circ):\\ \\text{valid octant}",
+        },
+      ],
+      resultFa:
+        "نتیجهٔ نهایی در رابطهٔ بالا آمده است؛ زاویه و طول را با یکدیگر مخلوط نکنید.",
+      resultEn:
+        "The result is shown above; keep angular and physical units distinct.",
+    },
   },
   {
     id: "terrestrial-latlong",
@@ -154,8 +236,10 @@ export const LESSONS_CH1: Lesson[] = [
     minutes: 40,
     spherePreset: "circles",
     olympiad: "کرهٔ زمین · موازی عرض · مایل دریایی",
-    summaryFa: "بند ۴ اسمارت استوای زمینی، قطب، نصف‌النهار گرینویچ، عرض، طول و فرمول (۲) را می‌گذارد.",
-    summaryEn: "Smart I §4 and Fig. 2: equator, Greenwich meridian, latitude, longitude, parallels, and HX = LY cos θ.",
+    summaryFa:
+      "عرض φ از استوا شمال‌مثبت و طول λ از گرینویچ شرق‌مثبت است. فاصلهٔ قطبی شمال π/۲ − φ است و در جنوب از π/۲ بزرگ‌تر می‌شود. مدل کروی تفاوت عرض ژئودتیک و زمین‌مرکزی را نادیده می‌گیرد.",
+    summaryEn:
+      "Latitude φ is north-positive from the equator; longitude λ is east-positive from Greenwich. North polar distance is π/2−φ and exceeds π/2 in the south. The spherical model neglects geodetic versus geocentric latitude.",
     smart: {
       chapter: "I",
       sections: "§4",
@@ -165,44 +249,96 @@ export const LESSONS_CH1: Lesson[] = [
     },
     figures: ["fig2"],
     englishFormulas: [
-      "Latitude φ = angular distance from the equator along the meridian.",
-      "Colatitude = 90° − φ.",
-      "HX = LY cos θ   (Smart 2) along a parallel of latitude θ.",
+      "\\theta_N=\\frac\\pi2-\\varphi",
+      "\\ell=R\\cos\\varphi\\,|\\Delta\\lambda|",
     ],
     formulas: [
-      { display: "colat = 90° − lat", nameFa: "متمم عرض", nameEn: "Colatitude" },
-      { display: "HX = LY cos θ", number: "(2)", nameFa: "کمان موازی عرض", nameEn: "Arc along a parallel" },
+      {
+        display: "\\theta_N=\\frac\\pi2-\\varphi",
+        tex: "\\theta_N=\\frac\\pi2-\\varphi",
+        nameFa: "فاصلهٔ قطبی شمال",
+        nameEn: "North polar distance",
+      },
+      {
+        display: "\\ell=R\\cos\\varphi\\,|\\Delta\\lambda|",
+        tex: "\\ell=R\\cos\\varphi\\,|\\Delta\\lambda|",
+        nameFa: "طول مسیر موازی",
+        nameEn: "Parallel path length",
+      },
     ],
     sections: [
       {
-        headingFa: "استوا، قطب و نصف‌النهار",
-        headingEn: "Equator, poles, meridian",
-        bodyFa: "زمین کره‌ای است که حول PQ (قطب شمال و جنوب) می‌چرخد. عظیمهٔ عمود بر PQ استواست. هر نیم‌عظیمه از P به Q یک نصف‌النهار است. نصف‌النهار دایرهٔ عبور گرینویچ نصف‌النهار مبدأ است.",
-        bodyEn: "The Earth is treated as a sphere spinning about PQ (north and south poles). The great circle perpendicular to PQ is the equator. Any semi-great circle from P to Q is a meridian. The meridian of the Greenwich transit circle is the principal meridian.",
+        headingFa: "قرارداد زمین کروی",
+        headingEn: "Spherical-Earth conventions",
+        bodyFa:
+          "عرض φ از استوا شمال‌مثبت و طول λ از گرینویچ شرق‌مثبت است. فاصلهٔ قطبی شمال π/۲ − φ است و در جنوب از π/۲ بزرگ‌تر می‌شود. مدل کروی تفاوت عرض ژئودتیک و زمین‌مرکزی را نادیده می‌گیرد.",
+        bodyEn:
+          "Latitude φ is north-positive from the equator; longitude λ is east-positive from Greenwich. North polar distance is π/2−φ and exceeds π/2 in the south. The spherical model neglects geodetic versus geocentric latitude.",
       },
       {
-        headingFa: "طول و عرض",
-        headingEn: "Longitude and latitude",
-        bodyFa: "طول جغرافیایی زاویهٔ کروی در قطب میان نصف‌النهار مکان و گرینویچ است، ۰° تا ۱۸۰° E یا W. عرض کمان از استوا روی نصف‌النهار است، شمال یا جنوب. متمم عرض فاصله تا قطب است: colat = 90° − φ.",
-        bodyEn: "Longitude is the spherical angle at the pole between the place’s meridian and Greenwich, 0°–180° E or W. Latitude is the arc from the equator along the meridian. Colatitude = 90° − φ.",
+        headingFa: "شعاع موازی و مسیر",
+        headingEn: "Parallel radius and path",
+        bodyFa:
+          "تصویر شعاع مکان بر استوا R cos φ است. پس مسیر روی موازی طول R cos φ ضرب در اختلاف طول رادیانی دارد؛ جز روی استوا، این مسیر ژئودزیک نیست.",
+        bodyEn:
+          "The parallel radius is R cos φ. Its path length is that radius times the longitude sweep in radians; except at the equator this path is not a geodesic.",
+        formula: "\\ell=R\\cos\\varphi\\,|\\Delta\\lambda|",
       },
       {
-        headingFa: "موازی عرض و مایل دریایی",
-        headingEn: "Parallels and the nautical mile",
-        bodyFa: "مکان‌های هم‌عرض روی صغیره‌ای موازی استوا می‌نشینند. اگر θ عرض گرینویچ باشد، طول کمان موازی برابر کمان استوایی متناظر ضرب در cos θ است — فرمول (۲). مایل دریایی طول یک دقیقهٔ عظیمه در مرکز زمین است (حدود ۶۰۸۰ فوت). اسمارت زمین را کره می‌گیرد.",
-        bodyEn: "Places of equal latitude lie on a small circle parallel to the equator. Smart (2): HX = LY cos θ. One nautical mile is the great-circle arc of one minute at the Earth’s centre (about 6080 ft). The Earth is treated as a sphere.",
-        formula: "HX = LY cos θ    … (2)",
+        headingFa: "مایل دریایی امروزی",
+        headingEn: "The modern nautical mile",
+        bodyFa:
+          "مایل دریایی امروزی دقیقاً ۱۸۵۲ متر است. یک دقیقهٔ کمان زمین تقریب وابسته به مدل است. تبدیل ۶۰ مایل دریایی بر درجه در مسائل کروی تقریبی است.",
+        bodyEn:
+          "The modern nautical mile is exactly 1852 metres. One arcminute of Earth is a model-dependent approximation. The classroom conversion of 60 nautical miles per degree is approximate.",
       },
     ],
-
     exercises: [
       {
-        textFa: "دو کشتی روی موازی ۴۸°N و ۱۵°S در یک نصف‌النهار می‌رانند. اگر سرعت X پانزده گره باشد، سرعت Y را بیابید. (تمرین ۴ اسمارت)",
-        textEn: "Two ships steam along 48° N and 15° S, always on the same meridian. If X’s speed is 15 knots, find Y’s speed. (Smart I, Ex. 4)",
-        source: "Smart I Exercises 4",
-        answer: "Speed_Y / Speed_X = cos 15° / cos 48°",
+        textFa:
+          "دو کشتی روی موازی‌های ۴۸ درجه شمالی و ۱۵ درجه جنوبی با هم‌طولی حرکت می‌کنند. نسبت سرعت جنوبی به شمالی را بیابید.",
+        textEn:
+          "Ships on parallels 48° N and 15° S maintain equal longitude. Find the south-to-north speed ratio.",
+        answer:
+          "\\frac{v_S}{v_N}=\\frac{\\cos15^\\circ}{\\cos48^\\circ}\\simeq1.44355",
+        source: "Original exercise based on Smart / تمرین تألیفی",
+      },
+      {
+        textFa:
+          "فرض‌ها و دامنهٔ اعتبار روابط این درس را بنویسید و یک حالت ویژه را با جایگذاری مستقیم بررسی کنید.",
+        textEn:
+          "State the assumptions and domain of the identities in this lesson. Verify a special case by direct substitution.",
+        source: "Original learning check / تمرین تألیفی",
       },
     ],
+    example: {
+      id: "check-terrestrial-latlong",
+      titleFa: "مثال حل‌شده و کنترل نتیجه",
+      titleEn: "Worked check",
+      source: "Original worked application / کاربرد تألیفی",
+      givenFa:
+        "دو کشتی روی موازی‌های ۴۸ درجه شمالی و ۱۵ درجه جنوبی با هم‌طولی حرکت می‌کنند. نسبت سرعت جنوبی به شمالی را بیابید.",
+      givenEn:
+        "Ships on parallels 48° N and 15° S maintain equal longitude. Find the south-to-north speed ratio.",
+      findFa: "نتیجه را با روابط همین درس و کنترل واحدها به دست آورید.",
+      findEn: "Use this lesson’s identities and check the units.",
+      steps: [
+        {
+          fa: "ابتدا قرارداد علامت‌ها و داده‌های معلوم را مشخص کنید؛ سپس رابطهٔ متناسب را انتخاب کنید.",
+          en: "Identify the sign conventions and given parts, then select the corresponding identity.",
+        },
+        {
+          fa: "پس از جایگذاری و ساده‌سازی، نتیجهٔ زیر به دست می‌آید. شرایط وجود و ربع را نیز کنترل کنید.",
+          en: "Substitute and simplify to obtain the result below; check existence and quadrant conditions.",
+          formula:
+            "\\frac{v_S}{v_N}=\\frac{\\cos15^\\circ}{\\cos48^\\circ}\\simeq1.44355",
+        },
+      ],
+      resultFa:
+        "نتیجهٔ نهایی در رابطهٔ بالا آمده است؛ زاویه و طول را با یکدیگر مخلوط نکنید.",
+      resultEn:
+        "The result is shown above; keep angular and physical units distinct.",
+    },
   },
   {
     id: "cosine-sides",
@@ -214,8 +350,10 @@ export const LESSONS_CH1: Lesson[] = [
     spherePreset: "triangle",
     proofId: "cosine",
     olympiad: "قانون کسینوس کروی · فرمول‌های نیم‌زاویه",
-    summaryFa: "بند ۵ اسمارت فرمول بنیادی مثلث کروی را از صفحهٔ مماس در رأس A به‌دست می‌آورد. همهٔ فرمول‌های بعد از (A) مشتق می‌شوند.",
-    summaryEn: "Smart I §5, Fig. 3: the fundamental cosine-formula, derived from tangent planes at A.",
+    summaryFa:
+      "دو ضلع b و c و زاویهٔ شامل A ضلع a را یکتا تعیین می‌کنند. اگر سه ضلع معلوم باشد، ابتدا وجود مثلث را کنترل و سپس cos A را جدا می‌کنیم. اثبات برداری پایین، برای ضلع منفرجه هم معتبر است.",
+    summaryEn:
+      "Two sides b,c and their included angle A uniquely determine a. For three given sides, first check existence, then isolate cos A. The vector proof below also applies to obtuse sides.",
     smart: {
       chapter: "I",
       sections: "§5",
@@ -223,39 +361,67 @@ export const LESSONS_CH1: Lesson[] = [
       formulae: ["(A)", "(7)", "(8)", "(9)", "(11)", "(12)", "(13)"],
       figures: ["3"],
     },
-    figures: ["fig3"],
+    figures: ["geometry-triangle"],
     englishFormulas: [
-      "cos a = cos b cos c + sin b sin c cos A     (A)",
-      "cos A = (cos a − cos b cos c) / (sin b sin c)     (9)",
-      "sin(A/2) = √[sin(s−b) sin(s−c) / (sin b sin c)]     (11)",
+      "\\cos a=\\cos b\\cos c+\\sin b\\sin c\\cos A",
+      "\\cos A=\\frac{\\cos a-\\cos b\\cos c}{\\sin b\\sin c}",
+      "\\sin\\frac A2=\\sqrt{\\frac{\\sin(s-b)\\sin(s-c)}{\\sin b\\sin c}}",
+      "\\cos\\frac A2=\\sqrt{\\frac{\\sin s\\sin(s-a)}{\\sin b\\sin c}}",
     ],
     formulas: [
-      { display: "cos a = cos b cos c + sin b sin c cos A", number: "(A)", nameFa: "فرمول کسینوس (صورت بنیادی)", nameEn: "The cosine-formula" },
-      { display: "cos b = cos c cos a + sin c sin a cos B", number: "(7)", nameFa: "همراه (A) برای ضلع b", nameEn: "Companion for side b" },
-      { display: "cos c = cos a cos b + sin a sin b cos C", number: "(8)", nameFa: "همراه (A) برای ضلع c", nameEn: "Companion for side c" },
-      { display: "sin(A/2) = √[sin(s−b) sin(s−c) / (sin b sin c)]", number: "(11)", nameFa: "نیم‌زاویه سینوس", nameEn: "Half-angle sine formula" },
-      { display: "cos(A/2) = √[sin s sin(s−a) / (sin b sin c)]", number: "(12)", nameFa: "نیم‌زاویه کسینوس", nameEn: "Half-angle cosine formula" },
-      { display: "tan(A/2) = √[sin(s−b) sin(s−c) / (sin s sin(s−a))]", number: "(13)", nameFa: "نیم‌زاویه تانژانت", nameEn: "Half-angle tangent formula" },
+      {
+        display: "\\cos a=\\cos b\\cos c+\\sin b\\sin c\\cos A",
+        tex: "\\cos a=\\cos b\\cos c+\\sin b\\sin c\\cos A",
+        nameFa: "کسینوس اضلاع",
+        nameEn: "Side cosine law",
+      },
+      {
+        display: "\\cos A=\\frac{\\cos a-\\cos b\\cos c}{\\sin b\\sin c}",
+        tex: "\\cos A=\\frac{\\cos a-\\cos b\\cos c}{\\sin b\\sin c}",
+        nameFa: "زاویه از سه ضلع",
+        nameEn: "Angle from three sides",
+      },
+      {
+        display:
+          "\\sin\\frac A2=\\sqrt{\\frac{\\sin(s-b)\\sin(s-c)}{\\sin b\\sin c}}",
+        tex: "\\sin\\frac A2=\\sqrt{\\frac{\\sin(s-b)\\sin(s-c)}{\\sin b\\sin c}}",
+        nameFa: "نیم‌زاویهٔ سینوسی",
+        nameEn: "Half-angle sine",
+      },
+      {
+        display:
+          "\\cos\\frac A2=\\sqrt{\\frac{\\sin s\\sin(s-a)}{\\sin b\\sin c}}",
+        tex: "\\cos\\frac A2=\\sqrt{\\frac{\\sin s\\sin(s-a)}{\\sin b\\sin c}}",
+        nameFa: "نیم‌زاویهٔ کسینوسی",
+        nameEn: "Half-angle cosine",
+      },
     ],
     sections: [
       {
-        headingFa: "ساخت اسمارت (شکل ۳)",
-        headingEn: "Smart’s construction (Fig. 3)",
-        bodyFa: "مثلث ABC روی کره به مرکز O. مماس در A بر عظیمهٔ AB را تا امتداد OB در D، و مماس در A بر AC را تا امتداد OC در E بکشید. OA بر صفحهٔ مماس در A عمود است، پس ∠DAE = A. از مثلث‌های قائم OAD و OAE: AD = OA tan c، AE = OA tan b، OD = OA sec c، OE = OA sec b.",
-        bodyEn: "From A draw the tangent to AB meeting OB produced at D, and the tangent to AC meeting OC produced at E. OA is perpendicular to the tangent plane, so ∠DAE = A. Right triangles OAD, OAE give AD = OA tan c, AE = OA tan b, OD = OA sec c, OE = OA sec b.",
+        headingFa: "از داده تا مجهول",
+        headingEn: "From data to unknown",
+        bodyFa:
+          "دو ضلع b و c و زاویهٔ شامل A ضلع a را یکتا تعیین می‌کنند. اگر سه ضلع معلوم باشد، ابتدا وجود مثلث را کنترل و سپس cos A را جدا می‌کنیم. اثبات برداری پایین، برای ضلع منفرجه هم معتبر است.",
+        bodyEn:
+          "Two sides b,c and their included angle A uniquely determine a. For three given sides, first check existence, then isolate cos A. The vector proof below also applies to obtuse sides.",
       },
       {
-        headingFa: "دو بسط برای DE²",
-        headingEn: "Two expansions of DE²",
-        bodyFa: "در مثلث مسطح DAE قانون کسینوس مسطح DE² را از b، c و A می‌دهد. در مثلث DOE همان DE² از a و دو sec به‌دست می‌آید. با اتحاد sec²θ = 1 + tan²θ صورت (A) ظاهر می‌شود.",
-        bodyEn: "The plane cosine law in triangle DAE and again in DOE, with sec² = 1 + tan², simplifies to formula (A).",
-        formula: "cos a = cos b cos c + sin b sin c cos A",
+        headingFa: "استخراج نیم‌زاویه",
+        headingEn: "Derive the half angle",
+        bodyFa:
+          "صورت ۱ − cos A برابر cos(b−c) − cos a بر مخرج sin b sin c است. اتحاد تفاضل کسینوس‌ها صورت را ۲ sin(s−b) sin(s−c) می‌کند. نصف این عبارت sin²(A/۲) است.",
+        bodyEn:
+          "The numerator of 1−cos A is cos(b−c)−cos a over sin b sin c. The cosine-difference identity gives 2 sin(s−b) sin(s−c). Half the resulting expression is sin²(A/2).",
+        formula:
+          "s=\\frac{a+b+c}{2},\\quad\\sin^2\\frac A2=\\frac{\\sin(s-b)\\sin(s-c)}{\\sin b\\sin c}",
       },
       {
-        headingFa: "دو کاربرد عملی",
-        headingEn: "Two practical applications",
-        bodyFa: "اسمارت دو کاربرد فوری می‌گذارد: (۱) دو ضلع و زاویهٔ شامل ضلع سوم را از (A) می‌دهند. (۲) سه ضلع زوایا را از (۹) یا، برای کار لگاریتمی، از (۱۱)–(۱۳) با 2s = a+b+c می‌دهند. صورت (۹) برای کار ماشینی پایدارتر است؛ نیم‌زاویه‌ها وقتی جداول لگاریتمی در کارند مفیدند.",
-        bodyEn: "(1) Two sides and the included angle determine the third side by (A). (2) Three sides determine the angles by (9) or, for logarithmic work, by (11)–(13) with 2s = a+b+c.",
+        headingFa: "هندسه و دقت عددی",
+        headingEn: "Geometry and numerical precision",
+        bodyFa:
+          "نزدیک صفر یا π، معکوس کسینوس حساس است. برای جدایی کوچک از هاورساین و برای کل بازه از atan2 طول ضرب‌برداری و ضرب‌داخلی استفاده کنید. نیم‌زاویه‌ها کاربرد عددی هم دارند.",
+        bodyEn:
+          "Inverse cosine is sensitive near 0 or π. Use haversine for small separations, or atan2 of cross-product norm and dot product over the full range. Half-angle identities also have numerical uses.",
       },
     ],
     example: {
@@ -268,17 +434,36 @@ export const LESSONS_CH1: Lesson[] = [
       findFa: "فاصلهٔ زاویه‌ای d.",
       findEn: "Angular separation d.",
       steps: [
-          { fa: "در مثلث قطبی دو ستاره: اضلاع ۹۰°−δ و زاویهٔ شامل Δα.", en: "Polar triangle: sides 90°−δ, included angle Δα.", formula: "cos d = sin δ₁ sin δ₂ + cos δ₁ cos δ₂ cos Δα" },
+        {
+          fa: "از مثلث قطبی دو ستاره، قانون کسینوس را با متمم میل‌ها به کار می‌بریم.",
+          en: "Use the polar triangle of the stars and apply the cosine law with co-declinations.",
+          formula:
+            "\\cos d=\\sin20^\\circ\\sin40^\\circ+\\cos20^\\circ\\cos40^\\circ\\cos30^\\circ",
+        },
+        {
+          fa: "arccos را به درجه حساب و با جایگذاری در رابطه کنترل می‌کنیم.",
+          en: "Evaluate arccos in degrees and check by substitution.",
+          formula: "d\\simeq32.51492^\\circ",
+        },
       ],
-      resultFa: "d ≈ ۲۸°.۸",
-      resultEn: "d ≈ 28°.8",
+      resultFa: "جدایی زاویه‌ای تقریباً ۳۲٫۵۱۴۹۲ درجه است.",
+      resultEn: "Angular separation is approximately 32.51492°.",
     },
     exercises: [
       {
-        textFa: "در مثلث کروی ABC با C = ۹۰°، a = ۱۱۹°۴۶′۳۶″، B = ۹۲°۲۵′۳۸″ اضلاع b و c و زاویهٔ A را از (A) بیابید.",
-        textEn: "Spherical triangle ABC with C = 90°, a = 119°46′36″, B = 92°25′38″. Find b, c and A. (Smart I, Ex. 1)",
-        source: "Smart I Exercises 1",
-        answer: "48°28′49″, 109°14′0″, 113°10′46″",
+        textFa:
+          "برای b = c = ۶۰ درجه و A = ۹۰ درجه، ضلع a را بیابید و با بسط مسطح مقایسه کنید.",
+        textEn:
+          "For b = c = 60° and A = 90°, find a and compare with the planar approximation.",
+        answer: "\\cos a=\\frac14,\\quad a\\simeq75.52249^\\circ",
+        source: "Original exercise based on Smart / تمرین تألیفی",
+      },
+      {
+        textFa:
+          "فرض‌ها و دامنهٔ اعتبار روابط این درس را بنویسید و یک حالت ویژه را با جایگذاری مستقیم بررسی کنید.",
+        textEn:
+          "State the assumptions and domain of the identities in this lesson. Verify a special case by direct substitution.",
+        source: "Original learning check / تمرین تألیفی",
       },
     ],
   },
@@ -292,45 +477,93 @@ export const LESSONS_CH1: Lesson[] = [
     spherePreset: "triangle",
     proofId: "sine",
     olympiad: "ابهام SSA · نسبت سینوس اضلاع",
-    summaryFa: "بند ۶: از جابه‌جایی (A) نسبت سینوس ضلع به سینوس زاویهٔ روبه‌رو ثابت می‌ماند. اسمارت ابهام ۱۸۰°−A را گوشزد می‌کند.",
-    summaryEn: "Smart I §6: the sine-formula from (A) by algebra, with the SSA ambiguity.",
+    summaryFa:
+      "در اثبات پایین، مربع قانون کسینوس چندجمله‌ای متقارنی می‌دهد. تقسیم بر مربع سینوس هر سه ضلع، نسبتی یکسان برای سه رأس می‌سازد. مثبت بودن سینوس اجزا، ریشهٔ مثبت را توجیه می‌کند.",
+    summaryEn:
+      "The proof below turns the squared cosine law into a symmetric polynomial. Dividing by the squared sines of all three sides gives a common ratio. Positivity of the parts’ sines justifies the positive root.",
     smart: {
       chapter: "I",
       sections: "§6",
       pages: "9–10",
       formulae: ["(B)"],
     },
-    figures: ["fig5"],
+    figures: ["geometry-triangle"],
     englishFormulas: [
-      "sin a / sin A = sin b / sin B = sin c / sin C     (B)",
-      "Given a, b, B: sin A = sin a sin B / sin b — A or 180°−A.",
+      "\\frac{\\sin a}{\\sin A}=\\frac{\\sin b}{\\sin B}=\\frac{\\sin c}{\\sin C}",
     ],
     formulas: [
-      { display: "sin a / sin A = sin b / sin B = sin c / sin C", number: "(B)", nameFa: "فرمول سینوس", nameEn: "The sine-formula" },
+      {
+        display:
+          "\\frac{\\sin a}{\\sin A}=\\frac{\\sin b}{\\sin B}=\\frac{\\sin c}{\\sin C}",
+        tex: "\\frac{\\sin a}{\\sin A}=\\frac{\\sin b}{\\sin B}=\\frac{\\sin c}{\\sin C}",
+        nameFa: "قانون سینوس",
+        nameEn: "Sine law",
+      },
     ],
     sections: [
       {
-        headingFa: "استخراج از (A)",
-        headingEn: "Derivation from (A)",
-        bodyFa: "از (A): sin b sin c cos A = cos a − cos b cos c. مربع بگیرید و ۱ − cos² را با اتحاد جایگذاری کنید. اسمارت کمیت مثبت X را چنان می‌گذارد که X² sin²a sin²c برابر چندجمله‌ای متقارن سه ضلع شود. پس sin A / sin a = X. چون اضلاع و زوایا میان ۰° و ۱۸۰°اند، سینوس‌ها مثبت‌اند و علامت منفی حذف می‌شود.",
-        bodyEn: "Square (A), replace 1 − cos², and introduce a positive quantity X built from the three sides. Then sin A / sin a = X. Sides and angles lie between 0° and 180°, so sines are positive and the minus sign is inadmissible.",
-        formula: "sin a : sin b : sin c = sin A : sin B : sin C",
+        headingFa: "از تقارن تا نسبت مشترک",
+        headingEn: "From symmetry to a common ratio",
+        bodyFa:
+          "در اثبات پایین، مربع قانون کسینوس چندجمله‌ای متقارنی می‌دهد. تقسیم بر مربع سینوس هر سه ضلع، نسبتی یکسان برای سه رأس می‌سازد. مثبت بودن سینوس اجزا، ریشهٔ مثبت را توجیه می‌کند.",
+        bodyEn:
+          "The proof below turns the squared cosine law into a symmetric polynomial. Dividing by the squared sines of all three sides gives a common ratio. Positivity of the parts’ sines justifies the positive root.",
       },
       {
-        headingFa: "ابهام در مسئلهٔ عددی",
-        headingEn: "The numerical ambiguity",
-        bodyFa: "اگر a، b و B معلوم باشند (B) فقط sin A را می‌دهد پس A یا ۱۸۰°−A. هر دو سینوس یکسان دارند. اطلاعات بیشتری (مانند مثلث مسطح SSA، یا ضلع سوم از کسینوس) لازم است تا ربع درست برگزیده شود. اسمارت این ابهام را در کار لگاریتمی جدی می‌گیرد.",
-        bodyEn: "Given two sides and the angle opposite one of them, (B) yields sin A, hence A or 180°−A. Further information is required — exactly as in the plane SSA ambiguity.",
+        headingFa: "ابهام دو ضلع و زاویهٔ غیرشامل",
+        headingEn: "The SSA ambiguity",
+        bodyFa:
+          "arcsin تنها یک نامزد می‌دهد و مکملش هم ممکن است معتبر باشد. هر دو را با قانون کسینوس و شرط وجود کنترل کنید؛ بسته به داده، صفر، یک یا دو جواب ممکن است.",
+        bodyEn:
+          "Arcsin gives one candidate; its supplement may also be valid. Test both with the cosine law and existence conditions. Depending on the data, zero, one, or two solutions may occur.",
       },
     ],
-
     exercises: [
       {
-        textFa: "دو ضلع یک مثلث کروی برابرند اگر و تنها اگر زوایای روبه‌رو برابر باشند. ثابت کنید.",
-        textEn: "Prove that two sides of a spherical triangle are equal iff the opposite angles are equal. (Smart I, Ex. 9)",
-        source: "Smart I Exercises 9",
+        textFa:
+          "برای a = ۵۰، b = ۴۰ و A = ۱۲۰ درجه، دو نامزد B را بیابید. چرا نامزد منفرجه رد می‌شود؟",
+        textEn:
+          "For a = 50°, b = 40°, A = 120°, find both B candidates. Why is the obtuse one rejected?",
+        answer:
+          "B\\simeq46.60892^\\circ\\ \\text{or}\\ 133.39108^\\circ;\\quad a>b\\Rightarrow A>B",
+        source: "Original exercise based on Smart / تمرین تألیفی",
+      },
+      {
+        textFa:
+          "فرض‌ها و دامنهٔ اعتبار روابط این درس را بنویسید و یک حالت ویژه را با جایگذاری مستقیم بررسی کنید.",
+        textEn:
+          "State the assumptions and domain of the identities in this lesson. Verify a special case by direct substitution.",
+        source: "Original learning check / تمرین تألیفی",
       },
     ],
+    example: {
+      id: "check-sine-law",
+      titleFa: "مثال حل‌شده و کنترل نتیجه",
+      titleEn: "Worked check",
+      source: "Original worked application / کاربرد تألیفی",
+      givenFa:
+        "برای a = ۵۰، b = ۴۰ و A = ۱۲۰ درجه، دو نامزد B را بیابید. چرا نامزد منفرجه رد می‌شود؟",
+      givenEn:
+        "For a = 50°, b = 40°, A = 120°, find both B candidates. Why is the obtuse one rejected?",
+      findFa: "نتیجه را با روابط همین درس و کنترل واحدها به دست آورید.",
+      findEn: "Use this lesson’s identities and check the units.",
+      steps: [
+        {
+          fa: "قانون سینوس می‌دهد sin B = sin ۴۰ درجه ضرب در sin ۱۲۰ درجه تقسیم بر sin ۵۰ درجه. معکوس سینوس و مکملش دو نامزد می‌دهند.",
+          en: "The sine law gives sin B = sin 40° sin 120° / sin 50°. Principal arcsine and its supplement give the two candidates.",
+        },
+        {
+          fa: "چون a از b بزرگ‌تر است، زاویهٔ مقابلش A باید از B بزرگ‌تر باشد. نامزد ۱۳۳٫۳۹۱۰۸ درجه از ۱۲۰ درجه بزرگ‌تر است، پس رد می‌شود.",
+          en: "Since a > b, the opposite angle A must exceed B. Reject 133.39108° because it exceeds A = 120°.",
+          formula:
+            "B\\simeq46.60892^\\circ\\ \\text{or}\\ 133.39108^\\circ;\\quad a>b\\Rightarrow A>B",
+        },
+      ],
+      resultFa:
+        "نتیجهٔ نهایی در رابطهٔ بالا آمده است؛ زاویه و طول را با یکدیگر مخلوط نکنید.",
+      resultEn:
+        "The result is shown above; keep angular and physical units distinct.",
+    },
   },
   {
     id: "analogue-c",
@@ -342,8 +575,10 @@ export const LESSONS_CH1: Lesson[] = [
     spherePreset: "triangle",
     proofId: "analogue",
     olympiad: "سه ضلع و دو زاویه مجاور",
-    summaryFa: "بند ۷: رابطه‌ای میان سه ضلع و دو زاویه، مشابه (A) اما با یک سینوس در سمت چپ. اثبات هندسی BA را تا BD = ۹۰° امتداد می‌دهد (شکل ۴).",
-    summaryEn: "Smart I §7, Fig. 4: the analogue of the cosine-formula.",
+    summaryFa:
+      "قانون سینوس فقط sin B را می‌دهد؛ فرمول مشابه cos B را نیز می‌دهد. با هر دو مؤلفه، atan2 ابهام مکمل را برطرف می‌کند.",
+    summaryEn:
+      "The sine law supplies sin B; the analogue supplies cos B. Using both in atan2 resolves the supplementary-angle ambiguity.",
     smart: {
       chapter: "I",
       sections: "§7",
@@ -351,38 +586,78 @@ export const LESSONS_CH1: Lesson[] = [
       formulae: ["(C)", "(14)", "(15)", "(16)"],
       figures: ["4"],
     },
-    figures: ["fig4"],
-    englishFormulas: [
-      "sin a cos B = cos b sin c − sin b cos c cos A     (C)",
-      "sin a cos C = cos c sin b − sin c cos b cos A     (14)",
-    ],
+    figures: ["geometry-triangle"],
+    englishFormulas: ["\\sin a\\cos B=\\cos b\\sin c-\\sin b\\cos c\\cos A"],
     formulas: [
-      { display: "sin a cos B = cos b sin c − sin b cos c cos A", number: "(C)", nameFa: "فرمول مشابه (گاوس)", nameEn: "The analogue formula" },
+      {
+        display: "\\sin a\\cos B=\\cos b\\sin c-\\sin b\\cos c\\cos A",
+        tex: "\\sin a\\cos B=\\cos b\\sin c-\\sin b\\cos c\\cos A",
+        nameFa: "فرمول مشابه",
+        nameEn: "Analogue formula",
+      },
     ],
     sections: [
       {
-        headingFa: "استخراج جبری",
-        headingEn: "Algebraic derivation",
-        bodyFa: "از همراه (۷): sin c sin a cos B = cos b − cos c cos a. سپس cos a را از (A) جایگذاری کنید و بر sin c تقسیم کنید تا (C) به‌دست آید. این رابطه سه ضلع و دو زاویهٔ مجاور ضلع a را به هم می‌بندد.",
-        bodyEn: "Write (7) as sin c sin a cos B = cos b − cos c cos a, substitute (A) for cos a, divide by sin c: that is (C).",
-        formula: "sin a cos B = cos b sin c − sin b cos c cos A",
+        headingFa: "دلیل نیاز به فرمول مشابه",
+        headingEn: "Why the analogue is useful",
+        bodyFa:
+          "قانون سینوس فقط sin B را می‌دهد؛ فرمول مشابه cos B را نیز می‌دهد. با هر دو مؤلفه، atan2 ابهام مکمل را برطرف می‌کند.",
+        bodyEn:
+          "The sine law supplies sin B; the analogue supplies cos B. Using both in atan2 resolves the supplementary-angle ambiguity.",
       },
       {
-        headingFa: "اثبات هندسی شکل ۴",
-        headingEn: "Geometric proof (Fig. 4)",
-        bodyFa: "ضلع c را از ۹۰° بزرگ‌تر نگیرید. عظیمهٔ BA را تا D چنان امتداد دهید که BD = ۹۰°. آن‌گاه AD = 90°−c و زاویه در A از مثلث CAD برابر ۱۸۰°−A است. کمان CD را x بنامید. اعمال (A) در CAD و در BCD (که در B قائم است چون BD=90°) دو عبارت برای cos x می‌دهد؛ حذف x صورت (C) است.",
-        bodyEn: "Produce BA to D with BD = 90°. Then AD = 90°−c and CÂD = 180°−A. Let CD = x. Formula (A) in CAD and in right triangle BCD yields two expressions for cos x; eliminating x gives (C).",
-        formula: "cos x = sin c cos b − cos c sin b cos A = sin a cos B",
+        headingFa: "جانشینی بدون شکل اضافی",
+        headingEn: "Derivation without an extra construction",
+        bodyFa:
+          "قانون کسینوس برای b را بنویسید و cos a را از صورت بنیادی جایگزین کنید. در اثبات پایین عامل‌گیری و حذف sin c به طور کامل آمده است؛ این عامل در مثلث معمول مثبت است.",
+        bodyEn:
+          "Write the cosine law for b and substitute the fundamental expression for cos a. The proof below explicitly factors and cancels sin c, positive for an ordinary triangle.",
       },
     ],
-
     exercises: [
       {
-        textFa: "وقتی c > ۹۰° برهان هندسی را کامل کنید؛ اسمارت آن را به دانشجو وامی‌گذارد (ص. ۱۱).",
-        textEn: "Complete the proof of (C) when c > 90°, as Smart leaves to the student (p. 11).",
-        source: "Smart I §7",
+        textFa:
+          "در هشتک با سه ضلع ۹۰ درجه، هر دو طرف فرمول مشابه را حساب کنید. آیا رابطه B = ۹۰ درجه را تأیید می‌کند؟",
+        textEn:
+          "For the three-right-side octant, evaluate both sides of the analogue. Does it confirm B = 90°?",
+        answer: "\\sin a\\cos B=0=\\cos b\\sin c-\\sin b\\cos c\\cos A",
+        source: "Original exercise based on Smart / تمرین تألیفی",
+      },
+      {
+        textFa:
+          "فرض‌ها و دامنهٔ اعتبار روابط این درس را بنویسید و یک حالت ویژه را با جایگذاری مستقیم بررسی کنید.",
+        textEn:
+          "State the assumptions and domain of the identities in this lesson. Verify a special case by direct substitution.",
+        source: "Original learning check / تمرین تألیفی",
       },
     ],
+    example: {
+      id: "check-analogue-c",
+      titleFa: "مثال حل‌شده و کنترل نتیجه",
+      titleEn: "Worked check",
+      source: "Original worked application / کاربرد تألیفی",
+      givenFa:
+        "در هشتک با سه ضلع ۹۰ درجه، هر دو طرف فرمول مشابه را حساب کنید. آیا رابطه B = ۹۰ درجه را تأیید می‌کند؟",
+      givenEn:
+        "For the three-right-side octant, evaluate both sides of the analogue. Does it confirm B = 90°?",
+      findFa: "نتیجه را با روابط همین درس و کنترل واحدها به دست آورید.",
+      findEn: "Use this lesson’s identities and check the units.",
+      steps: [
+        {
+          fa: "ابتدا قرارداد علامت‌ها و داده‌های معلوم را مشخص کنید؛ سپس رابطهٔ متناسب را انتخاب کنید.",
+          en: "Identify the sign conventions and given parts, then select the corresponding identity.",
+        },
+        {
+          fa: "پس از جایگذاری و ساده‌سازی، نتیجهٔ زیر به دست می‌آید. شرایط وجود و ربع را نیز کنترل کنید.",
+          en: "Substitute and simplify to obtain the result below; check existence and quadrant conditions.",
+          formula: "\\sin a\\cos B=0=\\cos b\\sin c-\\sin b\\cos c\\cos A",
+        },
+      ],
+      resultFa:
+        "نتیجهٔ نهایی در رابطهٔ بالا آمده است؛ زاویه و طول را با یکدیگر مخلوط نکنید.",
+      resultEn:
+        "The result is shown above; keep angular and physical units distinct.",
+    },
   },
   {
     id: "four-parts",
@@ -394,8 +669,10 @@ export const LESSONS_CH1: Lesson[] = [
     spherePreset: "triangle",
     proofId: "four-parts",
     olympiad: "زنجیرهٔ چهار جزء متوالی",
-    summaryFa: "بند ۸: چهار جزء متوالی B، a، C، b. زاویهٔ C «زاویهٔ داخلی» و ضلع a «ضلع داخلی» است. قاعدهٔ حافظه صورت (D).",
-    summaryEn: "Smart I §8, Fig. 5: four consecutive parts and the cotangent formula.",
+    summaryFa:
+      "روی مرز مثلث B، a، C، b را دنبال کنید. ضلع داخلی a میان دو زاویه و زاویهٔ داخلی C میان دو ضلع است. رابطهٔ نهایی c و A را حذف می‌کند.",
+    summaryEn:
+      "Trace B,a,C,b along the boundary. Inner side a lies between the two angles; inner angle C lies between the sides. The final identity eliminates c and A.",
     smart: {
       chapter: "I",
       sections: "§8",
@@ -403,37 +680,79 @@ export const LESSONS_CH1: Lesson[] = [
       formulae: ["(D)", "(17)", "(18)"],
       figures: ["5"],
     },
-    figures: ["fig5"],
-    englishFormulas: [
-      "cos a cos C = sin a cot b − sin C cot B     (D)",
-      "cos(inner side)·cos(inner angle) = sin(inner side)·cot(other side) − sin(inner angle)·cot(other angle)",
-    ],
+    figures: ["geometry-triangle"],
+    englishFormulas: ["\\cos a\\cos C=\\sin a\\cot b-\\sin C\\cot B"],
     formulas: [
-      { display: "cos a cos C = sin a cot b − sin C cot B", number: "(D)", nameFa: "فرمول چهار جزء", nameEn: "Four-parts formula" },
+      {
+        display: "\\cos a\\cos C=\\sin a\\cot b-\\sin C\\cot B",
+        tex: "\\cos a\\cos C=\\sin a\\cot b-\\sin C\\cot B",
+        nameFa: "رابطهٔ چهار جزء",
+        nameEn: "Four-parts identity",
+      },
     ],
     sections: [
       {
         headingFa: "چهار جزء متوالی",
         headingEn: "Four consecutive parts",
-        bodyFa: "در شکل ۵ زنجیرهٔ B، a، C، b را ببینید. C میان a و b است (زاویهٔ داخلی) و a میان B و C است (ضلع داخلی). از (A) برای cos b و cos c بنویسید، دومی را در اولی جایگذاری کنید، بر sin a sin b تقسیم کنید، و sin c / sin b را از (B) بگذارید تا (D) به‌دست آید.",
-        bodyEn: "The consecutive parts are B, a, C, b. C is the inner angle, a the inner side. Substitute the cosine-formula for c into that for b, divide by sin a sin b, and use (B).",
-        formula: "cos a cos C = sin a cot b − sin C cot B",
+        bodyFa:
+          "روی مرز مثلث B، a، C، b را دنبال کنید. ضلع داخلی a میان دو زاویه و زاویهٔ داخلی C میان دو ضلع است. رابطهٔ نهایی c و A را حذف می‌کند.",
+        bodyEn:
+          "Trace B,a,C,b along the boundary. Inner side a lies between the two angles; inner angle C lies between the sides. The final identity eliminates c and A.",
       },
       {
-        headingFa: "قاعدهٔ حافظه",
-        headingEn: "Memory rule",
-        bodyFa: "کسینوس (ضلع داخلی) × کسینوس (زاویهٔ داخلی) = سینوس (ضلع داخلی) × کتانژانت (ضلع دیگر) − سینوس (زاویهٔ داخلی) × کتانژانت (زاویهٔ دیگر).",
-        bodyEn: "cos(inner side)·cos(inner angle) = sin(inner side)·cot(other side) − sin(inner angle)·cot(other angle).",
+        headingFa: "قاعدهٔ حفظی پس از استنتاج",
+        headingEn: "The mnemonic follows the derivation",
+        bodyFa:
+          "اثبات پایین جایگزینی cos c، انتقال جمله و استفاده از قانون سینوس را جدا نشان می‌دهد. حذف یک عامل فقط وقتی ناصفر است مجاز است؛ حالت حدی را از صورت تقسیم‌نشده یا پیوستگی کنترل کنید.",
+        bodyEn:
+          "The proof separates substitution for cos c, rearrangement, and use of the sine law. Cancel a factor only when nonzero; check limiting cases using the undivided form or continuity.",
       },
     ],
-
     exercises: [
       {
-        textFa: "با C = ۹۰° نشان دهید (D) به tan a = tan c cos B فرو می‌کاهد (از قواعد نپر).",
-        textEn: "With C = 90°, reduce (D) to tan a = tan c cos B (a Napier rule).",
-        source: "Smart I §§8–10",
+        textFa:
+          "برای C = ۹۰ درجه، فرمول چهار جزء چه رابطه‌ای برای tan B می‌دهد؟ شرط تقسیم را بنویسید.",
+        textEn:
+          "At C = 90°, what relation for tan B follows from the four-parts formula? State the division conditions.",
+        answer: "\\cot B=\\sin a\\cot b,\\quad\\tan B=\\frac{\\tan b}{\\sin a}",
+        source: "Original exercise based on Smart / تمرین تألیفی",
+      },
+      {
+        textFa:
+          "فرض‌ها و دامنهٔ اعتبار روابط این درس را بنویسید و یک حالت ویژه را با جایگذاری مستقیم بررسی کنید.",
+        textEn:
+          "State the assumptions and domain of the identities in this lesson. Verify a special case by direct substitution.",
+        source: "Original learning check / تمرین تألیفی",
       },
     ],
+    example: {
+      id: "check-four-parts",
+      titleFa: "مثال حل‌شده و کنترل نتیجه",
+      titleEn: "Worked check",
+      source: "Original worked application / کاربرد تألیفی",
+      givenFa:
+        "برای C = ۹۰ درجه، فرمول چهار جزء چه رابطه‌ای برای tan B می‌دهد؟ شرط تقسیم را بنویسید.",
+      givenEn:
+        "At C = 90°, what relation for tan B follows from the four-parts formula? State the division conditions.",
+      findFa: "نتیجه را با روابط همین درس و کنترل واحدها به دست آورید.",
+      findEn: "Use this lesson’s identities and check the units.",
+      steps: [
+        {
+          fa: "ابتدا قرارداد علامت‌ها و داده‌های معلوم را مشخص کنید؛ سپس رابطهٔ متناسب را انتخاب کنید.",
+          en: "Identify the sign conventions and given parts, then select the corresponding identity.",
+        },
+        {
+          fa: "پس از جایگذاری و ساده‌سازی، نتیجهٔ زیر به دست می‌آید. شرایط وجود و ربع را نیز کنترل کنید.",
+          en: "Substitute and simplify to obtain the result below; check existence and quadrant conditions.",
+          formula:
+            "\\cot B=\\sin a\\cot b,\\quad\\tan B=\\frac{\\tan b}{\\sin a}",
+        },
+      ],
+      resultFa:
+        "نتیجهٔ نهایی در رابطهٔ بالا آمده است؛ زاویه و طول را با یکدیگر مخلوط نکنید.",
+      resultEn:
+        "The result is shown above; keep angular and physical units distinct.",
+    },
   },
   {
     id: "right-angled",
@@ -445,8 +764,10 @@ export const LESSONS_CH1: Lesson[] = [
     spherePreset: "triangle",
     proofId: "napier",
     olympiad: "قواعد نپر · مثلث ربعی",
-    summaryFa: "بندهای ۹–۱۰: اثبات هندسی ساده‌سازی (A)(B)(C) در قائم‌الزاویه از شکل ۶، و پنج جزء دایره‌ای نپر (شکل ۷).",
-    summaryEn: "Smart I §§9–10, Figs. 6–7: geometric proofs and Napier’s circular parts.",
+    summaryFa:
+      "قائمه بودن C شرط روی زاویه است؛ ربعی بودن c شرط روی ضلع. قطبی گرفتن این دو را به هم تبدیل می‌کند. در هندسهٔ کروی وتر لزوماً از هر دو ساق بلندتر نیست.",
+    summaryEn:
+      "C = π/2 is a condition on an angle; c = π/2 is a condition on a side. Polar duality interchanges them. A spherical hypotenuse need not exceed both legs.",
     smart: {
       chapter: "I",
       sections: "§§9–10",
@@ -454,43 +775,85 @@ export const LESSONS_CH1: Lesson[] = [
       formulae: ["(19)", "(20)"],
       figures: ["6", "7"],
     },
-    figures: ["fig6", "fig7"],
+    figures: ["geometry-triangle"],
     englishFormulas: [
-      "C = 90°:  cos c = cos a cos b,   sin a = sin A sin c,   tan a = tan c cos B.",
-      "Napier: sin(middle) = product of tangents of adjacents = product of cosines of opposites.",
+      "C=\\frac\\pi2\\Rightarrow\\cos c=\\cos a\\cos b",
+      "\\sin a=\\sin A\\sin c,\\quad\\sin b=\\sin B\\sin c",
     ],
     formulas: [
-      { display: "cos c = cos a cos b     (C = 90°)", nameFa: "کسینوس وتر قائم‌الزاویه", nameEn: "Right-angled cosine of hypotenuse" },
-      { display: "sin(middle) = tan(adj₁) tan(adj₂) = cos(opp₁) cos(opp₂)", nameFa: "دو قاعدهٔ نپر", nameEn: "Napier’s two rules" },
+      {
+        display: "C=\\frac\\pi2\\Rightarrow\\cos c=\\cos a\\cos b",
+        tex: "C=\\frac\\pi2\\Rightarrow\\cos c=\\cos a\\cos b",
+        nameFa: "کسینوس قائم",
+        nameEn: "Right-triangle cosine",
+      },
+      {
+        display: "\\sin a=\\sin A\\sin c,\\quad\\sin b=\\sin B\\sin c",
+        tex: "\\sin a=\\sin A\\sin c,\\quad\\sin b=\\sin B\\sin c",
+        nameFa: "روابط سینوسی ساق‌ها",
+        nameEn: "Leg sine identities",
+      },
     ],
     sections: [
       {
-        headingFa: "اثبات هندسی شکل ۶",
-        headingEn: "Geometric proof (Fig. 6)",
-        bodyFa: "از P روی OC عمودهایی بر وجوه بریزید؛ آن‌ها چنان به هم می‌رسند که PS ⊥ صفحهٔ AOB. مثلث‌های قائم OPQ و OPR می‌دهند PQ = OP sin b و PR = OP sin a. کتانژانت زاویه در S برابر tan b cos A است و از (A) تمام می‌شود. همین شکل (B) و (C) را نیز می‌دهد.",
-        bodyEn: "From P on OC drop perpendiculars to the faces; they meet so that PS ⊥ plane AOB. Right triangles OPQ, OPR give PQ = OP sin b, PR = OP sin a. The same figure yields (A), (B) and (C).",
+        headingFa: "قائم‌الزاویه با ربعی فرق دارد",
+        headingEn: "Right-angled differs from quadrantal",
+        bodyFa:
+          "قائمه بودن C شرط روی زاویه است؛ ربعی بودن c شرط روی ضلع. قطبی گرفتن این دو را به هم تبدیل می‌کند. در هندسهٔ کروی وتر لزوماً از هر دو ساق بلندتر نیست.",
+        bodyEn:
+          "C = π/2 is a condition on an angle; c = π/2 is a condition on a side. Polar duality interchanges them. A spherical hypotenuse need not exceed both legs.",
       },
       {
-        headingFa: "قائم‌الزاویه و ربعی",
-        headingEn: "Right-angled and quadrantal",
-        bodyFa: "اگر یکی از زوایا ۹۰° باشد چهار فرمول ساده می‌شوند. اگر یکی از اضلاع ۹۰° باشد مثلث ربعی است. نپر پنج جزء دایره‌ای را می‌چیند (شکل ۷). برای C=90° اجزای داخل دایره: a، b، 90°−A، 90°−c، 90°−B. برای مثلث ربعی با c=90° همان پنج جزء بیرون دایره می‌نشینند: A، B، 90°−a، C−90°، 90°−b.",
-        bodyEn: "If an angle is 90° the four formulae simplify; if a side is 90° the triangle is quadrantal. Napier arranges five circular parts (Fig. 7). For C = 90° the parts inside the circle are a, b, 90°−A, 90°−c, 90°−B.",
-      },
-      {
-        headingFa: "دو قاعده",
-        headingEn: "The two rules",
-        bodyFa: "هر جزء را که میانه بگیرید، دو جزء مجاور و دو جزء مقابل دارید. سینوس میانه = حاصل تانژانت‌های مجاور = حاصل کسینوس‌های مقابل. اسمارت خاطرنشان می‌کند که اعمال مستقیم (A)–(D) اغلب ساده‌تر از حفظ پنج‌ضلعی است.",
-        bodyEn: "sin(middle) = product of tangents of the two adjacents = product of cosines of the two opposites. Smart notes that applying (A)–(D) directly is often simpler than memorising the pentagon.",
+        headingFa: "ترتیب پنج جزء",
+        headingEn: "The five-part order",
+        bodyFa:
+          "اجزای دایره را به ترتیب a، b، متمم A، متمم c، متمم B قرار دهید. همسایه و مقابل از همین ترتیب تعریف می‌شوند؛ ترتیب دلخواه مجاز نیست. هر قاعده را با قانون سینوس یا کسینوس قائم کنترل کنید.",
+        bodyEn:
+          "Arrange a,b,π/2−A,π/2−c,π/2−B cyclically. Adjacent and opposite are defined by this order, not an arbitrary rearrangement. Check each rule against the right-triangle sine or cosine laws.",
       },
     ],
-
     exercises: [
       {
-        textFa: "در مثلث قائم از C، از قواعد نپر بنویسید sin a = sin A sin c و tan a = tan c cos B.",
-        textEn: "For C = 90°, write sin a = sin A sin c and tan a = tan c cos B from Napier’s rules.",
-        source: "Smart I §10",
+        textFa: "برای a = ۳۰ درجه و B = ۵۰ درجه و C قائم، c را به دست آورید.",
+        textEn: "For a = 30°, B = 50°, and right angle C, determine c.",
+        answer:
+          "\\tan c=\\frac{\\tan30^\\circ}{\\cos50^\\circ},\\quad c\\simeq41.93011^\\circ",
+        source: "Original exercise based on Smart / تمرین تألیفی",
+      },
+      {
+        textFa:
+          "فرض‌ها و دامنهٔ اعتبار روابط این درس را بنویسید و یک حالت ویژه را با جایگذاری مستقیم بررسی کنید.",
+        textEn:
+          "State the assumptions and domain of the identities in this lesson. Verify a special case by direct substitution.",
+        source: "Original learning check / تمرین تألیفی",
       },
     ],
+    example: {
+      id: "check-right-angled",
+      titleFa: "مثال حل‌شده و کنترل نتیجه",
+      titleEn: "Worked check",
+      source: "Original worked application / کاربرد تألیفی",
+      givenFa: "برای a = ۳۰ درجه و B = ۵۰ درجه و C قائم، c را به دست آورید.",
+      givenEn: "For a = 30°, B = 50°, and right angle C, determine c.",
+      findFa: "نتیجه را با روابط همین درس و کنترل واحدها به دست آورید.",
+      findEn: "Use this lesson’s identities and check the units.",
+      steps: [
+        {
+          fa: "از فرمول چهار جزء برای C قائم داریم tan a = cos B tan c. چون a حاد و cos B مثبت است، c را در بازهٔ حاد انتخاب می‌کنیم.",
+          en: "The right-triangle four-parts relation is tan a = cos B tan c. Since a is acute and cos B is positive, c is acute.",
+        },
+        {
+          fa: "پس از جایگذاری و ساده‌سازی، نتیجهٔ زیر به دست می‌آید. شرایط وجود و ربع را نیز کنترل کنید.",
+          en: "Substitute and simplify to obtain the result below; check existence and quadrant conditions.",
+          formula:
+            "\\tan c=\\frac{\\tan30^\\circ}{\\cos50^\\circ},\\quad c\\simeq41.93011^\\circ",
+        },
+      ],
+      resultFa:
+        "نتیجهٔ نهایی در رابطهٔ بالا آمده است؛ زاویه و طول را با یکدیگر مخلوط نکنید.",
+      resultEn:
+        "The result is shown above; keep angular and physical units distinct.",
+    },
   },
   {
     id: "cosine-angles",
@@ -502,8 +865,10 @@ export const LESSONS_CH1: Lesson[] = [
     spherePreset: "triangle",
     proofId: "polar",
     olympiad: "دوگان قطبی · کسینوس زوایا",
-    summaryFa: "بند ۱۱ و شکل ۸: قطب‌های اضلاع، مثلث قطبی، a′ = ۱۸۰°−A و A′ = ۱۸۰°−a. اعمال (A) روی قطبی کسینوس زوایا را می‌دهد.",
-    summaryEn: "Smart I §11, Fig. 8: the polar triangle and the polar of formula (A).",
+    summaryFa:
+      "هر ضلع دو قطب پادپا دارد. قطب BC را در نیم‌کرهٔ A انتخاب کنید و چرخه‌ای ادامه دهید. علامت ناسازگار روابط مکمل را تغییر می‌دهد.",
+    summaryEn:
+      "Each side has two antipodal poles. Choose the BC pole in A’s hemisphere, and cyclically. Inconsistent pole signs change the complement relations.",
     smart: {
       chapter: "I",
       sections: "§11",
@@ -511,38 +876,89 @@ export const LESSONS_CH1: Lesson[] = [
       formulae: ["polar of (A)"],
       figures: ["8"],
     },
-    figures: ["fig8"],
+    figures: ["geometry-triangle"],
     englishFormulas: [
-      "a′ = 180° − A,   A′ = 180° − a   (and cyclic)",
-      "− cos A = cos B cos C − sin B sin C cos a",
+      "a^{\\prime}=\\pi-A,\\quad A^{\\prime}=\\pi-a",
+      "\\cos A=-\\cos B\\cos C+\\sin B\\sin C\\cos a",
     ],
     formulas: [
-      { display: "a′ = 180° − A,  A′ = 180° − a", nameFa: "اضلاع و زوایای مثلث قطبی", nameEn: "Polar sides and angles" },
-      { display: "cos A = −cos B cos C + sin B sin C cos a", nameFa: "کسینوس زوایا (قطبیِ A)", nameEn: "Polar cosine-formula" },
+      {
+        display: "a^{\\prime}=\\pi-A,\\quad A^{\\prime}=\\pi-a",
+        tex: "a^{\\prime}=\\pi-A,\\quad A^{\\prime}=\\pi-a",
+        nameFa: "روابط قطبی",
+        nameEn: "Polar relations",
+      },
+      {
+        display: "\\cos A=-\\cos B\\cos C+\\sin B\\sin C\\cos a",
+        tex: "\\cos A=-\\cos B\\cos C+\\sin B\\sin C\\cos a",
+        nameFa: "کسینوس زوایا",
+        nameEn: "Angle cosine law",
+      },
     ],
     sections: [
       {
-        headingFa: "ساخت شکل ۸",
-        headingEn: "Construction of Fig. 8",
-        bodyFa: "عظیمهٔ BC دو قطب دارد؛ آن که در نیم‌کرهٔ A است رأس A′ مثلث قطبی است. به همین ترتیب B′ و C′. چون A′ قطب BC است، کمان A′B′ برابر متمم زاویهٔ A میان قطب‌های AB و AC است و a′ = 180° − A تمام می‌شود. دوگان همین است: A′ = 180° − a. شکل ۸ اسمارت L و M را روی عظیمه‌ای که A′ قطب آن است علامت می‌زند.",
-        bodyEn: "The pole of BC lying in A’s hemisphere is A′. Then a′ = 180° − A and A′ = 180° − a, and cyclic. Smart’s Fig. 8 marks L, M on the great circle of which A′ is pole.",
+        headingFa: "انتخاب قطب‌های داخلی",
+        headingEn: "Choose the inward poles",
+        bodyFa:
+          "هر ضلع دو قطب پادپا دارد. قطب BC را در نیم‌کرهٔ A انتخاب کنید و چرخه‌ای ادامه دهید. علامت ناسازگار روابط مکمل را تغییر می‌دهد.",
+        bodyEn:
+          "Each side has two antipodal poles. Choose the BC pole in A’s hemisphere, and cyclically. Inconsistent pole signs change the complement relations.",
       },
       {
-        headingFa: "انتقال فرمول‌ها",
-        headingEn: "Transfer of formulae",
-        bodyFa: "اعمال (A) بر A′B′C′ و جایگزینی a′ = 180°−A و دور، کسینوس زوایای ABC را از ضلع روبه‌رو می‌دهد. هر زاویه را در (A)–(D) با ۱۸۰°−ضلع روبه‌رو عوض کنید: A را با ۱۸۰°−a جایگذاری کنید.",
-        bodyEn: "Apply (A) to the polar triangle and substitute a′ = 180°−A. The same replacement 180°−a for A in (A)–(D) generates the whole polar set.",
-        formula: "−cos A = cos B cos C − sin B sin C cos a",
+        headingFa: "دوگانگی و حل از سه زاویه",
+        headingEn: "Duality and solving from three angles",
+        bodyFa:
+          "ضلع قطبی مکمل زاویهٔ اصلی است، نه برابر آن. جانشینی کامل در قانون اضلاع، قانون زوایا را می‌دهد. در هندسهٔ کروی، سه زاویه می‌توانند اضلاع را تعیین کنند؛ اندازهٔ زاویه‌ای مستقل از شکل نیست.",
+        bodyEn:
+          "A polar side supplements the original angle rather than equalling it. Full substitution in the side law gives the angle law. Three angles can determine spherical sides; angular size is not independent of shape.",
       },
     ],
-
     exercises: [
       {
-        textFa: "از فرمول قطبی (A) نشان دهید اگر سه زاویه معلوم باشند اضلاع تعیین می‌شوند (و برعکس).",
-        textEn: "From the polar of (A), three angles determine the sides.",
-        source: "Smart I §11",
+        textFa:
+          "مثلثی با اضلاع ۹۰ درجه چه مثلث قطبی‌ای دارد؟ فرمول مکمل را کنترل کنید.",
+        textEn:
+          "What is the polar of a triangle whose three sides are 90°? Check the supplement relations.",
+        answer:
+          "a=b=c=A=B=C=90^\\circ\\Rightarrow a^{\\prime}=b^{\\prime}=c^{\\prime}=90^\\circ",
+        source: "Original exercise based on Smart / تمرین تألیفی",
+      },
+      {
+        textFa:
+          "فرض‌ها و دامنهٔ اعتبار روابط این درس را بنویسید و یک حالت ویژه را با جایگذاری مستقیم بررسی کنید.",
+        textEn:
+          "State the assumptions and domain of the identities in this lesson. Verify a special case by direct substitution.",
+        source: "Original learning check / تمرین تألیفی",
       },
     ],
+    example: {
+      id: "check-cosine-angles",
+      titleFa: "مثال حل‌شده و کنترل نتیجه",
+      titleEn: "Worked check",
+      source: "Original worked application / کاربرد تألیفی",
+      givenFa:
+        "مثلثی با اضلاع ۹۰ درجه چه مثلث قطبی‌ای دارد؟ فرمول مکمل را کنترل کنید.",
+      givenEn:
+        "What is the polar of a triangle whose three sides are 90°? Check the supplement relations.",
+      findFa: "نتیجه را با روابط همین درس و کنترل واحدها به دست آورید.",
+      findEn: "Use this lesson’s identities and check the units.",
+      steps: [
+        {
+          fa: "ابتدا قرارداد علامت‌ها و داده‌های معلوم را مشخص کنید؛ سپس رابطهٔ متناسب را انتخاب کنید.",
+          en: "Identify the sign conventions and given parts, then select the corresponding identity.",
+        },
+        {
+          fa: "پس از جایگذاری و ساده‌سازی، نتیجهٔ زیر به دست می‌آید. شرایط وجود و ربع را نیز کنترل کنید.",
+          en: "Substitute and simplify to obtain the result below; check existence and quadrant conditions.",
+          formula:
+            "a=b=c=A=B=C=90^\\circ\\Rightarrow a^{\\prime}=b^{\\prime}=c^{\\prime}=90^\\circ",
+        },
+      ],
+      resultFa:
+        "نتیجهٔ نهایی در رابطهٔ بالا آمده است؛ زاویه و طول را با یکدیگر مخلوط نکنید.",
+      resultEn:
+        "The result is shown above; keep angular and physical units distinct.",
+    },
   },
   {
     id: "haversine-example",
@@ -554,8 +970,10 @@ export const LESSONS_CH1: Lesson[] = [
     spherePreset: "circles",
     proofId: "haversine",
     olympiad: "فاصلهٔ عظیمهٔ زمینی · هاورساین",
-    summaryFa: "بندهای ۱۲–۱۴: دو مکان روی زمین، فاصلهٔ عظیمه، زوایای مسیر و بالاترین عرض. سپس هاورساین hav θ = (1−cos θ)/2 و بازآزمایی مثال.",
-    summaryEn: "Smart I §§12–14, Fig. 9: the Glasgow-style worked example and haversines.",
+    summaryFa:
+      "دو مکان A و B را به قطب شمال وصل کنید. اضلاع قطبی متمم عرض‌ها و زاویهٔ شامل اختلاف طول است. از اختلاف طول جهت‌دار هم می‌توان استفاده کرد چون کسینوس و هاورساین زوج‌اند.",
+    summaryEn:
+      "Join places A,B to the north pole. The polar sides are co-latitudes and the included angle is the longitude difference. Signed differences also work because cosine and haversine are even.",
     smart: {
       chapter: "I",
       sections: "§§12–14",
@@ -563,35 +981,52 @@ export const LESSONS_CH1: Lesson[] = [
       formulae: ["(21)", "(22)", "(23)", "(24)–(34)"],
       figures: ["9"],
     },
-    figures: ["fig9"],
+    figures: ["geometry-circles"],
     englishFormulas: [
-      "hav θ = (1 − cos θ)/2 = sin²(θ/2)     (21)",
-      "hav a = hav(b − c) + sin b sin c hav A     (23)",
+      "\\operatorname{hav}t=\\sin^2\\frac t2",
+      "\\operatorname{hav}a=\\operatorname{hav}(b-c)+\\sin b\\sin c\\operatorname{hav}A",
     ],
     formulas: [
-      { display: "hav θ = ½(1 − cos θ) = sin²(θ/2)", number: "(21)", nameFa: "تعریف هاورساین", nameEn: "Haversine" },
-      { display: "hav a = hav(b − c) + sin b sin c hav A", number: "(23)", nameFa: "صورت هاورساین (A)", nameEn: "Haversine form of (A)" },
+      {
+        display: "\\operatorname{hav}t=\\sin^2\\frac t2",
+        tex: "\\operatorname{hav}t=\\sin^2\\frac t2",
+        nameFa: "تعریف هاورساین",
+        nameEn: "Haversine definition",
+      },
+      {
+        display:
+          "\\operatorname{hav}a=\\operatorname{hav}(b-c)+\\sin b\\sin c\\operatorname{hav}A",
+        tex: "\\operatorname{hav}a=\\operatorname{hav}(b-c)+\\sin b\\sin c\\operatorname{hav}A",
+        nameFa: "فرمول هاورساین",
+        nameEn: "Haversine identity",
+      },
     ],
     sections: [
       {
-        headingFa: "صورت مثال بند ۱۲ (شکل ۹)",
-        headingEn: "The §12 problem (Fig. 9)",
-        bodyFa: "A: عرض ۲۴°۱۸′ N، طول ۱۳۳°۳۹′ E. B: عرض ۳۶°۴۷′ N، طول ۱۲۵°۲۴′ W. خواسته: (i) کمان عظیمهٔ AB؛ (ii) زاویهٔ PAB در قطب شمال؛ (iii) بالاترین عرض روی AB. اضلاع قطبی PA = ۶۵°۴۲′ و PB = ۵۳°۱۳′اند. اختلاف طول کوتاه‌تر APB = ۱۰۰°۵۷′ است (نه کمان مکمل ۲۵۹°۰۳′).",
-        bodyEn: "A: 24°18′ N, 133°39′ E. B: 36°47′ N, 125°24′ W. Find AB, angle PAB, and the highest latitude on AB. Polar distances PA = 65°42′, PB = 53°13′. The shorter longitude difference is APB = 100°57′.",
+        headingFa: "ساخت مثلث دو مکان",
+        headingEn: "Build the two-place triangle",
+        bodyFa:
+          "دو مکان A و B را به قطب شمال وصل کنید. اضلاع قطبی متمم عرض‌ها و زاویهٔ شامل اختلاف طول است. از اختلاف طول جهت‌دار هم می‌توان استفاده کرد چون کسینوس و هاورساین زوج‌اند.",
+        bodyEn:
+          "Join places A,B to the north pole. The polar sides are co-latitudes and the included angle is the longitude difference. Signed differences also work because cosine and haversine are even.",
       },
       {
-        headingFa: "نتایج اسمارت از (A) و (۱۱)",
-        headingEn: "Smart’s results from (A) and (11)",
-        bodyFa: "با لگاریتم پنج‌رقمی: cos AB = 0.10776 ⇒ AB = 83°49′.8 ≈ 83°49′ = ۵۰۲۸.۸ مایل دریایی. زاویه در A از نیم‌زاویه (۱۱) برابر ۵۲°۱۶′ است. بالاترین عرض قطب C است که روی AB عمود است؛ sin PC = sin PA sin PAC ⇒ عرض C = ۴۳°۵۳′ N.",
-        bodyEn: "Five-figure logs: cos AB = 0.10776 ⇒ AB = 83°49′.8 ≈ 83°49′ = 5028.8 nautical miles. Angle at A from (11) is 52°16′. Highest latitude: sin PC = sin PA sin PAC ⇒ lat C = 43°53′ N.",
-        formula: "AB = 83°49′ = 5028.8 nmi",
+        headingFa: "فاصله با هاورساین",
+        headingEn: "Separation by haversine",
+        bodyFa:
+          "جانشینی فاصله‌های قطبی فرمول زیر را می‌دهد. q را فقط برای خطای کوچک گردکردن به بازهٔ صفر تا یک محدود کنید؛ این کار جای اعتبارسنجی داده نیست.",
+        bodyEn:
+          "Substituting polar distances gives the following formula. Clamp q into [0,1] only for small roundoff, not as a replacement for input validation.",
+        formula:
+          "q=\\operatorname{hav}(\\varphi_2-\\varphi_1)+\\cos\\varphi_1\\cos\\varphi_2\\operatorname{hav}(\\Delta\\lambda),\\quad\\sigma=2\\arcsin\\sqrt q",
       },
       {
-        headingFa: "هاورساین — بند ۱۳",
-        headingEn: "Haversines — §13",
-        bodyFa: "hav θ نامنفی است از ۰° تا ۱۸۰°. جایگزینی cos = 1 − 2 hav در (A) صورت (۲۳) را می‌دهد. اسمارت همان AB را با جداول ناوبری Inman بازمی‌آزماید و ۸۳°۴۹′ را بازمی‌یابد. بند ۱۴ زاویهٔ کمکی D را برای یافتن ضلع سوم و یک زاویه با هم معرفی می‌کند.",
-        bodyEn: "hav θ ≥ 0 on 0°–180°. Substituting cos = 1 − 2 hav in (A) yields (23). Smart repeats AB with Inman’s Nautical Tables and recovers 83°49′. §14 introduces an auxiliary angle D to find the third side and an angle together.",
-        formula: "hav AB = hav(PA − PB) + sin PA sin PB hav APB",
+        headingFa: "فاصلهٔ فیزیکی و پادپا",
+        headingEn: "Physical distance and antipodes",
+        bodyFa:
+          "طول عظیمه Rσ است با σ رادیانی. روی زمین واقعی، مدل کروی تقریبی است. نزدیک پادپا جهت مسیر حساس و در پادپای دقیق مسیر کوتاه غیر یکتا است.",
+        bodyEn:
+          "Great-circle length is Rσ with σ in radians. This is an approximation for real Earth. Near antipodes the route direction is sensitive; at exact antipodes the shortest route is not unique.",
       },
     ],
     example: {
@@ -604,18 +1039,49 @@ export const LESSONS_CH1: Lesson[] = [
       findFa: "AB، زاویه در A، عرض بالاترین نقطهٔ AB.",
       findEn: "AB, angle at A, highest latitude on AB.",
       steps: [
-          { fa: "PA = ۶۵°۴۲′، PB = ۵۳°۱۳′، APB = ۱۰۰°۵۷′.", en: "PA = 65°42′, PB = 53°13′, APB = 100°57′." },
-          { fa: "فرمول (A) برای AB.", en: "Formula (A) for AB.", formula: "cos AB = cos PA cos PB + sin PA sin PB cos APB" },
+        {
+          fa: "PA = ۶۵°۴۲′، PB = ۵۳°۱۳′، APB = ۱۰۰°۵۷′.",
+          en: "PA = 65°42′, PB = 53°13′, APB = 100°57′.",
+        },
+        {
+          fa: "فرمول (A) برای AB.",
+          en: "Formula (A) for AB.",
+          formula:
+            "\\cos AB=\\cos PA\\cos PB+\\sin PA\\sin PB\\cos H,\\quad AB\\simeq83.81404^\\circ",
+        },
+        {
+          fa: "زاویهٔ A روبه‌روی PB است. آن را با صورت حل‌شدهٔ قانون کسینوس از سه ضلع می‌یابیم؛ ترتیب اضلاع را جابه‌جا نکنید.",
+          en: "Angle A is opposite PB. Recover it from the rearranged cosine law using all three sides, keeping the opposite-side ordering.",
+          formula:
+            "\\cos A=\\frac{\\cos PB-\\cos PA\\cos AB}{\\sin PA\\sin AB},\\quad A\\simeq52.27241^\\circ",
+        },
+        {
+          fa: "از A تا نزدیک‌ترین نقطه به قطب، مثلث قائم با قطب می‌سازیم. قانون سینوس در آن، فاصلهٔ قطبی کمینه را از زاویهٔ A تعیین می‌کند؛ برای مسیر این مثال، نقطهٔ بیشینه روی کمان کوتاه قرار دارد.",
+          en: "The northernmost point of the route forms a right spherical triangle with A and the pole. The sine law gives its minimum polar distance; for this example the maximum lies on the minor route arc.",
+          formula: "\\cos\\varphi_{\\max}=\\sin PA\\sin A",
+        },
       ],
-      resultFa: "AB ≈ ۸۳°۴۹′ · ۵۰۲۹ مایل دریایی · A ≈ ۵۲°۱۶′ · عرض C ≈ ۴۳°۵۳′N",
-      resultEn: "AB ≈ 83°49′ · 5029 nmi · A ≈ 52°16′ · lat C ≈ 43°53′N",
+      resultFa:
+        "جدایی، زاویهٔ A و بیشینهٔ عرض از روابط بالا به دست می‌آیند؛ تبدیل ۶۰ مایل دریایی بر درجه تقریبی است.",
+      resultEn:
+        "AB ≈ 83.81404°; spherical-model distance ≈ 5028.84 nmi; A ≈ 52.27241°; maximum latitude ≈ 43.87486° N.",
       widget: "gc-distance",
     },
     exercises: [
       {
-        textFa: "طول جغرافیایی نقطهٔ C (بالاترین عرض AB) را که اسمارت در ص. ۱۸ به تمرین وامی‌گذارد بیابید.",
-        textEn: "Find the longitude of C, left as an exercise by Smart on p. 18.",
-        source: "Smart I §12",
+        textFa:
+          "دو مکان روی استوا با اختلاف طول ۰٫۰۰۱ درجه چه جدایی زاویه‌ای دارند؟ چرا هاورساین مناسب است؟",
+        textEn:
+          "Two equatorial places differ by 0.001° in longitude. What is their separation? Why is haversine useful?",
+        answer: "\\sigma=0.001^\\circ=1.74532925\\times10^{-5}\\ \\mathrm{rad}",
+        source: "Original exercise based on Smart / تمرین تألیفی",
+      },
+      {
+        textFa:
+          "فرض‌ها و دامنهٔ اعتبار روابط این درس را بنویسید و یک حالت ویژه را با جایگذاری مستقیم بررسی کنید.",
+        textEn:
+          "State the assumptions and domain of the identities in this lesson. Verify a special case by direct substitution.",
+        source: "Original learning check / تمرین تألیفی",
       },
     ],
   },
@@ -629,53 +1095,110 @@ export const LESSONS_CH1: Lesson[] = [
     spherePreset: "triangle",
     proofId: "delambre",
     olympiad: "قیاسی‌های نپر · sin 1″",
-    summaryFa: "بندهای ۱۵–۱۶: تقریب زوایای کوچک، تبدیل زمان↔کمان، سپس چهار قیاس دلامبر (۴۵)–(۴۸) و چهار قیاس نپر. تمرین‌های پایان فصل.",
-    summaryEn: "Smart I §§15–16: small-angle formulae, Delambre (45)–(48), Napier (49)–(52).",
+    summaryFa:
+      "sin θ تقریباً θ فقط برای θ رادیانی درست است. یک دقیقهٔ زمان ۱۵ دقیقهٔ قوسی، یعنی ۹۰۰ ثانیهٔ قوسی است؛ ضریب ۱۵ تقسیم بر ۲۰۶۲۶۵ برای دقیقهٔ زمان یک عامل ۶۰ کم دارد.",
+    summaryEn:
+      "sin θ ≈ θ assumes radians. One minute of time is 15 arcminutes, or 900 arcseconds. The factor 15/206265 for time minutes is missing a factor of 60.",
     smart: {
       chapter: "I",
       sections: "§§15–16",
       pages: "21–24",
       formulae: ["(35)–(52)"],
     },
-    figures: ["fig7"],
+    figures: ["geometry-triangle"],
     englishFormulas: [
-      "1 radian = 206265″,   sin 1″ = 1/206265     (36)",
-      "tan ½(a+b) = [cos ½(A−B) / cos ½(A+B)] tan ½c     (49)",
+      "1\\,\\mathrm h=15^\\circ,\\quad1\\,\\mathrm{min}_{time}=900^{\\prime\\prime}",
+      "\\tan\\frac{a+b}2=\\frac{\\cos((A-B)/2)}{\\cos((A+B)/2)}\\tan\\frac c2",
     ],
     formulas: [
-      { display: "sin 1″ = 1/206265", number: "(36)", nameFa: "سینوس یک ثانیهٔ قوسی", nameEn: "Sine of one arcsecond" },
-      { display: "24ʰ = 360°,   1ʰ = 15°,   1ᵐ = 15′,   1ˢ = 15″", number: "(40)", nameFa: "تبدیل زمان و قوس", nameEn: "Time–arc conversion" },
-      { display: "sin(c/2) sin((A−B)/2) = cos(C/2) sin((a−b)/2)", number: "(45)", nameFa: "دلامبر (یکی از چهار)", nameEn: "Delambre’s analogy (one of four)" },
-      { display: "tan ½(a+b) = [cos ½(A−B)/cos ½(A+B)] tan ½c", number: "(49)", nameFa: "قیاسی نپر برای مجموع اضلاع", nameEn: "Napier’s analogy for sum of sides" },
+      {
+        display:
+          "1\\,\\mathrm h=15^\\circ,\\quad1\\,\\mathrm{min}_{time}=900^{\\prime\\prime}",
+        tex: "1\\,\\mathrm h=15^\\circ,\\quad1\\,\\mathrm{min}_{time}=900^{\\prime\\prime}",
+        nameFa: "تبدیل دقیق زمان و قوس",
+        nameEn: "Exact time–arc conversion",
+      },
+      {
+        display:
+          "\\tan\\frac{a+b}2=\\frac{\\cos((A-B)/2)}{\\cos((A+B)/2)}\\tan\\frac c2",
+        tex: "\\tan\\frac{a+b}2=\\frac{\\cos((A-B)/2)}{\\cos((A+B)/2)}\\tan\\frac c2",
+        nameFa: "قیاس مجموع اضلاع",
+        nameEn: "Sum-of-sides analogy",
+      },
     ],
     sections: [
       {
-        headingFa: "زوایای کوچک",
-        headingEn: "Small angles",
-        bodyFa: "در اندازه‌گیری دایره‌ای، sin θ ≈ θ و tan θ ≈ θ. یک رادیان = ۲۰۶۲۶۵″ پس sin 1″ = 1/206265 و sin 1′ ≈ 1/3438. اگر زاویهٔ ساعتی کوچک بر حسب دقیقهٔ زمان θ′ باشد sin θ ≈ θ′ / 206265. برای زوایای ساعتی کوچک بر حسب دقیقهٔ زمان: sin H ≈ 15 Hᵐ sin 1″.",
-        bodyEn: "In circular measure sin θ ≈ θ. One radian = 206265″, so sin 1″ = 1/206265. For a small hour angle in minutes of time, sin H ≈ 15 Hᵐ sin 1″.",
-        formula: "sin θ″ = θ″ sin 1″     (38)",
+        headingFa: "واحد تقریب زاویهٔ کوچک",
+        headingEn: "Small angles need radians",
+        bodyFa:
+          "sin θ تقریباً θ فقط برای θ رادیانی درست است. یک دقیقهٔ زمان ۱۵ دقیقهٔ قوسی، یعنی ۹۰۰ ثانیهٔ قوسی است؛ ضریب ۱۵ تقسیم بر ۲۰۶۲۶۵ برای دقیقهٔ زمان یک عامل ۶۰ کم دارد.",
+        bodyEn:
+          "sin θ ≈ θ assumes radians. One minute of time is 15 arcminutes, or 900 arcseconds. The factor 15/206265 for time minutes is missing a factor of 60.",
+        formula: "H_{\\rm rad}=\\frac{\\pi}{720}H_{\\rm time\\ minutes}",
       },
       {
-        headingFa: "دلامبر و نپر",
-        headingEn: "Delambre and Napier",
-        bodyFa: "چهار قیاس دلامبر (۴۵)–(۴۸) که جفت‌جفت گرفته شوند چهار قیاس نپر (۴۹)–(۵۲) را می‌دهند: مجموع/تفاضل اضلاع از مجموع/تفاضل زوایا (و برعکس). این‌ها مسیر لگاریتمی ترجیحی‌اند وقتی دو زاویه و ضلع شامل، یا دو ضلع و زاویهٔ شامل، معلوم باشند — پایدارتر از (A) به‌تنهایی.",
-        bodyEn: "Delambre’s four formulae (45)–(48), taken in pairs, give Napier’s analogies (49)–(52). They are the preferred logarithmic route when two angles and the included side, or two sides and the included angle, are given.",
+        headingFa: "تقریب را با تساوی جدا کنید",
+        headingEn: "Distinguish approximation from equality",
+        bodyFa:
+          "یک رادیان دقیقاً ۶۴۸۰۰۰ تقسیم بر π ثانیهٔ قوسی است. ۲۰۶۲۶۵ گرد شده و سینوس یک ثانیه فقط تقریباً معکوس آن است.",
+        bodyEn:
+          "One radian is exactly 648000/π arcseconds. 206265 is rounded, and the sine of one arcsecond is only approximately its reciprocal.",
+      },
+      {
+        headingFa: "قیاس از نسبت هویت‌ها",
+        headingEn: "Analogies from ratios of identities",
+        bodyFa:
+          "در اثبات پایین، چهار هویت دلامبر از ضرب فرمول‌های نیم‌زاویه و اتحادهای جمع به ضرب ساخته می‌شوند؛ سپس تقسیم جفت‌های مشخص، قیاس‌های نپر را می‌دهد. برای معکوس تانژانت، ربع را جداگانه کنترل کنید.",
+        bodyEn:
+          "The derivation below constructs all four Delambre identities from half-angle products and sum-to-product identities, then divides explicit pairs to obtain Napier’s analogies. Resolve quadrants when inverting tangents.",
       },
     ],
-
     exercises: [
       {
-        textFa: "اگر اجزا a,b,c,A,B,C افزایش‌های da،…،dC بپذیرند، نشان دهید da = cos C db + cos B dc + K sin b sin c dA با K = sin A / sin a. (تمرین ۸)",
-        textEn: "If the elements receive increments da,…,dC, show da = cos C db + cos B dc + K sin b sin c dA, with K = sin A / sin a. (Smart I, Ex. 8)",
-        source: "Smart I Exercises 8",
+        textFa:
+          "یک دقیقهٔ زمان چند ثانیهٔ قوسی و چند رادیان است؟ تقریب سینوس آن را بنویسید.",
+        textEn:
+          "Convert one minute of time to arcseconds and radians. Give its small-angle sine approximation.",
+        answer:
+          "1\\,\\mathrm{min}_{time}=900^{\\prime\\prime}=\\pi/720\\ \\mathrm{rad},\\quad\\sin H\\simeq0.00436332",
+        source: "Original exercise based on Smart / تمرین تألیفی",
       },
       {
-        textFa: "در مثلث متساوی‌الاضلاع کروی، da/dA = cos(A/2) cot(a/2). (گلاسگو ۱۹۶۷)",
-        textEn: "For an equilateral spherical triangle, da/dA = cos(A/2) cot(a/2). [Glas. 1967]",
-        source: "Smart I Exercises 9 (Glas. 1967)",
+        textFa:
+          "فرض‌ها و دامنهٔ اعتبار روابط این درس را بنویسید و یک حالت ویژه را با جایگذاری مستقیم بررسی کنید.",
+        textEn:
+          "State the assumptions and domain of the identities in this lesson. Verify a special case by direct substitution.",
+        source: "Original learning check / تمرین تألیفی",
       },
     ],
+    example: {
+      id: "check-delambre-napier",
+      titleFa: "مثال حل‌شده و کنترل نتیجه",
+      titleEn: "Worked check",
+      source: "Original worked application / کاربرد تألیفی",
+      givenFa:
+        "یک دقیقهٔ زمان چند ثانیهٔ قوسی و چند رادیان است؟ تقریب سینوس آن را بنویسید.",
+      givenEn:
+        "Convert one minute of time to arcseconds and radians. Give its small-angle sine approximation.",
+      findFa: "نتیجه را با روابط همین درس و کنترل واحدها به دست آورید.",
+      findEn: "Use this lesson’s identities and check the units.",
+      steps: [
+        {
+          fa: "ابتدا قرارداد علامت‌ها و داده‌های معلوم را مشخص کنید؛ سپس رابطهٔ متناسب را انتخاب کنید.",
+          en: "Identify the sign conventions and given parts, then select the corresponding identity.",
+        },
+        {
+          fa: "پس از جایگذاری و ساده‌سازی، نتیجهٔ زیر به دست می‌آید. شرایط وجود و ربع را نیز کنترل کنید.",
+          en: "Substitute and simplify to obtain the result below; check existence and quadrant conditions.",
+          formula:
+            "1\\,\\mathrm{min}_{time}=900^{\\prime\\prime}=\\pi/720\\ \\mathrm{rad},\\quad\\sin H\\simeq0.00436332",
+        },
+      ],
+      resultFa:
+        "نتیجهٔ نهایی در رابطهٔ بالا آمده است؛ زاویه و طول را با یکدیگر مخلوط نکنید.",
+      resultEn:
+        "The result is shown above; keep angular and physical units distinct.",
+    },
   },
   {
     id: "spherical-area",
@@ -687,41 +1210,91 @@ export const LESSONS_CH1: Lesson[] = [
     spherePreset: "area",
     proofId: "girard",
     olympiad: "زیادی کروی · ژیرار · ل‌هویلیه",
-    summaryFa: "اسمارت در فصل I مساحت را در بخشی شماره‌دار نمی‌گذارد؛ المپیاد زیادی کروی را می‌خواهد. قضیهٔ ژیرار و فرمول ل‌هویلیه مکمل مسیر ایران‌اند نه بند اسمارت.",
-    summaryEn: "Not a numbered Smart I section; Girard and L’Huilier are supplied for the olympiad track.",
+    summaryFa:
+      "زیادی E مجموع زاویه‌ها منهای π است و زاویه‌ها باید رادیانی باشند. روی کرهٔ واحد مساحت عددی برابر E است؛ زاویهٔ فضایی استرادیان و مساحت فیزیکی واحد طول مربع دارد.",
+    summaryEn:
+      "Excess E is the angle sum minus π, with angles in radians. Unit-sphere area is numerically E; solid angle is in steradians and physical area in squared length units.",
     smart: {
       chapter: "I",
       sections: "supplement (Girard / L’Huilier)",
       pages: "—",
       formulae: ["E = A+B+C−π"],
     },
-    figures: ["fig-lune"],
-    englishFormulas: [
-      "Spherical excess E = A + B + C − π",
-      "Area (unit sphere) = E steradians; on radius R: R² E",
-      "tan(E/4) = √[tan(s/2) tan((s−a)/2) tan((s−b)/2) tan((s−c)/2)]",
-    ],
+    figures: ["geometry-area"],
+    englishFormulas: ["E=A+B+C-\\pi,\\quad S=R^2E"],
     formulas: [
-      { display: "E = A + B + C − π", nameFa: "زیادی کروی", nameEn: "Spherical excess" },
-      { display: "Area = R² E", nameFa: "قضیهٔ ژیرار", nameEn: "Girard’s theorem" },
+      {
+        display: "E=A+B+C-\\pi,\\quad S=R^2E",
+        tex: "E=A+B+C-\\pi,\\quad S=R^2E",
+        nameFa: "قضیهٔ ژیرار",
+        nameEn: "Girard theorem",
+      },
     ],
     sections: [
       {
-        headingFa: "هلال و ژیرار",
-        headingEn: "Lunes and Girard",
-        bodyFa: "هلال با زاویهٔ A روی کرهٔ واحد مساحت ۲A دارد. سه هلال زوایای مثلث کروی را با احتساب اضافی مثلث و ضدمثلث می‌پوشانند پس مساحت = E = A+B+C−π.",
-        bodyEn: "A lune of angle A has area 2A on the unit sphere. Summing the three lunes and correcting the over-count of the triangle and its antipode yields Area = E = A+B+C−π.",
-        formula: "Area = E = A + B + C − π",
+        headingFa: "مساحت از زیادی کروی",
+        headingEn: "Area from spherical excess",
+        bodyFa:
+          "زیادی E مجموع زاویه‌ها منهای π است و زاویه‌ها باید رادیانی باشند. روی کرهٔ واحد مساحت عددی برابر E است؛ زاویهٔ فضایی استرادیان و مساحت فیزیکی واحد طول مربع دارد.",
+        bodyEn:
+          "Excess E is the angle sum minus π, with angles in radians. Unit-sphere area is numerically E; solid angle is in steradians and physical area in squared length units.",
+      },
+      {
+        headingFa: "اگر تنها اضلاع معلوم‌اند",
+        headingEn: "When only sides are known",
+        bodyFa:
+          "فرمول ل‌هویلیه از اضلاع، E را بدون تفریق مجموع زاویه‌های تقریباً مسطح می‌دهد. این نتیجهٔ محاسباتی مستقل است؛ اثبات ژیرار پایین با شمارش صریح هلال‌ها انجام می‌شود.",
+        bodyEn:
+          "L’Huilier computes E from sides without subtracting an almost planar angle sum. This is a separate computational result; the Girard proof below explicitly counts lunes.",
+        formula:
+          "\\tan\\frac E4=\\sqrt{\\tan\\frac s2\\tan\\frac{s-a}2\\tan\\frac{s-b}2\\tan\\frac{s-c}2},\\quad s=\\frac{a+b+c}2",
       },
     ],
-
     exercises: [
       {
-        textFa: "برای مثلث متساوی‌الاضلاع با ضلع ۶۰° زیادی را از ل‌هویلیه حساب کنید.",
-        textEn: "Equilateral triangle, side 60°: compute E from L’Huilier.",
-        source: "olympiad supplement",
-        answer: "E ≈ 31°.59",
+        textFa:
+          "مثلث با اضلاع هر یک ۶۰ درجه را حل کنید: زاویهٔ رأس، زیادی و مساحت کرهٔ واحد چیست؟",
+        textEn:
+          "Solve the equilateral 60°-side triangle: vertex angle, excess, and unit-sphere area.",
+        answer:
+          "A=\\arccos(1/3)\\simeq70.52878^\\circ,\\quad E\\simeq31.58634^\\circ,\\quad S\\simeq0.5512856",
+        source: "Original exercise based on Smart / تمرین تألیفی",
+      },
+      {
+        textFa:
+          "فرض‌ها و دامنهٔ اعتبار روابط این درس را بنویسید و یک حالت ویژه را با جایگذاری مستقیم بررسی کنید.",
+        textEn:
+          "State the assumptions and domain of the identities in this lesson. Verify a special case by direct substitution.",
+        source: "Original learning check / تمرین تألیفی",
       },
     ],
+    example: {
+      id: "check-spherical-area",
+      titleFa: "مثال حل‌شده و کنترل نتیجه",
+      titleEn: "Worked check",
+      source: "Original worked application / کاربرد تألیفی",
+      givenFa:
+        "مثلث با اضلاع هر یک ۶۰ درجه را حل کنید: زاویهٔ رأس، زیادی و مساحت کرهٔ واحد چیست؟",
+      givenEn:
+        "Solve the equilateral 60°-side triangle: vertex angle, excess, and unit-sphere area.",
+      findFa: "نتیجه را با روابط همین درس و کنترل واحدها به دست آورید.",
+      findEn: "Use this lesson’s identities and check the units.",
+      steps: [
+        {
+          fa: "از قانون کسینوس برای اضلاع مساوی داریم cos A = cos ۶۰ تقسیم بر (۱ + cos ۶۰) = یک سوم. سپس E = ۳A − π را با A رادیانی حساب می‌کنیم.",
+          en: "The equilateral cosine law gives cos A = cos 60°/(1+cos 60°) = 1/3. Then compute E = 3A−π with A in radians.",
+        },
+        {
+          fa: "پس از جایگذاری و ساده‌سازی، نتیجهٔ زیر به دست می‌آید. شرایط وجود و ربع را نیز کنترل کنید.",
+          en: "Substitute and simplify to obtain the result below; check existence and quadrant conditions.",
+          formula:
+            "A=\\arccos(1/3)\\simeq70.52878^\\circ,\\quad E\\simeq31.58634^\\circ,\\quad S\\simeq0.5512856",
+        },
+      ],
+      resultFa:
+        "نتیجهٔ نهایی در رابطهٔ بالا آمده است؛ زاویه و طول را با یکدیگر مخلوط نکنید.",
+      resultEn:
+        "The result is shown above; keep angular and physical units distinct.",
+    },
   },
 ];

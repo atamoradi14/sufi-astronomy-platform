@@ -1,18 +1,26 @@
 "use client";
 
-import { useEffect, useMemo, useState, Suspense } from "react";
+import { useEffect, useMemo, useState, useRef, Suspense } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import type { SphereViewState } from "./CelestialSphere";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   angularDistanceDeg,
   lonLatToCart,
   sphericalAngleDeg,
 } from "@/lib/astronomy/sphereGeom";
 import { deg as trig } from "@/lib/astronomy/sphericalTrig";
-import { formatDeg, toPersianDigits } from "@/lib/utils";
+import { MathBlock } from "@/components/ui/MathBlock";
+import { RotateCcw, Maximize2, MousePointer2 } from "lucide-react";
+import { formatDeg } from "@/lib/utils";
 
 const CelestialSphere = dynamic(
   () => import("./CelestialSphere").then((m) => m.CelestialSphere),
@@ -26,7 +34,11 @@ const CelestialSphere = dynamic(
   },
 );
 
-const PRESETS: Array<{ id: string; label: string; patch: Partial<SphereViewState> }> = [
+const PRESETS: Array<{
+  id: string;
+  label: string;
+  patch: Partial<SphereViewState>;
+}> = [
   {
     id: "circles",
     label: "عظیمه / صغیره",
@@ -96,8 +108,8 @@ const PRESETS: Array<{ id: string; label: string; patch: Partial<SphereViewState
       showTriangle: true,
       showSmallDemo: false,
       pointA: { lon: 0, lat: 90 },
-      pointB: { lon: 0, lat: 35 },
-      pointC: { lon: 40, lat: 20 },
+      pointB: { lon: 0, lat: 35.7 },
+      pointC: { lon: -40, lat: 20 },
       highlight: "triangle",
     },
   },
@@ -147,12 +159,12 @@ const PRESETS: Array<{ id: string; label: string; patch: Partial<SphereViewState
 
 const INITIAL: SphereViewState = {
   showEquator: true,
-  showMeridians: true,
-  showParallels: true,
+  showMeridians: false,
+  showParallels: false,
   showHorizon: false,
   showEcliptic: false,
   showTriangle: true,
-  showSmallDemo: true,
+  showSmallDemo: false,
   smallRadius: 35,
   observerLat: 35.7,
   pointA: { lon: -20, lat: 55 },
@@ -163,7 +175,9 @@ const INITIAL: SphereViewState = {
 
 export function SphereLab() {
   return (
-    <Suspense fallback={<div className="text-[var(--muted)]">بارگذاری آزمایشگاه…</div>}>
+    <Suspense
+      fallback={<div className="text-[var(--muted)]">بارگذاری آزمایشگاه…</div>}
+    >
       <SphereLabInner />
     </Suspense>
   );
@@ -172,11 +186,20 @@ export function SphereLab() {
 function SphereLabInner() {
   const search = useSearchParams();
   const [state, setState] = useState<SphereViewState>(INITIAL);
+  const [active, setActive] = useState("triangle");
+  const [editing, setEditing] = useState<"pointA" | "pointB" | "pointC" | null>(
+    null,
+  );
+  const [cameraKey, setCameraKey] = useState(0);
+  const stageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const preset = search.get("preset");
     const found = PRESETS.find((p) => p.id === preset);
-    if (found) setState((s) => ({ ...s, ...found.patch }));
+    if (found) {
+      setState({ ...INITIAL, ...found.patch });
+      setActive(found.id);
+    }
   }, [search]);
 
   const metrics = useMemo(() => {
@@ -196,155 +219,286 @@ function SphereLabInner() {
       (Math.sin((b * Math.PI) / 180) / Math.sin((angB * Math.PI) / 180));
     const E = trig.excess(angA, angB, angC);
     const area = trig.areaUnit(angA, angB, angC);
-    return { a, b, c, angA, angB, angC, cFromCos, sineCheck, E, area };
+    const valid =
+      [a, b, c, angA, angB, angC].every(Number.isFinite) &&
+      Math.min(a, b, c) > 1e-6 &&
+      Math.max(a, b, c) < 179.999999 &&
+      E > 1e-7 &&
+      a + b + c < 359.999999;
+    return { a, b, c, angA, angB, angC, cFromCos, sineCheck, E, area, valid };
   }, [state.pointA, state.pointB, state.pointC]);
 
   const set = (patch: Partial<SphereViewState>) =>
     setState((s) => ({ ...s, ...patch }));
 
+  const applyPreset = (id: string) => {
+    const p = PRESETS.find((p) => p.id === id);
+    if (p) {
+      setState({ ...INITIAL, ...p.patch });
+      setActive(id);
+      setEditing(null);
+    }
+  };
+  const metric = (v: number, n = 3) =>
+    metrics.valid && Number.isFinite(v) ? `${v.toFixed(n)}°` : "—";
+  const isPzx = active === "astro-tri";
+  const layerKeys: Array<[keyof SphereViewState, string]> = [
+    ["showEquator", "استوا · Equator"],
+    ["showMeridians", "نصف‌النهارها · Meridians"],
+    ["showParallels", "مدارهای میل · Parallels"],
+    ["showHorizon", "افق · Horizon"],
+    ["showEcliptic", "دایرة‌البروج · Ecliptic"],
+    ["showTriangle", "مثلث · Triangle"],
+    ["showSmallDemo", "صغیرهٔ حول A · Small circle"],
+  ];
   return (
-    <div className="grid gap-4 xl:grid-cols-[1.35fr_0.9fr]">
-      <Card className="overflow-hidden p-0">
-        <div className="flex flex-wrap items-center gap-2 border-b border-[var(--border)] px-4 py-3">
-          <span className="text-xs text-[var(--muted)]">پیش‌فرض‌ها:</span>
-          {PRESETS.map((p) => (
-            <Button
-              key={p.id}
-              size="sm"
-              variant="secondary"
-              onClick={() => set(p.patch)}
+    <div className="space-y-5">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_330px] items-start">
+        <div className="workspace lg:sticky lg:top-24" ref={stageRef}>
+          <div className="workspace-toolbar">
+            <span className="study-kicker">SPHERE / LAB</span>
+            <select
+              aria-label="Sphere preset / نمای کره"
+              className="control-input !w-auto max-w-full"
+              value={active}
+              onChange={(e) => applyPreset(e.target.value)}
             >
-              {p.label}
+              {PRESETS.filter((p) => p.id !== "basics").map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.label}
+                </option>
+              ))}
+            </select>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setCameraKey((k) => k + 1)}
+            >
+              <RotateCcw size={15} />
+              بازنشانی نما
             </Button>
-          ))}
-          <span className="mr-auto text-[11px] text-[var(--muted)]">
-            بکشید برای چرخش · اسکرول برای بزرگ‌نمایی (Pan/Tilt)
-          </span>
+            <Button
+              size="sm"
+              variant="ghost"
+              aria-label="Fullscreen sphere / تمام‌صفحه"
+              onClick={() => {
+                if (document.fullscreenElement) void document.exitFullscreen();
+                else void stageRef.current?.requestFullscreen();
+              }}
+            >
+              <Maximize2 size={16} />
+            </Button>
+          </div>
+          <div className="workspace-stage">
+            <CelestialSphere
+              resetKey={cameraKey}
+              state={{
+                ...state,
+                vertexLabels: isPzx ? ["P", "Z", "X"] : undefined,
+              }}
+              className="h-[min(70vh,670px)] max-lg:h-[min(90vw,480px)] min-h-[300px] w-full"
+              onPlace={
+                editing
+                  ? (point) => {
+                      set({ [editing]: point });
+                      setEditing(null);
+                      setActive("triangle");
+                    }
+                  : undefined
+              }
+            />
+          </div>
+          <div className="workspace-legend">
+            <span>
+              <i style={{ background: "#79d5ca" }} />a = BC
+            </span>
+            <span>
+              <i style={{ background: "#91b9ff" }} />b = CA
+            </span>
+            <span>
+              <i style={{ background: "#f1cf7b" }} />c = AB / استوا
+            </span>
+            <span>
+              <i style={{ background: "#ed94aa" }} />
+              افق
+            </span>
+            <span>
+              <i style={{ background: "#ad9bff" }} />
+              دایرة‌البروج / صغیره
+            </span>
+          </div>
+          <p className="px-5 pb-4 text-xs leading-7 text-[var(--muted)]">
+            کشیدن: چرخش · اسکرول یا دو انگشت: بزرگ‌نمایی · برای جابه‌جایی رأس،
+            نام آن را انتخاب و روی سطح کلیک کنید. خطوط پشت کره پنهان‌اند.
+          </p>
         </div>
-        <CelestialSphere state={state} className="h-[min(62vh,560px)] w-full" />
-      </Card>
-
-      <div className="space-y-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">لایه‌های کره</CardTitle>
-            <CardDescription>
-              طبق Smart §1–2: دایرهٔ عظیمه = صفحه از مرکز؛ دایرهٔ صغیره = صفحهٔ موازی افست‌دار.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-2 text-sm">
-            <Toggle
-              label="استوا (عظیمه)"
-              on={state.showEquator}
-              onChange={(v) => set({ showEquator: v, highlight: "great" })}
-            />
-            <Toggle
-              label=" نصف‌النهارات"
-              on={state.showMeridians}
-              onChange={(v) => set({ showMeridians: v })}
-            />
-            <Toggle
-              label="مدارات میل (صغیره)"
-              on={state.showParallels}
-              onChange={(v) => set({ showParallels: v, highlight: "small" })}
-            />
-            <Toggle
-              label="افق ناظر"
-              on={state.showHorizon}
-              onChange={(v) => set({ showHorizon: v })}
-            />
-            <Toggle
-              label="دایرة‌البروج"
-              on={state.showEcliptic}
-              onChange={(v) => set({ showEcliptic: v, highlight: "great" })}
-            />
-            <Toggle
-              label="مثلث کروی ABC"
-              on={state.showTriangle}
-              onChange={(v) => set({ showTriangle: v, highlight: "triangle" })}
-            />
-            <Toggle
-              label="دایرهٔ صغیره حول A"
-              on={state.showSmallDemo}
-              onChange={(v) => set({ showSmallDemo: v, highlight: "small" })}
-            />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">کنترل نقاط و شعاع</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <PointEditor
-              label="A"
-              value={state.pointA}
-              onChange={(pointA) => set({ pointA })}
-            />
-            <PointEditor
-              label="B"
-              value={state.pointB}
-              onChange={(pointB) => set({ pointB })}
-            />
-            <PointEditor
-              label="C"
-              value={state.pointC}
-              onChange={(pointC) => set({ pointC })}
-            />
-            <Slider
-              label="شعاع زاویه‌ای دایرهٔ صغیره حول A"
-              min={5}
-              max={85}
-              value={state.smallRadius}
-              onChange={(smallRadius) => set({ smallRadius, highlight: "small" })}
-              format={(v) => formatDeg(v, 0)}
-            />
-            <Slider
-              label="عرض ناظر (افق)"
-              min={-80}
-              max={80}
-              value={state.observerLat}
-              onChange={(observerLat) => set({ observerLat })}
-              format={(v) => formatDeg(v, 1)}
-            />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">اندازه‌گیری زنده</CardTitle>
-            <CardDescription>
-              اضلاع a,b,c روبه‌روی زوایای A,B,C — آزمایش قانون کسینوس‌ها و سینوس‌ها
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-2 text-sm">
-            <Metric label="ضلع a = BC" value={formatDeg(metrics.a, 2)} />
-            <Metric label="ضلع b = AC" value={formatDeg(metrics.b, 2)} />
-            <Metric label="ضلع c = AB" value={formatDeg(metrics.c, 2)} />
-            <Metric label="زاویه A" value={formatDeg(metrics.angA, 2)} />
-            <Metric label="زاویه B" value={formatDeg(metrics.angB, 2)} />
-            <Metric label="زاویه C" value={formatDeg(metrics.angC, 2)} />
-            <Metric
-              label="c from cos-law"
-              value={formatDeg(metrics.cFromCos, 2)}
-            />
-            <Metric
-              label="(sin a/sin A)/(sin b/sin B)"
-              value={toPersianDigits(metrics.sineCheck.toFixed(4))}
-            />
-            <Metric label="E = A+B+C−180°" value={formatDeg(metrics.E, 2)} />
-            <Metric
-              label="Area (sr, R=1)"
-              value={toPersianDigits(metrics.area.toFixed(5))}
-            />
-            <div className="col-span-2 rounded-lg border border-[var(--teal)]/30 bg-[var(--teal)]/5 px-3 py-2 font-mono text-[10px] leading-5 text-[var(--muted)] dir-ltr text-left">
-              cos c = cos a cos b + sin a sin b cos C
-              <br />
-              Area = E = A+B+C−π (Girard, unit sphere)
-            </div>
-          </CardContent>
-        </Card>
+        <aside className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">لایه‌های راهنما</CardTitle>
+              <CardDescription>
+                هر بار یک مفهوم را جدا بررسی کنید.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 gap-2">
+              {layerKeys.map(([key, label]) => (
+                <Toggle
+                  key={key}
+                  label={label}
+                  on={state[key] === true}
+                  onChange={(v) => set({ [key]: v })}
+                />
+              ))}
+            </CardContent>
+          </Card>
+          {state.showTriangle && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">رأس‌های مثلث</CardTitle>
+                <CardDescription>
+                  {isPzx
+                    ? "A=P، B=Z، C=X؛ عرض ناظر، رأس Z و افق را با هم تغییر می‌دهد."
+                    : "طول و عرضِ جهت هر رأس روی کره؛ همهٔ ورودی‌ها درجه‌اند."}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex gap-2">
+                  {(["pointA", "pointB", "pointC"] as const).map((key, i) => (
+                    <Button
+                      key={key}
+                      size="sm"
+                      variant={editing === key ? "default" : "outline"}
+                      aria-pressed={editing === key}
+                      onClick={() => setEditing(editing === key ? null : key)}
+                    >
+                      <MousePointer2 size={13} />
+                      {["A", "B", "C"][i]}
+                    </Button>
+                  ))}
+                </div>
+                {editing && (
+                  <p
+                    role="status"
+                    className="text-xs leading-7 text-[var(--teal)]"
+                  >
+                    رأس {editing.slice(-1)} را با کلیک روی سطح جای‌گذاری کنید یا
+                    با همان دکمه لغو کنید.
+                  </p>
+                )}
+                {(["pointA", "pointB", "pointC"] as const).map((key, i) => (
+                  <details key={key} open={editing === key || i === 0}>
+                    <summary className="py-2 text-sm text-[var(--gold-soft)]">
+                      {["A", "B", "C"][i]} · {state[key].lon.toFixed(1)}°,{" "}
+                      {state[key].lat.toFixed(1)}°
+                    </summary>
+                    <PointEditor
+                      label={["A", "B", "C"][i]}
+                      value={state[key]}
+                      onChange={(v) => {
+                        set({ [key]: v });
+                        setActive("triangle");
+                      }}
+                    />
+                  </details>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+          {(state.showHorizon || state.showSmallDemo) && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">پارامترهای هندسی</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {state.showSmallDemo && (
+                  <Slider
+                    label="فاصلهٔ قطبی صغیره θ"
+                    min={5}
+                    max={175}
+                    value={state.smallRadius}
+                    onChange={(smallRadius) => set({ smallRadius })}
+                    format={(v) => formatDeg(v, 0)}
+                  />
+                )}{" "}
+                {state.showHorizon && (
+                  <Slider
+                    label="عرض ناظر φ"
+                    min={-90}
+                    max={90}
+                    value={state.observerLat}
+                    onChange={(observerLat) =>
+                      set({
+                        observerLat,
+                        ...(isPzx
+                          ? { pointB: { lon: 0, lat: observerLat } }
+                          : {}),
+                      })
+                    }
+                    format={(v) => formatDeg(v, 1)}
+                  />
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </aside>
       </div>
+      {state.showTriangle && (
+        <Card>
+          <CardHeader>
+            <CardTitle>اندازه‌گیری و کنترل سازگاری</CardTitle>
+            <CardDescription>
+              محاسبه از همان بردارهایی که روی کره رسم شده‌اند؛ اضلاع درجه‌ای و
+              مساحت روی کرهٔ واحد است.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {!metrics.valid && (
+              <p
+                role="status"
+                className="rounded-lg border border-[var(--rose-ink)]/40 p-3 text-sm leading-7 text-[var(--rose-ink)]"
+              >
+                این آرایش، مثلث محدب معمول و غیرمنحط نمی‌سازد. رأس‌های متمایز و
+                غیرپادپا را در یک نیم‌کرهٔ باز انتخاب کنید؛ زاویه و مساحت برای
+                حالت منحط گزارش نمی‌شود.
+              </p>
+            )}
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+              {[
+                ["a = BC", metrics.a],
+                ["b = CA", metrics.b],
+                ["c = AB", metrics.c],
+                ["A", metrics.angA],
+                ["B", metrics.angB],
+                ["C", metrics.angC],
+              ].map(([label, v]) => (
+                <Metric
+                  key={label}
+                  label={String(label)}
+                  value={metric(Number(v))}
+                />
+              ))}
+            </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              <Metric label="زیادی کروی · E" value={metric(metrics.E)} />
+              <Metric
+                label="مساحت واحد · S / R² (sr)"
+                value={metrics.valid ? metrics.area.toFixed(7) : "—"}
+              />
+              <Metric
+                label="اختلاف ضلع محاسبه‌شده و هندسی (deg)"
+                value={
+                  metrics.valid
+                    ? Math.abs(metrics.cFromCos - metrics.c) < 1e-10
+                      ? "< 10⁻¹⁰"
+                      : Math.abs(metrics.cFromCos - metrics.c).toExponential(2)
+                    : "—"
+                }
+              />
+            </div>
+            <MathBlock>{String.raw`\cos c=\cos a\cos b+\sin a\sin b\cos C,\qquad S=R^2(A+B+C-\pi)`}</MathBlock>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
@@ -361,6 +515,7 @@ function Toggle({
   return (
     <button
       type="button"
+      aria-pressed={on}
       onClick={() => onChange(!on)}
       className={`rounded-lg border px-3 py-2 text-right transition-colors ${
         on
@@ -386,7 +541,7 @@ function PointEditor({
     <div className="rounded-lg border border-[var(--border)] bg-[var(--ink)]/40 p-3 space-y-2">
       <div className="text-sm text-[var(--gold-soft)]">نقطه {label}</div>
       <Slider
-        label="طول"
+        label={`طول رأس ${label}`}
         min={-180}
         max={180}
         value={value.lon}
@@ -394,9 +549,9 @@ function PointEditor({
         format={(v) => formatDeg(v, 0)}
       />
       <Slider
-        label="عرض / میل"
-        min={-89}
-        max={89}
+        label={`عرض / میل رأس ${label}`}
+        min={-90}
+        max={90}
         value={value.lat}
         onChange={(lat) => onChange({ ...value, lat })}
         format={(v) => formatDeg(v, 0)}
@@ -427,6 +582,7 @@ function Slider({
         <span className="text-[var(--parchment)]">{format(value)}</span>
       </div>
       <input
+        aria-label={label}
         type="range"
         min={min}
         max={max}
@@ -443,7 +599,9 @@ function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-[var(--border)] px-3 py-2">
       <div className="text-[10px] text-[var(--muted)]">{label}</div>
-      <div className="font-mono text-[var(--gold-soft)] dir-ltr text-left">{value}</div>
+      <div className="font-mono text-[var(--gold-soft)] dir-ltr text-left">
+        {value}
+      </div>
     </div>
   );
 }

@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { LESSONS, SMART_CHAPTERS, SMART_BOOK } from "@/lib/content/lessons";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toPersianDigits } from "@/lib/utils";
 
@@ -25,14 +31,21 @@ export function CourseBrowser() {
         <p className="text-[var(--parchment)]">
           منبع:{" "}
           <span className="text-[var(--gold-soft)] dir-ltr">
-            {SMART_BOOK.author}, {SMART_BOOK.title} ({SMART_BOOK.part}, pp. {SMART_BOOK.pages})
+            {SMART_BOOK.author}, {SMART_BOOK.title} ({SMART_BOOK.part}, pp.{" "}
+            {SMART_BOOK.pages})
           </span>
-          . نه فصل، شماره‌گذاری فرمول‌ها و شکل‌های بازسازی‌شده؛ هر درس به آزمایشگاه کره یا اثبات وصل است.
+          . فصل‌های اول تا سوم درس‌نامهٔ تفصیلی‌اند؛ فصل‌های بعد مرور
+          مقدماتی‌اند. شکل‌ها ساخت‌های هندسی مستقل‌اند و تمرین‌های تألیفی مشخص
+          شده‌اند.
         </p>
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Button size="sm" variant={chapter === "all" ? "default" : "secondary"} onClick={() => setChapter("all")}>
+        <Button
+          size="sm"
+          variant={chapter === "all" ? "default" : "secondary"}
+          onClick={() => setChapter("all")}
+        >
           همه دروس
         </Button>
         {SMART_CHAPTERS.map((c) => (
@@ -76,7 +89,9 @@ export function CourseBrowser() {
                 <p className="mt-1 font-[family-name:var(--font-display)] text-lg text-[var(--gold-soft)]">
                   {c.titleFa}
                 </p>
-                <p className="text-xs text-[var(--muted)] dir-ltr text-left">{c.titleEn}</p>
+                <p className="text-xs text-[var(--muted)] dir-ltr text-left">
+                  {c.titleEn}
+                </p>
                 <p className="mt-2 text-[11px] text-[var(--gold-soft)]">
                   {toPersianDigits(n)} درس
                 </p>
@@ -96,13 +111,18 @@ export function CourseBrowser() {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <p className="text-[11px] text-[var(--teal)] dir-ltr text-left">
-                    Smart {l.smart.chapter} {l.smart.sections} · pp. {l.smart.pages}
+                    Smart {l.smart.chapter} {l.smart.sections} · pp.{" "}
+                    {l.smart.pages}
                   </p>
                   <CardTitle className="mt-1">
                     {toPersianDigits(i + 1)}. {l.titleFa}
                   </CardTitle>
-                  <p className="mt-1 text-sm text-[var(--muted)] dir-ltr text-left">{l.titleEn}</p>
-                  <CardDescription className="mt-2">{l.summaryFa}</CardDescription>
+                  <p className="mt-1 text-sm text-[var(--muted)] dir-ltr text-left">
+                    {l.titleEn}
+                  </p>
+                  <CardDescription className="mt-2">
+                    {l.summaryFa}
+                  </CardDescription>
                 </div>
                 <span className="rounded-md border border-[var(--border)] px-2 py-1 text-[11px] text-[var(--gold-soft)]">
                   {l.level}

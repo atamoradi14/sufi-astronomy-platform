@@ -26,8 +26,9 @@ function ProofsInner() {
           اثبات‌های گام‌به‌گام
         </h1>
         <p className="max-w-3xl text-sm leading-8 text-[var(--muted)]">
-          ساخت‌های مماس و فرمول‌های اسمارت: کسینوس اضلاع (A)، قانون جیب (B)، فرمول مشابه (C)، چهار جزء (D)، مثلث
-          قطبی، نپر، هاورساین، PZX، و زمان نجومی.
+          ساخت‌های مماس و فرمول‌های اسمارت: کسینوس اضلاع (A)، قانون جیب (B)،
+          فرمول مشابه (C)، چهار جزء (D)، مثلث قطبی، نپر، هاورساین، PZX، و زمان
+          نجومی.
         </p>
         <div className="flex flex-wrap gap-2">
           {PROOFS.map((p) => (
@@ -45,7 +46,7 @@ function ProofsInner() {
           </Button>
         </div>
       </header>
-      <ProofWorkbench kind={kind} />
+      <ProofWorkbench key={kind} kind={kind} />
     </div>
   );
 }
@@ -54,7 +55,9 @@ export default function ProofsPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-6xl px-4 py-16 text-[var(--muted)]">بارگذاری اثبات…</div>
+        <div className="mx-auto max-w-6xl px-4 py-16 text-[var(--muted)]">
+          بارگذاری اثبات…
+        </div>
       }
     >
       <ProofsInner />

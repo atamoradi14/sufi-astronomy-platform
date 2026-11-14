@@ -3,11 +3,18 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { getProof, type ProofKind } from "@/lib/content/proofs";
-import { BookFigure } from "@/components/learn/BookFigures";
 import { deg } from "@/lib/astronomy/sphericalTrig";
 import { dms, formatDms, nauticalMiles } from "@/lib/astronomy/angle";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { MathBlock } from "@/components/ui/MathBlock";
+import { GeometryFigure } from "@/components/learn/GeometryFigure";
 import { toPersianDigits } from "@/lib/utils";
 
 export function ProofWorkbench({ kind }: { kind: ProofKind }) {
@@ -22,23 +29,19 @@ export function ProofWorkbench({ kind }: { kind: ProofKind }) {
 
   useEffect(() => {
     if (!playing) return;
-    const t = setInterval(() => {
-      setStep((s) => {
-        if (s >= proof.steps.length - 1) {
-          setPlaying(false);
-          return s;
-        }
-        return s + 1;
-      });
-    }, 2600);
-    return () => clearInterval(t);
-  }, [playing, proof.steps.length]);
+    if (step >= proof.steps.length - 1) {
+      setPlaying(false);
+      return;
+    }
+    const timer = setTimeout(() => setStep((s) => s + 1), 9000);
+    return () => clearTimeout(timer);
+  }, [playing, step, proof.steps.length]);
 
   const s = proof.steps[step];
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-      <div className="space-y-4">
+    <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+      <div className="min-w-0 space-y-4">
         <Card>
           <CardHeader>
             <CardTitle>{proof.titleFa}</CardTitle>
@@ -53,19 +56,49 @@ export function ProofWorkbench({ kind }: { kind: ProofKind }) {
                 style={{ width: `${((step + 1) / proof.steps.length) * 100}%` }}
               />
             </div>
-            <div className="min-h-[220px] space-y-3 rounded-xl border border-[var(--border)] bg-[var(--ink-deep)] p-5">
+            <div className="min-h-[300px] space-y-3 rounded-xl border border-[var(--border)] bg-[var(--ink-deep)] p-5">
               <h3 className="font-[family-name:var(--font-display)] text-xl text-[var(--gold-soft)]">
                 {s.titleFa}
               </h3>
-              <p className="text-xs text-[var(--muted)] dir-ltr text-left">{s.titleEn}</p>
-              <p className="text-sm leading-8 text-[var(--parchment)]/90">{s.bodyFa}</p>
-              <p className="text-sm leading-7 text-[var(--muted)] dir-ltr text-left">{s.bodyEn}</p>
-              <p className="rounded-md border border-[var(--teal)]/40 bg-[var(--teal)]/10 px-3 py-2 font-mono text-xs text-[var(--gold-soft)] dir-ltr text-left">
-                {s.formula}
+              <p className="text-xs text-[var(--muted)] dir-ltr text-left">
+                {s.titleEn}
               </p>
+              <p className="text-sm leading-8 text-[var(--parchment)]/90">
+                {s.bodyFa}
+              </p>
+              <p className="text-sm leading-7 text-[var(--muted)] dir-ltr text-left">
+                {s.bodyEn}
+              </p>
+              <MathBlock>{s.formula}</MathBlock>
+            </div>
+            <div
+              className="flex flex-wrap gap-2"
+              role="group"
+              aria-label="Proof steps"
+            >
+              {proof.steps.map((st, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  aria-current={i === step ? "step" : undefined}
+                  title={st.titleEn}
+                  onClick={() => {
+                    setStep(i);
+                    setPlaying(false);
+                  }}
+                  className={`h-9 w-9 rounded-lg border ${i === step ? "bg-[var(--gold)] text-[var(--ink)]" : "border-[var(--border)]"}`}
+                >
+                  {i + 1}
+                </button>
+              ))}
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button size="sm" variant="secondary" disabled={step === 0} onClick={() => setStep((x) => x - 1)}>
+              <Button
+                size="sm"
+                variant="secondary"
+                disabled={step === 0}
+                onClick={() => setStep((x) => x - 1)}
+              >
                 قبل
               </Button>
               <Button
@@ -74,6 +107,14 @@ export function ProofWorkbench({ kind }: { kind: ProofKind }) {
                 onClick={() => setStep((x) => x + 1)}
               >
                 بعد
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => setPlaying(false)}
+                disabled={!playing}
+              >
+                توقف
               </Button>
               <Button
                 size="sm"
@@ -91,7 +132,6 @@ export function ProofWorkbench({ kind }: { kind: ProofKind }) {
             </div>
           </CardContent>
         </Card>
-        <BookFigure id={proof.figure} />
       </div>
       <NumericPanel kind={kind} />
     </div>
@@ -103,18 +143,29 @@ function NumericPanel({ kind }: { kind: ProofKind }) {
   const [b, setB] = useState(65);
   const [C, setC] = useState(40);
 
-  const c = useMemo(() => deg.cosineLawSide(a, b, C), [a, b, C]);
+  const included = kind === "napier" ? 90 : C;
+  const c = useMemo(() => deg.cosineLawSide(a, b, included), [a, b, included]);
   const Aang = useMemo(() => deg.angleFromSides(a, b, c), [a, b, c]);
   const Bang = useMemo(() => deg.angleFromSides(b, a, c), [a, b, c]);
   const sineRatio = useMemo(() => {
     const sa = Math.sin((a * Math.PI) / 180) / Math.sin((Aang * Math.PI) / 180);
-    const sc = Math.sin((c * Math.PI) / 180) / Math.sin((C * Math.PI) / 180);
+    const sc =
+      Math.sin((c * Math.PI) / 180) / Math.sin((included * Math.PI) / 180);
     return sa / sc;
-  }, [a, Aang, c, C]);
-  const analogue = useMemo(() => deg.analogueCosB(a, b, c, Aang), [a, b, c, Aang]);
+  }, [a, Aang, c, included]);
+  const analogue = useMemo(
+    () => deg.analogueCosB(a, b, c, Aang),
+    [a, b, c, Aang],
+  );
   const cosB = Math.cos((Bang * Math.PI) / 180);
-  const havC = useMemo(() => deg.haversineSide(a, b, C), [a, b, C]);
-  const E = useMemo(() => deg.excess(Aang, Bang, C), [Aang, Bang, C]);
+  const havC = useMemo(
+    () => deg.haversineSide(a, b, included),
+    [a, b, included],
+  );
+  const E = useMemo(
+    () => deg.excess(Aang, Bang, included),
+    [Aang, Bang, included],
+  );
   const El = useMemo(() => deg.excessLHuilier(a, b, c), [a, b, c]);
 
   const PA = dms(65, 42);
@@ -127,25 +178,60 @@ function NumericPanel({ kind }: { kind: ProofKind }) {
     <Card>
       <CardHeader>
         <CardTitle className="text-lg">آزمایش عددی</CardTitle>
-        <CardDescription className="dir-ltr text-left">Live identities from Smart’s formulae</CardDescription>
+        <CardDescription className="dir-ltr text-left">
+          Live identities from Smart’s formulae
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {kind !== "sidereal" && (
+          <GeometryFigure
+            kind={
+              kind === "pzx"
+                ? "horizon"
+                : kind === "polar"
+                  ? "polar"
+                  : kind === "girard"
+                    ? "area"
+                    : "triangle"
+            }
+            sides={{ a, b, C: included }}
+          />
+        )}
         {kind !== "pzx" && kind !== "sidereal" && (
           <>
             <Num label="a" value={a} onChange={setA} />
             <Num label="b" value={b} onChange={setB} />
-            <Num label="C" value={C} onChange={setC} />
+            {kind !== "napier" ? (
+              <Num label="C" value={C} onChange={setC} />
+            ) : (
+              <p className="text-sm" dir="ltr">
+                C = 90°
+              </p>
+            )}
           </>
         )}
         <div className="grid grid-cols-1 gap-2 text-sm">
-          {(kind === "cosine" || kind === "analogue" || kind === "four-parts" || kind === "napier") && (
+          {(kind === "cosine" ||
+            kind === "analogue" ||
+            kind === "four-parts" ||
+            kind === "napier") && (
             <Metric label="c from (A)" value={formatDms(c, 2)} />
           )}
           {kind === "sine" && (
-            <Metric label="(sin a)/sin A ÷ (sin c)/sin C" value={toPersianDigits(sineRatio.toFixed(6))} />
+            <Metric
+              label="(sin a)/sin A ÷ (sin c)/sin C"
+              value={toPersianDigits(sineRatio.toFixed(6))}
+            />
           )}
           {kind === "analogue" && (
-            <Metric label="(C): cos B vs analogueCosB" value={toPersianDigits((analogue - cosB).toExponential(2))} />
+            <Metric
+              label="(C): cos B vs analogueCosB"
+              value={
+                Math.abs(analogue - cosB) < 1e-10
+                  ? "< 10⁻¹⁰"
+                  : (analogue - cosB).toExponential(2)
+              }
+            />
           )}
           {kind === "haversine" && (
             <>
@@ -157,7 +243,9 @@ function NumericPanel({ kind }: { kind: ProofKind }) {
               />
             </>
           )}
-          {kind === "polar" && <Metric label="A from three sides (9)" value={formatDms(Aang, 2)} />}
+          {kind === "polar" && (
+            <Metric label="A from three sides (9)" value={formatDms(Aang, 2)} />
+          )}
           {kind === "girard" && (
             <>
               <Metric label="E = A+B+C−180°" value={formatDms(E, 3)} />
@@ -178,11 +266,14 @@ function NumericPanel({ kind }: { kind: ProofKind }) {
             </>
           )}
           {kind === "delambre" && (
-            <Metric label="c from (A) — check analogies against this" value={formatDms(c, 2)} />
+            <Metric
+              label="c from (A) — check analogies against this"
+              value={formatDms(c, 2)}
+            />
           )}
           {kind === "napier" && (
             <Metric
-              label="right-angled check: set C=90° below in the lesson"
+              label="C = 90° · c from cos c = cos a cos b"
               value={formatDms(deg.rightHypotenuse(a, b), 2)}
             />
           )}
@@ -208,6 +299,7 @@ function Num({
         <span>{toPersianDigits(value)}°</span>
       </div>
       <input
+        aria-label={label}
         type="range"
         min={10}
         max={120}
@@ -222,7 +314,9 @@ function Num({
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-[var(--border)] px-3 py-2">
-      <div className="text-[10px] text-[var(--muted)] dir-ltr text-left">{label}</div>
+      <div className="text-[10px] text-[var(--muted)] dir-ltr text-left">
+        {label}
+      </div>
       <div className="font-mono text-[var(--gold-soft)]">{value}</div>
     </div>
   );

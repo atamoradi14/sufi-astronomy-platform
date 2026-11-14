@@ -1,5 +1,4 @@
 import type { Lesson } from "./lessonTypes";
-
 export const LESSONS_CH2: Lesson[] = [
   {
     id: "horizontal",
@@ -10,8 +9,10 @@ export const LESSONS_CH2: Lesson[] = [
     minutes: 45,
     spherePreset: "horizon",
     olympiad: "دستگاه افقی · سمت‌الرأس",
-    summaryFa: "فصل دوم: کرهٔ سماوی به مرکز ناظر. بندهای ۱۷–۱۸ ارتفاع، سمت‌الرأس، افق، سمت و متمم عرض ناظر را از شکل‌های ۱۰–۱۱ می‌گذارند.",
-    summaryEn: "Smart II §§17–18, Figs. 10–11: zenith, horizon, altitude, azimuth, co-latitude.",
+    summaryFa:
+      "سمت‌الرأس امتداد شاقول به بالاست و افق هندسی بر آن عمود است. ارتفاع h بالای افق مثبت و فاصلهٔ سمت‌الرأسی z از بالای سر سنجیده می‌شود. افق طبیعی با عوارض زمین ممکن است با افق هندسی فرق کند.",
+    summaryEn:
+      "Zenith is the upward vertical and the geometric horizon is perpendicular to it. Altitude h is positive above the horizon; zenith distance z is measured from overhead. Terrain can make the visible horizon differ from the geometric horizon.",
     smart: {
       chapter: "II",
       sections: "§§17–18",
@@ -19,45 +20,88 @@ export const LESSONS_CH2: Lesson[] = [
       formulae: ["(1)", "(2)"],
       figures: ["10", "11"],
     },
-    figures: ["fig10", "fig11"],
-    englishFormulas: [
-      "z = 90° − a     (Smart II.1)",
-      "PZ = 90° − φ     (Smart II.2)  — co-latitude",
-    ],
+    figures: ["geometry-horizon"],
+    englishFormulas: ["z=\\frac\\pi2-h,\\quad PZ=\\frac\\pi2-\\varphi"],
     formulas: [
-      { display: "z = 90° − a", number: "II.(1)", nameFa: "سمت‌الرأسی", nameEn: "Zenith distance" },
-      { display: "PZ = 90° − φ", number: "II.(2)", nameFa: "متمم عرض ناظر", nameEn: "Observer’s co-latitude" },
+      {
+        display: "z=\\frac\\pi2-h,\\quad PZ=\\frac\\pi2-\\varphi",
+        tex: "z=\\frac\\pi2-h,\\quad PZ=\\frac\\pi2-\\varphi",
+        nameFa: "ارتفاع و فاصلهٔ قطبی",
+        nameEn: "Altitude and polar distance",
+      },
     ],
     sections: [
       {
-        headingFa: "سمت‌الرأس، افق، ارتفاع",
-        headingEn: "Zenith, horizon, altitude",
-        bodyFa: "O ناظر است. Z سمت‌الرأس است — شاقول امتداد یافته. صفحهٔ عمود بر OZ افق سماوی NAS را می‌برد. ارتفاع a کمان عظیمه از افق تا ستاره روی دایرهٔ قائم است. سمت‌الرأسی z = ZX = 90° − a. موازی‌های ارتفاع، صغیره‌های موازی افق‌اند.",
-        bodyEn: "O is the observer, Z the zenith (plumb-line produced). The plane through O perpendicular to OZ cuts the sphere in the celestial horizon. Altitude a is the great-circle arc from the horizon to the star on its vertical circle; zenith distance z = 90° − a.",
-        formula: "z = 90° − a",
+        headingFa: "دستگاه محلی ناظر",
+        headingEn: "The observer’s local frame",
+        bodyFa:
+          "سمت‌الرأس امتداد شاقول به بالاست و افق هندسی بر آن عمود است. ارتفاع h بالای افق مثبت و فاصلهٔ سمت‌الرأسی z از بالای سر سنجیده می‌شود. افق طبیعی با عوارض زمین ممکن است با افق هندسی فرق کند.",
+        bodyEn:
+          "Zenith is the upward vertical and the geometric horizon is perpendicular to it. Altitude h is positive above the horizon; zenith distance z is measured from overhead. Terrain can make the visible horizon differ from the geometric horizon.",
       },
       {
-        headingFa: "قطب، نقطهٔ شمال، سمت",
-        headingEn: "Pole, north point, azimuth",
-        bodyFa: "OP موازی محور زمین است؛ P قطب شمال سماوی. دایرهٔ قائم گذرنده از P نصف‌النهار افقی را در N (نقطهٔ شمال) قطع می‌کند. سمت زاویهٔ کروی PZX است (یا کمان افق از N). نقاط اصلی: N, E, S, W. اگر سمت ۹۰°E یا ۹۰°W باشد ستاره روی قائم اول (prime vertical) است.",
-        bodyEn: "OP is parallel to the Earth’s axis, P the north celestial pole. The vertical through P meets the horizon at the north point N. Azimuth is the spherical angle PZX (or the horizon arc from N). Cardinal points N, E, S, W. Azimuth 90° E or W is the prime vertical.",
+        headingFa: "سمت از شمال به شرق",
+        headingEn: "Azimuth north through east",
+        bodyFa:
+          "اینجا سمت A از شمال صفر، شرق ۹۰، جنوب ۱۸۰ و غرب ۲۷۰ درجه است. قرارداد تاریخی منبع ممکن است فرق کند؛ قبل از استفاده از فرمول مبدأ و جهت را کنترل کنید. در سمت‌الرأس یا سمت‌القدم، سمت تعریف ندارد.",
+        bodyEn:
+          "Here azimuth A is 0° north, 90° east, 180° south, 270° west. Historical conventions may differ; check origin and direction before using a formula. Azimuth is undefined at zenith and nadir.",
       },
       {
-        headingFa: "عرض روی کرهٔ سماوی",
-        headingEn: "Latitude on the celestial sphere",
-        bodyFa: "زاویهٔ POZ برابر عرض ناظر φ است، پس PZ = 90° − φ متمم عرض است. ارتفاع قطب برابر عرض ناظر است: alt(P) = φ.",
-        bodyEn: "Angle POZ is the observer’s latitude φ, so PZ = 90° − φ. The altitude of the pole equals the latitude.",
-        formula: "alt(P) = φ,   PZ = 90° − φ",
+        headingFa: "قطب در هر دو نیم‌کره",
+        headingEn: "The pole in both hemispheres",
+        bodyFa:
+          "ارتفاع قطب شمال برابر عرض علامت‌دار φ است؛ در جنوب زیر افق قرار دارد. آنجا قطب جنوب به ارتفاع قدرمطلق φ دیده می‌شود.",
+        bodyEn:
+          "The north pole altitude equals signed latitude φ; in the south it lies below the horizon. The south pole is then |φ| above the horizon.",
       },
     ],
-
     exercises: [
       {
-        textFa: "اگر ناظر رو به شمال باشد، شرق به راست اوست (پاورقی ص. ۲۷). این را با شکل‌های ۱۰–۱۱ تطبیق دهید.",
-        textEn: "Facing north, east is to the observer’s right (Smart p. 27 n.). Match this with Figs. 10–11.",
-        source: "Smart II §18",
+        textFa:
+          "در عرض ۳۵ درجه جنوبی، ارتفاع قطب شمال و قطب جنوب چیست؟ برای h = ۲۵ درجه، z را بیابید.",
+        textEn:
+          "At latitude 35° S find the altitudes of both celestial poles. Find z for h = 25°.",
+        answer:
+          "h_{NCP}=-35^\\circ,\\quad h_{SCP}=35^\\circ,\\quad z=65^\\circ",
+        source: "Original exercise based on Smart / تمرین تألیفی",
+      },
+      {
+        textFa:
+          "فرض‌ها و دامنهٔ اعتبار روابط این درس را بنویسید و یک حالت ویژه را با جایگذاری مستقیم بررسی کنید.",
+        textEn:
+          "State the assumptions and domain of the identities in this lesson. Verify a special case by direct substitution.",
+        source: "Original learning check / تمرین تألیفی",
       },
     ],
+    example: {
+      id: "check-horizontal",
+      titleFa: "مثال حل‌شده و کنترل نتیجه",
+      titleEn: "Worked check",
+      source: "Original worked application / کاربرد تألیفی",
+      givenFa:
+        "در عرض ۳۵ درجه جنوبی، ارتفاع قطب شمال و قطب جنوب چیست؟ برای h = ۲۵ درجه، z را بیابید.",
+      givenEn:
+        "At latitude 35° S find the altitudes of both celestial poles. Find z for h = 25°.",
+      findFa: "نتیجه را با روابط همین درس و کنترل واحدها به دست آورید.",
+      findEn: "Use this lesson’s identities and check the units.",
+      steps: [
+        {
+          fa: "ابتدا قرارداد علامت‌ها و داده‌های معلوم را مشخص کنید؛ سپس رابطهٔ متناسب را انتخاب کنید.",
+          en: "Identify the sign conventions and given parts, then select the corresponding identity.",
+        },
+        {
+          fa: "پس از جایگذاری و ساده‌سازی، نتیجهٔ زیر به دست می‌آید. شرایط وجود و ربع را نیز کنترل کنید.",
+          en: "Substitute and simplify to obtain the result below; check existence and quadrant conditions.",
+          formula:
+            "h_{NCP}=-35^\\circ,\\quad h_{SCP}=35^\\circ,\\quad z=65^\\circ",
+        },
+      ],
+      resultFa:
+        "نتیجهٔ نهایی در رابطهٔ بالا آمده است؛ زاویه و طول را با یکدیگر مخلوط نکنید.",
+      resultEn:
+        "The result is shown above; keep angular and physical units distinct.",
+    },
   },
   {
     id: "equatorial",
@@ -68,53 +112,107 @@ export const LESSONS_CH2: Lesson[] = [
     minutes: 50,
     spherePreset: "celestial",
     olympiad: "δ · H · موازی میل",
-    summaryFa: "بند ۱۹ و شکل‌های ۱۲–۱۳: استوای سماوی، میل، فاصلهٔ قطبی شمال، نصف‌النهار، عبور، طلوع/غروب و زاویهٔ ساعتی. قاعدهٔ سمت–H.",
-    summaryEn: "Smart II §19, Figs. 12–13: equator, declination, N.P.D., meridian, hour angle.",
+    summaryFa:
+      "میل δ از استوا شمال‌مثبت است و بعد α از اعتدال بهاری به شرق بین صفر و ۲۴ ساعت سنجیده می‌شود. مختصات کاتالوگ چارچوب و مبدأ زمانی دارند؛ تقدیم و حرکت خاص را با چرخش روزانه یکی نگیرید.",
+    summaryEn:
+      "Declination δ is north-positive from the equator; RA α runs east from the vernal equinox in [0,24 h). Catalogue coordinates have a frame and epoch; precession and proper motion differ from daily rotation.",
     smart: {
       chapter: "II",
       sections: "§19",
       pages: "28–30",
       figures: ["12", "13"],
     },
-    figures: ["fig12", "fig13"],
+    figures: ["geometry-celestial"],
     englishFormulas: [
-      "N.P.D. = 90° − δ   (algebraic δ; north +)",
-      "Hour angle H measured westwards from the observer’s meridian, 0ʰ to 24ʰ.",
-      "Azimuth west ⇔ 0ʰ ≤ H ≤ 12ʰ; azimuth east ⇔ 12ʰ ≤ H ≤ 24ʰ.",
+      "\\mathrm{NPD}=90^\\circ-\\delta",
+      "H_{deg}=15(\\mathrm{LST}_h-\\alpha_h)",
     ],
     formulas: [
-      { display: "N.P.D. = 90° − δ", nameFa: "فاصلهٔ قطبی شمال", nameEn: "North polar distance" },
-      { display: "H west 0ʰ–24ʰ from the meridian", nameFa: "زاویهٔ ساعتی", nameEn: "Hour angle" },
+      {
+        display: "\\mathrm{NPD}=90^\\circ-\\delta",
+        tex: "\\mathrm{NPD}=90^\\circ-\\delta",
+        nameFa: "فاصلهٔ قطبی شمال",
+        nameEn: "North polar distance",
+      },
+      {
+        display: "H_{deg}=15(\\mathrm{LST}_h-\\alpha_h)",
+        tex: "H_{deg}=15(\\mathrm{LST}_h-\\alpha_h)",
+        nameFa: "زاویهٔ ساعتی به درجه",
+        nameEn: "Hour angle in degrees",
+      },
     ],
     sections: [
       {
-        headingFa: "استوا و میل",
-        headingEn: "Equator and declination",
-        bodyFa: "عظیمهٔ عمود بر OP استوای سماوی است و افق را در E و W قطع می‌کند. میل δ کمان از استوا تا ستاره روی دایرهٔ ساعتی است، شمال مثبت. فاصلهٔ قطبی شمال PX = 90° − δ برای هر دو علامت میل برقرار است.",
-        bodyEn: "The great circle whose plane is perpendicular to OP is the celestial equator; it meets the horizon at E and W. Declination δ is the arc from the equator to the star on the hour circle, north positive. North polar distance = 90° − δ holds for both signs.",
-        formula: "PX = 90° − δ",
+        headingFa: "میل و بعد",
+        headingEn: "Declination and right ascension",
+        bodyFa:
+          "میل δ از استوا شمال‌مثبت است و بعد α از اعتدال بهاری به شرق بین صفر و ۲۴ ساعت سنجیده می‌شود. مختصات کاتالوگ چارچوب و مبدأ زمانی دارند؛ تقدیم و حرکت خاص را با چرخش روزانه یکی نگیرید.",
+        bodyEn:
+          "Declination δ is north-positive from the equator; RA α runs east from the vernal equinox in [0,24 h). Catalogue coordinates have a frame and epoch; precession and proper motion differ from daily rotation.",
       },
       {
-        headingFa: "نصف‌النهار، عبور، طلوع و غروب",
-        headingEn: "Meridian, transit, rising and setting",
-        bodyFa: "نیم‌عظیمهٔ PZRSQ نصف‌النهار ناظر است. روی آن ستاره از عبور (culmination) می‌گذرد: ارتفاع بیشینه و z کمینه. سپس روی موازی میل به غرب می‌رود، در F غروب می‌کند (ارتفاع ۰)، در M به عبور پایین می‌رسد، در G طلوع می‌کند و به L بازمی‌گردد.",
-        bodyEn: "Semi-great circle PZRSQ is the observer’s meridian. On it the star transits: maximum altitude, minimum zenith distance. It then rides the parallel of declination westwards, sets at F, reaches lower culmination at M, rises at G, and returns to L.",
+        headingFa: "زاویهٔ ساعتی",
+        headingEn: "Hour angle",
+        bodyFa:
+          "H از نصف‌النهار محلی به غرب مثبت است؛ پیش از عبور بالایی منفی و پس از آن مثبت نوشته می‌شود. بازهٔ منفی ۱۲ تا مثبت ۱۲ ساعت برای محاسبه مناسب است.",
+        bodyEn:
+          "H runs west-positive from the local meridian, conventionally negative before upper transit and positive after it. The signed range [−12 h,12 h) is convenient.",
+        formula: "H=\\mathrm{LST}-\\alpha\\pmod{24\\,\\mathrm h}",
       },
       {
-        headingFa: "زاویهٔ ساعتی و قاعدهٔ سمت",
-        headingEn: "Hour angle and the azimuth rule",
-        bodyFa: "H زاویه در قطب میان نصف‌النهار ناظر و دایرهٔ ساعتی ستاره است، از ۰° در عبور تا ۳۶۰° (یا ۰ʰ تا ۲۴ʰ) به غرب. از شکل ۱۳: اگر سمت غرب باشد H میان ۰ʰ و ۱۲ʰ است؛ اگر سمت شرق باشد H میان ۱۲ʰ و ۲۴ʰ است.",
-        bodyEn: "H is the angle at P from the observer’s meridian westwards to the star’s hour circle, 0ʰ to 24ʰ. If azimuth is west, 0ʰ ≤ H ≤ 12ʰ; if azimuth is east, 12ʰ ≤ H ≤ 24ʰ.",
+        headingFa: "حرکت روزانه",
+        headingEn: "Daily motion",
+        bodyFa:
+          "چرخش زمین H را افزایش می‌دهد؛ α و δ یک ستاره در مدت کوتاه تقریباً ثابت‌اند. در عبور بالایی H صفر است. حرکت غرب‌سوی آسمان به معنی افزایش بعد نیست.",
+        bodyEn:
+          "Earth’s rotation increases H; a star’s α and δ are approximately constant over a short interval. At upper transit H = 0. Westward daily motion is not increasing RA.",
       },
     ],
-
     exercises: [
       {
-        textFa: "شکل ۱۴ را برای ناظر جنوبی کامل کنید و همان قاعدهٔ سمت–H را بازیابید (بند ۲۰).",
-        textEn: "Complete Fig. 14 for a southern observer and recover the same azimuth–H rule (§20).",
-        source: "Smart II §20",
+        textFa:
+          "اگر LST برابر ۲ ساعت و بعد ستاره ۲۳ ساعت باشد، H علامت‌دار چند ساعت و درجه است؟",
+        textEn:
+          "If LST = 2 h and RA = 23 h, find the signed hour angle in hours and degrees.",
+        answer: "H=(2-23)\\bmod24=3\\,\\mathrm h=45^\\circ\\quad\\text{west}",
+        source: "Original exercise based on Smart / تمرین تألیفی",
+      },
+      {
+        textFa:
+          "فرض‌ها و دامنهٔ اعتبار روابط این درس را بنویسید و یک حالت ویژه را با جایگذاری مستقیم بررسی کنید.",
+        textEn:
+          "State the assumptions and domain of the identities in this lesson. Verify a special case by direct substitution.",
+        source: "Original learning check / تمرین تألیفی",
       },
     ],
+    example: {
+      id: "check-equatorial",
+      titleFa: "مثال حل‌شده و کنترل نتیجه",
+      titleEn: "Worked check",
+      source: "Original worked application / کاربرد تألیفی",
+      givenFa:
+        "اگر LST برابر ۲ ساعت و بعد ستاره ۲۳ ساعت باشد، H علامت‌دار چند ساعت و درجه است؟",
+      givenEn:
+        "If LST = 2 h and RA = 23 h, find the signed hour angle in hours and degrees.",
+      findFa: "نتیجه را با روابط همین درس و کنترل واحدها به دست آورید.",
+      findEn: "Use this lesson’s identities and check the units.",
+      steps: [
+        {
+          fa: "ابتدا قرارداد علامت‌ها و داده‌های معلوم را مشخص کنید؛ سپس رابطهٔ متناسب را انتخاب کنید.",
+          en: "Identify the sign conventions and given parts, then select the corresponding identity.",
+        },
+        {
+          fa: "پس از جایگذاری و ساده‌سازی، نتیجهٔ زیر به دست می‌آید. شرایط وجود و ربع را نیز کنترل کنید.",
+          en: "Substitute and simplify to obtain the result below; check existence and quadrant conditions.",
+          formula:
+            "H=(2-23)\\bmod24=3\\,\\mathrm h=45^\\circ\\quad\\text{west}",
+        },
+      ],
+      resultFa:
+        "نتیجهٔ نهایی در رابطهٔ بالا آمده است؛ زاویه و طول را با یکدیگر مخلوط نکنید.",
+      resultEn:
+        "The result is shown above; keep angular and physical units distinct.",
+    },
   },
   {
     id: "rising-setting",
@@ -125,56 +223,85 @@ export const LESSONS_CH2: Lesson[] = [
     minutes: 40,
     spherePreset: "horizon",
     olympiad: "هرگز غروب نمی‌کند · z در عبور",
-    summaryFa: "بند ۲۱ و شکل ۱۵: شرط قطبی‌گذر δ > co-lat. بند فرعی: z در عبور بالا = |φ − δ| و در عبور پایین = ۱۸۰° − (φ + δ) (با قرارداد شمال).",
-    summaryEn: "Smart II §21, Fig. 15: circumpolar condition; culmination zenith distances.",
+    summaryFa:
+      "در فرمول ارتفاع h را صفر می‌گذاریم. برای ناظر و ستارهٔ غیرقطبی، تقسیم بر cos φ cos δ مجاز است. اگر قدرمطلق طرف راست از یک بیشتر باشد، عبور از افق وجود ندارد.",
+    summaryEn:
+      "Set h = 0 in the altitude equation. For a nonpolar observer and star, divide by cos φ cos δ. If the resulting cosine has absolute value above one, no horizon crossing exists.",
     smart: {
       chapter: "II",
       sections: "§21",
       pages: "32–33",
       figures: ["15"],
     },
-    figures: ["fig15"],
+    figures: ["geometry-horizon"],
     englishFormulas: [
-      "Never sets (north) if N.P.D. < φ, i.e. δ > 90° − φ.",
-      "Upper culmination: z = |φ − δ|; lower: z = 180° − (φ + δ) when the star is circumpolar.",
+      "\\cos H_0=-\\tan\\varphi\\tan\\delta",
+      "z_{\\rm upper}=|\\varphi-\\delta|",
     ],
     formulas: [
-      { display: "δ > 90° − φ   (northern circumpolar)", nameFa: "شرط قطبی‌گذر شمالی", nameEn: "Northern circumpolar condition" },
-      { display: "z_upper = |φ − δ|,   z_lower = 180° − (φ + δ)", nameFa: "سمت‌الرأسی در دو عبور", nameEn: "Zenith distances at culmination" },
+      {
+        display: "\\cos H_0=-\\tan\\varphi\\tan\\delta",
+        tex: "\\cos H_0=-\\tan\\varphi\\tan\\delta",
+        nameFa: "زاویهٔ افق",
+        nameEn: "Horizon hour angle",
+      },
+      {
+        display: "z_{\\rm upper}=|\\varphi-\\delta|",
+        tex: "z_{\\rm upper}=|\\varphi-\\delta|",
+        nameFa: "فاصلهٔ سمت‌الرأسی عبور بالا",
+        nameEn: "Upper-transit zenith distance",
+      },
     ],
     sections: [
       {
-        headingFa: "قطبی‌گذر",
-        headingEn: "Circumpolar stars",
-        bodyFa: "اگر موازی میل هرگز افق را قطع نکند ستاره قطبی‌گذر است. در شکل ۱۵: PM < PN، یعنی فاصلهٔ قطبی شمال کمتر از عرض، یا δ > 90° − φ در نیم‌کرهٔ شمال. قطبی‌گذر جنوبی — قطب جنوب هرگز زیر افق پنهان نمی‌شود.",
-        bodyEn: "If the parallel of declination never meets the horizon the star is circumpolar. Fig. 15: PM < PN, i.e. north polar distance less than the latitude, or δ > 90° − φ in the north.",
-        formula: "δ > co-lat(φ)",
+        headingFa: "حل عبور از افق",
+        headingEn: "Solve a horizon crossing",
+        bodyFa:
+          "در فرمول ارتفاع h را صفر می‌گذاریم. برای ناظر و ستارهٔ غیرقطبی، تقسیم بر cos φ cos δ مجاز است. اگر قدرمطلق طرف راست از یک بیشتر باشد، عبور از افق وجود ندارد.",
+        bodyEn:
+          "Set h = 0 in the altitude equation. For a nonpolar observer and star, divide by cos φ cos δ. If the resulting cosine has absolute value above one, no horizon crossing exists.",
+        formula: "\\cos H_0=-\\tan\\varphi\\tan\\delta",
       },
       {
-        headingFa: "عبور بالا و پایین",
-        headingEn: "Upper and lower culmination",
-        bodyFa: "در L عبور بالاست (transit). در M عبور پایین. سمت‌الرأسی در عبور بالا ZL = |φ − δ|. در عبور پایین ZM = 180° − (φ + δ). اگر δ = φ عبور بالا در سمت‌الرأس است. اگر δ > φ عبور بالا میان P و Z است و سمت از ۹۰° تجاوز نمی‌کند.",
-        bodyEn: "At L, upper culmination; at M, lower. z_upper = |φ − δ|, z_lower = 180° − (φ + δ). If δ = φ the star transits in the zenith. If δ > φ upper culmination lies between P and Z and azimuth does not exceed 90°.",
+        headingFa: "آزمون هر دو نیم‌کره",
+        headingEn: "A test for both hemispheres",
+        bodyFa:
+          "کمینهٔ sin h در H = π و بیشینه در H = صفر است. کمینهٔ مثبت یعنی همیشه بالا، بیشینهٔ منفی یعنی همیشه پایین. برابری صفر حالت تماس مماسی است. این آزمون علامت‌دار برای شمال و جنوب یکسان کار می‌کند.",
+        bodyEn:
+          "Minimum sin h occurs at H = π and maximum at H = 0. Positive minimum means always above; negative maximum means always below. Equality is a grazing case. This signed test works north and south.",
+        formula:
+          "\\sin h_{\\min}=\\sin\\varphi\\sin\\delta-\\cos\\varphi\\cos\\delta,\\quad\\sin h_{\\max}=\\sin\\varphi\\sin\\delta+\\cos\\varphi\\cos\\delta",
       },
       {
-        headingFa: "طلوع و غروب وقتی رخ می‌دهند",
-        headingEn: "When rising and setting occur",
-        bodyFa: "ارتفاع صفر در فرمول PZX (درس بعد) می‌دهد cos H₀ = −tan φ tan δ. اگر |tan φ tan δ| > 1 ستاره هرگز افق را قطع نمی‌کند — هرگز طلوع یا هرگز غروب.",
-        bodyEn: "Setting a = 0 in the PZX cosine formula yields cos H₀ = −tan φ tan δ. If the right-hand side lies outside [−1, 1] the star never rises or never sets.",
-        formula: "cos H₀ = − tan φ tan δ",
+        headingFa: "مدت بالای افق",
+        headingEn: "Time above the horizon",
+        bodyFa:
+          "طلوع در H = منفی H₀ و غروب در مثبت H₀ است. اگر H₀ درجه‌ای باشد، مدت ۲H₀ تقسیم بر ۱۵ ساعت نجومی است. شکست، اندازهٔ قرص و عوارض زمین در این مدل نیستند. در قطب از معادلهٔ تقسیم‌نشده استفاده کنید.",
+        bodyEn:
+          "Rising is at −H₀, setting at +H₀. With H₀ in degrees the duration is 2H₀/15 sidereal hours. This excludes refraction, disc size, and terrain. At a pole use the undivided altitude equation.",
       },
     ],
     example: {
       id: "ex-rising",
       titleFa: "مدت بالای افق",
       titleEn: "Time above the horizon",
-      source: "Smart II §21 + PZX with a = 0",
+      source: "Original application of Smart II §31, (24)",
       givenFa: "φ = ۴۰°N، δ = +۱۵°.",
       givenEn: "φ = 40°N, δ = +15°.",
       findFa: "زاویهٔ ساعتی غروب و مدت روز ستاره.",
       findEn: "Setting hour angle and time above the horizon.",
       steps: [
-          { fa: "cos H₀ = −tan ۴۰° tan ۱۵°.", en: "cos H₀ = −tan 40° tan 15°." },
+        {
+          fa: "ارتفاع را صفر می‌گذاریم و معادلهٔ کسینوس را برای H₀ حل می‌کنیم. قدرمطلق طرف راست کمتر از یک است، پس طلوع و غروب وجود دارند.",
+          en: "Set altitude to zero and solve the cosine equation for H₀. Its right side lies in [−1,1], so both crossings exist.",
+          formula:
+            "\\cos H_0=-\\tan40^\\circ\\tan15^\\circ,\\quad H_0\\simeq102.99324^\\circ",
+        },
+        {
+          fa: "فاصلهٔ زاویه‌ای طلوع تا غروب ۲H₀ است. با تقسیم درجه بر ۱۵، ساعت نجومی به دست می‌آید.",
+          en: "The hour-angle interval from rising to setting is 2H₀. Divide degrees by 15 to get sidereal hours.",
+          formula: "\\Delta t_{\\rm sid}=2H_0/15\\simeq13.73243\\,\\mathrm h",
+        },
       ],
       resultFa: "H₀ ≈ ۱۰۳° ≈ ۶ʰ۵۲ᵐ؛ مدت ≈ ۱۳ʰ۴۴ᵐ",
       resultEn: "H₀ ≈ 103° ≈ 6ʰ52ᵐ; duration ≈ 13ʰ44ᵐ",
@@ -182,10 +309,20 @@ export const LESSONS_CH2: Lesson[] = [
     },
     exercises: [
       {
-        textFa: "شرط آن که ستاره‌ای هرگز در عرض φ طلوع نکند را بنویسید.",
-        textEn: "Write the condition that a star never rises at latitude φ.",
-        source: "Smart II §21",
-        answer: "δ < φ − 90° (north latitude)",
+        textFa:
+          "در عرض ۴۰ درجه شمالی، ستاره‌های با میل مثبت ۶۰ و منفی ۶۰ درجه چه وضعی نسبت به افق دارند؟",
+        textEn:
+          "At latitude 40° N classify stars at declination +60° and −60° relative to the horizon.",
+        answer:
+          "\\delta=+60^\\circ:\\ h_{\\min}=10^\\circ;\\quad\\delta=-60^\\circ:\\ h_{\\max}=-10^\\circ",
+        source: "Original exercise based on Smart / تمرین تألیفی",
+      },
+      {
+        textFa:
+          "فرض‌ها و دامنهٔ اعتبار روابط این درس را بنویسید و یک حالت ویژه را با جایگذاری مستقیم بررسی کنید.",
+        textEn:
+          "State the assumptions and domain of the identities in this lesson. Verify a special case by direct substitution.",
+        source: "Original learning check / تمرین تألیفی",
       },
     ],
   },
@@ -199,8 +336,10 @@ export const LESSONS_CH2: Lesson[] = [
     spherePreset: "astro-tri",
     proofId: "pzx",
     olympiad: "تبدیل استوا ↔ افق",
-    summaryFa: "بندهای ۲۲–۲۳ و شکل‌های ۱۶–۱۷: تقریب زمین‌مرکز برای ستارگان، سپس دو مسئلهٔ استاندارد PZX با فرمول‌های (۳)–(۷) و صورت هاورساین.",
-    summaryEn: "Smart II §§22–23, Figs. 16–17: standard sphere at Earth’s centre; PZX formulae (3)–(7).",
+    summaryFa:
+      "P قطب شمال، Z سمت‌الرأس و X جهت ستاره است. اضلاع قطبی متمم عرض و میل و ZX فاصلهٔ سمت‌الرأسی است. زاویهٔ داخلی P کوچک‌ترِ زاویهٔ بین نصف‌النهارهاست؛ برای زمان و سمت از H جهت‌دار استفاده می‌کنیم.",
+    summaryEn:
+      "P is the north pole, Z the zenith, X the star direction. The polar sides are co-latitude and co-declination; ZX is zenith distance. The interior angle at P is the smaller meridian angle; time and azimuth calculations use signed H.",
     smart: {
       chapter: "II",
       sections: "§§22–23",
@@ -208,38 +347,53 @@ export const LESSONS_CH2: Lesson[] = [
       formulae: ["(3)", "(4)", "(5)", "(6)", "(7)"],
       figures: ["16", "17"],
     },
-    figures: ["fig17"],
+    figures: ["geometry-astro-tri"],
     englishFormulas: [
-      "cos z = sin φ sin δ + cos φ cos δ cos H     (3)",
-      "hav z = hav(φ − δ) + cos φ cos δ hav H     (4)",
-      "sin δ = sin φ cos z + cos φ sin z cos A     (5)",
-      "cos H = cos z sec φ sec δ − tan φ tan δ     (7)",
+      "\\sin h=\\sin\\varphi\\sin\\delta+\\cos\\varphi\\cos\\delta\\cos H",
+      "A=\\operatorname{atan2}(-\\cos\\delta\\sin H,\\sin\\delta\\cos\\varphi-\\cos\\delta\\sin\\varphi\\cos H)",
     ],
     formulas: [
-      { display: "cos z = sin φ sin δ + cos φ cos δ cos H", number: "II.(3)", nameFa: "کسینوس سمت‌الرأسی", nameEn: "Cosine of zenith distance" },
-      { display: "hav z = hav(φ − δ) + cos φ cos δ hav H", number: "II.(4)", nameFa: "هاورساین سمت‌الرأسی", nameEn: "Haversine form of (3)" },
-      { display: "sin δ = sin φ cos z + cos φ sin z cos A", number: "II.(5)", nameFa: "میل از ارتفاع و سمت", nameEn: "Declination from z and A" },
-      { display: "cos H = cos z sec φ sec δ − tan φ tan δ", number: "II.(7)", nameFa: "زاویهٔ ساعتی از z و δ", nameEn: "Hour angle from z and δ" },
+      {
+        display:
+          "\\sin h=\\sin\\varphi\\sin\\delta+\\cos\\varphi\\cos\\delta\\cos H",
+        tex: "\\sin h=\\sin\\varphi\\sin\\delta+\\cos\\varphi\\cos\\delta\\cos H",
+        nameFa: "ارتفاع هندسی",
+        nameEn: "Geometric altitude",
+      },
+      {
+        display:
+          "A=\\operatorname{atan2}(-\\cos\\delta\\sin H,\\sin\\delta\\cos\\varphi-\\cos\\delta\\sin\\varphi\\cos H)",
+        tex: "A=\\operatorname{atan2}(-\\cos\\delta\\sin H,\\sin\\delta\\cos\\varphi-\\cos\\delta\\sin\\varphi\\cos H)",
+        nameFa: "سمت با ربع درست",
+        nameEn: "Quadrant-safe azimuth",
+      },
     ],
     sections: [
       {
-        headingFa: "کرهٔ استاندارد (شکل‌های ۱۶–۱۷)",
-        headingEn: "The standard sphere (Figs. 16–17)",
-        bodyFa: "برای ستارگان، فاصلهٔ قطبی از ناظر برابر آن از مرکز زمین است. برای ماه چنین نیست. از این پس کرهٔ سماوی در C، مرکز زمین، مرکز دارد: CZ سمت‌الرأس ناظر، CP محور، افق عمود بر CZ.",
-        bodyEn: "For stars, north polar distance from the observer equals that from the Earth’s centre. For the Moon it does not. Hereafter the celestial sphere is centred at C, the Earth’s centre: CZ is the zenith, CP the axis, the horizon perpendicular to CZ.",
+        headingFa: "سه رأس PZX",
+        headingEn: "The PZX vertices",
+        bodyFa:
+          "P قطب شمال، Z سمت‌الرأس و X جهت ستاره است. اضلاع قطبی متمم عرض و میل و ZX فاصلهٔ سمت‌الرأسی است. زاویهٔ داخلی P کوچک‌ترِ زاویهٔ بین نصف‌النهارهاست؛ برای زمان و سمت از H جهت‌دار استفاده می‌کنیم.",
+        bodyEn:
+          "P is the north pole, Z the zenith, X the star direction. The polar sides are co-latitude and co-declination; ZX is zenith distance. The interior angle at P is the smaller meridian angle; time and azimuth calculations use signed H.",
       },
       {
-        headingFa: "مسئلهٔ (i): از (φ, δ, H) به (z, A)",
-        headingEn: "Problem (i): (φ, δ, H) → (z, A)",
-        bodyFa: "در PZX دو ضلع PZ = 90°−φ و PX = 90°−δ و زاویهٔ شامل در P برابر H است. فرمول (A) همان (۳) است؛ صورت هاورساین (۴) است. سپس (A) روی ضلع PX، میل را از z و A می‌دهد — یا سمت را از δ، z، φ. صورت هاورساین سمت: cos φ cos a hav A = hav(90°−δ) − hav(φ−a).",
-        bodyEn: "Sides PZ = 90°−φ, PX = 90°−δ, included angle H. Formula (A) is (3); haversine form is (4). (5) recovers δ from z and A, or azimuth from δ, z, φ.",
-        formula: "cos z = sin φ sin δ + cos φ cos δ cos H",
+        headingFa: "ربع را حفظ کنید",
+        headingEn: "Keep the quadrant",
+        bodyFa:
+          "سمت از شمال به شرق و H به غرب مثبت است. کسینوس به تنهایی علامت H یا ربع A را نمی‌دهد. مؤلفه‌های شرقی و شمالی، سمت را با atan2 تعیین می‌کنند.",
+        bodyEn:
+          "Azimuth is north through east and H west-positive. A cosine alone gives neither H’s sign nor A’s quadrant. East and north components determine A through atan2.",
       },
       {
-        headingFa: "مسئلهٔ (ii): از (φ, z, A) به (δ, H)",
-        headingEn: "Problem (ii): (φ, z, A) → (δ, H)",
-        bodyFa: "با سمت معلوم، (۵) میل را می‌دهد و (۳) یا (۷) زاویهٔ ساعتی را. اگر ستاره شرق نصف‌النهار باشد (شکل ۱۳) زاویه در P برابر ۲۴ʰ − H است و همان فرمول‌ها برقرارند.",
-        bodyEn: "Given φ, z, A, (5) yields δ and (3) or (7) yields H. East of the meridian the angle at P is 24ʰ − H; the same formulae apply.",
+        headingFa: "تبدیل معکوس",
+        headingEn: "The inverse transform",
+        bodyFa:
+          "از h و A، ابتدا sin δ را با تصویر روی قطب حساب کنید؛ سپس H را از دو مؤلفهٔ زیر با atan2 بیابید. در جهت قطب، بعد و H مستقل تعریف نمی‌شوند.",
+        bodyEn:
+          "From h,A first compute sin δ by projection on the pole. Then recover H with atan2 from the two components below. At the pole, RA and H are not independently defined.",
+        formula:
+          "\\begin{aligned}\\sin\\delta&=\\sin\\varphi\\sin h+\\cos\\varphi\\cos h\\cos A\\\\\\cos\\delta\\sin H&=-\\cos h\\sin A\\\\\\cos\\delta\\cos H&=\\sin h\\cos\\varphi-\\cos h\\sin\\varphi\\cos A\\end{aligned}",
       },
     ],
     example: {
@@ -252,17 +406,40 @@ export const LESSONS_CH2: Lesson[] = [
       findFa: "سمت‌الرأسی و ارتفاع.",
       findEn: "Zenith distance and altitude.",
       steps: [
-          { fa: "فرمول (۳) را با H = ۳۰° به کار برید.", en: "Apply (3) with H = 30°." },
+        {
+          fa: "دو ساعت زاویهٔ ساعتی برابر ۳۰ درجه است. مؤلفهٔ قائم را از قانون کسینوس PZX حساب می‌کنیم.",
+          en: "Two hours of hour angle is 30°. Compute the up component using the PZX cosine law.",
+          formula:
+            "\\sin h=\\sin35.7^\\circ\\sin16.5^\\circ+\\cos35.7^\\circ\\cos16.5^\\circ\\cos30^\\circ",
+        },
+        {
+          fa: "ارتفاع را از معکوس سینوس و فاصلهٔ سمت‌الرأسی را از متمم آن می‌یابیم.",
+          en: "Recover altitude with arcsine and zenith distance as its complement.",
+          formula:
+            "h\\simeq57.14626^\\circ,\\quad z=90^\\circ-h\\simeq32.85374^\\circ",
+        },
       ],
-        resultFa: "z ≈ ۳۲°.۹؛ a ≈ ۵۷°.۱",
-        resultEn: "z ≈ 32°.9; a ≈ 57°.1",
+      resultFa:
+        "فاصلهٔ سمت‌الرأسی تقریباً ۳۲٫۸۵۳۷ درجه و ارتفاع ۵۷٫۱۴۶۳ درجه است.",
+      resultEn: "Zenith distance ≈ 32.8537°; altitude ≈ 57.1463°.",
       widget: "pzx",
     },
     exercises: [
       {
-        textFa: "اگر z₁ سمت‌الرأسی در عبور نصف‌النهار و z₂ روی قائم اول باشد، ثابت کنید cot δ = csc z₁ sec z₂ − cot 2φ (تمرین ۱ فصل II، با تصحیح اسمارت).",
-        textEn: "If z₁, z₂ are meridian and prime-vertical zenith distances, prove cot δ = csc z₁ sec z₂ − cot 2φ (Smart II, Ex. 1).",
-        source: "Smart II Exercises 1",
+        textFa:
+          "برای φ = ۳۵٫۷، δ = ۱۶٫۵ و H = ۳۰ درجه، ارتفاع را بیابید و محل ستاره را از نظر شرق یا غرب نصف‌النهار مشخص کنید.",
+        textEn:
+          "For φ = 35.7°, δ = 16.5°, H = 30°, find altitude and identify the side of the meridian.",
+        answer:
+          "z\\simeq32.85374^\\circ,\\quad h\\simeq57.14626^\\circ,\\quad H>0:\\ \\text{west}",
+        source: "Original exercise based on Smart / تمرین تألیفی",
+      },
+      {
+        textFa:
+          "فرض‌ها و دامنهٔ اعتبار روابط این درس را بنویسید و یک حالت ویژه را با جایگذاری مستقیم بررسی کنید.",
+        textEn:
+          "State the assumptions and domain of the identities in this lesson. Verify a special case by direct substitution.",
+        source: "Original learning check / تمرین تألیفی",
       },
     ],
   },
@@ -276,8 +453,10 @@ export const LESSONS_CH2: Lesson[] = [
     spherePreset: "celestial",
     proofId: "sidereal",
     olympiad: "α · LST · ST = H + α",
-    summaryFa: "بندهای ۲۴ و ۲۷: فاصلهٔ قطبی شمال زیر حرکت روزانه ثابت است؛ H یکنواخت می‌افزاید، ۰ʰ تا ۲۴ʰ؛ و تعریف بعد و زمان نجومی از زاویهٔ ساعتی نقطهٔ اعتدال. ST = H + α.",
-    summaryEn: "Smart II §§24, 27, Figs. 18 and 22: RA, vernal equinox, sidereal time.",
+    summaryFa:
+      "زمان نجومی محلی زاویهٔ ساعتی اعتدال بهاری است. برای ستاره در عبور بالایی، LST برابر بعد است. این زمان را با ساعت مدنی یا UTC یکی نگیرید.",
+    summaryEn:
+      "Local sidereal time is the hour angle of the vernal equinox. A star at upper transit has RA equal to LST. This is not civil time or UTC.",
     smart: {
       chapter: "II",
       sections: "§§24, 27",
@@ -285,59 +464,113 @@ export const LESSONS_CH2: Lesson[] = [
       formulae: ["(8)", "(9)", "(13)", "(14)"],
       figures: ["18", "22"],
     },
-    figures: ["fig18", "fig22"],
+    figures: ["geometry-celestial"],
     englishFormulas: [
-      "Sidereal time = H.A. of ♈ + R.A. of X,   i.e.  S.T. = H + α     (8)(9)",
-      "H.A. at Greenwich = H.A. at longitude l ∓ long. of l     (13)",
-      "S.T. at Greenwich = S.T. at l ∓ long. of l     (14)",
+      "\\mathrm{LST}=H+\\alpha\\pmod{24\\,\\mathrm h}",
+      "\\mathrm{LST}=\\mathrm{GST}+\\lambda_E/15\\pmod{24\\,\\mathrm h}",
     ],
     formulas: [
-      { display: "S.T. = H + α", number: "II.(9)", nameFa: "زمان نجومی محلی", nameEn: "Local sidereal time" },
-      { display: "GST = LST ∓ longitude (time measure; + if west)", number: "II.(14)", nameFa: "زمان نجومی گرینویچ", nameEn: "Greenwich sidereal time" },
+      {
+        display: "\\mathrm{LST}=H+\\alpha\\pmod{24\\,\\mathrm h}",
+        tex: "\\mathrm{LST}=H+\\alpha\\pmod{24\\,\\mathrm h}",
+        nameFa: "زمان نجومی محلی",
+        nameEn: "Local sidereal time",
+      },
+      {
+        display:
+          "\\mathrm{LST}=\\mathrm{GST}+\\lambda_E/15\\pmod{24\\,\\mathrm h}",
+        tex: "\\mathrm{LST}=\\mathrm{GST}+\\lambda_E/15\\pmod{24\\,\\mathrm h}",
+        nameFa: "طول شرقی به درجه",
+        nameEn: "East longitude in degrees",
+      },
     ],
     sections: [
       {
-        headingFa: "بعد از ♈ (شکل ۱۸)",
-        headingEn: "Right ascension from ♈ (Fig. 18)",
-        bodyFa: "میل از گردش روزانه ثابت می‌ماند؛ H یکنواخت می‌افزاید. زاویه از یک مرجع استوایی برگزیده ♈ به شرق تا دایرهٔ ساعتی ستاره بعد α است، ۰ʰ تا ۲۴ʰ — مخالف در حس با زاویهٔ ساعتی. پس حس بعد مخالف حس H است.",
-        bodyEn: "Declination is constant under diurnal motion; H increases uniformly. The angle from a chosen equatorial reference ♈ eastwards to the star’s hour circle is right ascension α, 0ʰ to 24ʰ — opposite in sense to hour angle.",
+        headingFa: "ساعتِ جهت‌گیری زمین",
+        headingEn: "A clock for Earth’s orientation",
+        bodyFa:
+          "زمان نجومی محلی زاویهٔ ساعتی اعتدال بهاری است. برای ستاره در عبور بالایی، LST برابر بعد است. این زمان را با ساعت مدنی یا UTC یکی نگیرید.",
+        bodyEn:
+          "Local sidereal time is the hour angle of the vernal equinox. A star at upper transit has RA equal to LST. This is not civil time or UTC.",
       },
       {
-        headingFa: "زمان نجومی",
-        headingEn: "Sidereal time",
-        bodyFa: "H.A. نقطهٔ اعتدال همان زمان نجومی است. از شکل ۱۸: RD = H و TD = α، پس RT = H + α. وقتی ♈ روی نصف‌النهار است ST = 0ʰ. ۲۴ʰ زمان نجومی یک روز نجومی است — دورهٔ گردش زمین نسبت به ستارگان ثابت.",
-        bodyEn: "The hour angle of ♈ is the sidereal time. Fig. 18: RD = H, TD = α, so RT = H + α. When ♈ is on the meridian, S.T. = 0ʰ. 24ʰ of sidereal time is a sidereal day.",
-        formula: "S.T. = H + α",
+        headingFa: "حساب پیمانه‌ای و طول",
+        headingEn: "Modular arithmetic and longitude",
+        bodyFa:
+          "LST را به صفر تا ۲۴ ساعت ببرید. برای H می‌توان بازهٔ منفی ۱۲ تا مثبت ۱۲ را انتخاب کرد. همهٔ جمله‌ها باید ساعت باشند؛ طول شرقی درجه‌ای به تقسیم بر ۱۵ نیاز دارد.",
+        bodyEn:
+          "Reduce LST to [0,24 h); H may use [−12 h,12 h). Keep all terms in hours; east longitude in degrees must be divided by 15.",
       },
       {
-        headingFa: "گرینویچ و طول جغرافیایی (شکل ۲۲)",
-        headingEn: "Greenwich and longitude (Fig. 22)",
-        bodyFa: "زاویهٔ ساعتی در گرینویچ برابر زاویهٔ ساعتی در l به‌علاوهٔ طول غربی l است (طول به واحد زمان: ۱۵° = ۱ʰ). زمان نجومی در گرینویچ = زمان نجومی در l ∓ طول l، با + اگر l غرب گرینویچ باشد.",
-        bodyEn: "H.A. at Greenwich = H.A. at l + west longitude of l (in time measure). Sidereal time at Greenwich = sidereal time at l ∓ longitude of l, + if l is west of Greenwich.",
-        formula: "H_Greenwich = H_l + long_W",
+        headingFa: "دقت آموزشی آسمان‌نما",
+        headingEn: "Educational precision of the sky viewer",
+        bodyFa:
+          "نمای آسمان از زمان نجومی متوسط تقریبی و مختصات کاتالوگ استفاده می‌کند. محاسبهٔ اخترسنجی دقیق به سازگاری چارچوب و مبدأ زمانی، تقدیم، ترقّص و UT1 نیاز دارد. تعداد رقم نمایش‌داده‌شده تضمین دقت رصدخانه‌ای نیست.",
+        bodyEn:
+          "The sky viewer uses approximate mean sidereal time and catalogue positions. Precision astrometry requires consistent frame and epoch, precession, nutation, and UT1. Displayed decimal places do not guarantee observatory accuracy.",
       },
     ],
-
     exercises: [
       {
-        textFa: "ستاره‌ای با α = ۵ʰ روی نصف‌النهار ناظر است. LST چیست؟",
-        textEn: "A star of RA 5ʰ is on the observer’s meridian. What is LST?",
-        source: "Smart II §24",
-        answer: "LST = 5ʰ",
+        textFa:
+          "اگر GST برابر ۹٫۲ ساعت و طول ۵۱ درجه شرقی باشد، LST چیست؟ ستارهٔ در عبور بالایی چه بعدی دارد؟",
+        textEn:
+          "For GST = 9.2 h and longitude 51° east, find LST and the RA of an upper-transiting star.",
+        answer:
+          "\\mathrm{LST}=9.2+51/15=12.6\\,\\mathrm h,\\quad\\alpha_{\\rm transit}=12.6\\,\\mathrm h",
+        source: "Original exercise based on Smart / تمرین تألیفی",
+      },
+      {
+        textFa:
+          "فرض‌ها و دامنهٔ اعتبار روابط این درس را بنویسید و یک حالت ویژه را با جایگذاری مستقیم بررسی کنید.",
+        textEn:
+          "State the assumptions and domain of the identities in this lesson. Verify a special case by direct substitution.",
+        source: "Original learning check / تمرین تألیفی",
       },
     ],
+    example: {
+      id: "check-celestial-sphere",
+      titleFa: "مثال حل‌شده و کنترل نتیجه",
+      titleEn: "Worked check",
+      source: "Original worked application / کاربرد تألیفی",
+      givenFa:
+        "اگر GST برابر ۹٫۲ ساعت و طول ۵۱ درجه شرقی باشد، LST چیست؟ ستارهٔ در عبور بالایی چه بعدی دارد؟",
+      givenEn:
+        "For GST = 9.2 h and longitude 51° east, find LST and the RA of an upper-transiting star.",
+      findFa: "نتیجه را با روابط همین درس و کنترل واحدها به دست آورید.",
+      findEn: "Use this lesson’s identities and check the units.",
+      steps: [
+        {
+          fa: "ابتدا قرارداد علامت‌ها و داده‌های معلوم را مشخص کنید؛ سپس رابطهٔ متناسب را انتخاب کنید.",
+          en: "Identify the sign conventions and given parts, then select the corresponding identity.",
+        },
+        {
+          fa: "پس از جایگذاری و ساده‌سازی، نتیجهٔ زیر به دست می‌آید. شرایط وجود و ربع را نیز کنترل کنید.",
+          en: "Substitute and simplify to obtain the result below; check existence and quadrant conditions.",
+          formula:
+            "\\mathrm{LST}=9.2+51/15=12.6\\,\\mathrm h,\\quad\\alpha_{\\rm transit}=12.6\\,\\mathrm h",
+        },
+      ],
+      resultFa:
+        "نتیجهٔ نهایی در رابطهٔ بالا آمده است؛ زاویه و طول را با یکدیگر مخلوط نکنید.",
+      resultEn:
+        "The result is shown above; keep angular and physical units distinct.",
+    },
   },
   {
     id: "ecliptic",
     chapterId: "ch2",
     titleFa: "مدار زمین، دایرة‌البروج و عرض‌طول سماوی",
-    titleEn: "The Earth’s orbit, the ecliptic, and celestial latitude/longitude",
+    titleEn:
+      "The Earth’s orbit, the ecliptic, and celestial latitude/longitude",
     level: "المپیاد",
     minutes: 50,
     spherePreset: "ecliptic",
     olympiad: "ε · λ، β · انحراف",
-    summaryFa: "بندهای ۲۵–۲۶ و شکل‌های ۱۹–۲۱: قوانین کپلر، موازی مدار ظاهری خورشید، دایرة‌البروج، میل ε ≈ ۲۳°.۵، انحراف و طول و عرض سماوی.",
-    summaryEn: "Smart II §§25–26, Figs. 19–21: Earth’s orbit, ecliptic, obliquity, λ and β.",
+    summaryFa:
+      "دایرة‌البروج صفحهٔ مرجع مداری زمین است و روی کره عظیمه می‌سازد. اعتدال بهاری عبور شمال‌سوی خورشید از استوا و مبدأ λ و α است. میل ε میان دو صفحه با مبدأ زمانی تغییر می‌کند.",
+    summaryEn:
+      "The ecliptic is Earth’s orbital reference plane and cuts a great circle on the sphere. The vernal equinox is the Sun’s northward equator crossing and the origin of λ and α. Obliquity ε varies with epoch.",
     smart: {
       chapter: "II",
       sections: "§§25–26",
@@ -346,41 +579,99 @@ export const LESSONS_CH2: Lesson[] = [
     },
     figures: ["fig19", "fig21"],
     englishFormulas: [
-      "Obliquity ε = ∠ between ecliptic and equator ≈ 23°.5.",
-      "Sun: β = 0;   sin δ = sin ε sin λ;   the four cardinal longitudes 0ʰ, 6ʰ, 12ʰ, 18ʰ.",
+      "\\sin\\delta=\\sin\\beta\\cos\\varepsilon+\\cos\\beta\\sin\\varepsilon\\sin\\lambda",
+      "\\alpha=\\operatorname{atan2}(\\cos\\beta\\sin\\lambda\\cos\\varepsilon-\\sin\\beta\\sin\\varepsilon,\\cos\\beta\\cos\\lambda)",
     ],
     formulas: [
-      { display: "ε ≈ 23°.5   (obliquity of the ecliptic)", nameFa: "میل دایرة‌البروج", nameEn: "Obliquity" },
-      { display: "sin δ_☉ = sin ε sin λ   (β = 0)", nameFa: "میل خورشید", nameEn: "Solar declination" },
+      {
+        display:
+          "\\sin\\delta=\\sin\\beta\\cos\\varepsilon+\\cos\\beta\\sin\\varepsilon\\sin\\lambda",
+        tex: "\\sin\\delta=\\sin\\beta\\cos\\varepsilon+\\cos\\beta\\sin\\varepsilon\\sin\\lambda",
+        nameFa: "میل استوایی",
+        nameEn: "Equatorial declination",
+      },
+      {
+        display:
+          "\\alpha=\\operatorname{atan2}(\\cos\\beta\\sin\\lambda\\cos\\varepsilon-\\sin\\beta\\sin\\varepsilon,\\cos\\beta\\cos\\lambda)",
+        tex: "\\alpha=\\operatorname{atan2}(\\cos\\beta\\sin\\lambda\\cos\\varepsilon-\\sin\\beta\\sin\\varepsilon,\\cos\\beta\\cos\\lambda)",
+        nameFa: "بعد؛ خروجی زاویه‌ای",
+        nameEn: "RA; angular output",
+      },
     ],
     sections: [
       {
-        headingFa: "مدار زمین و مدار ظاهری خورشید",
-        headingEn: "Earth’s orbit and the Sun’s apparent orbit",
-        bodyFa: "زمین روی بیضی با کانون خورشید می‌گردد (قانون اول کپلر). از زمین مدار خورشید روی بیضی مقابل می‌نماید (شکل‌های ۱۹–۲۰). صفحهٔ این مدار دایرة‌البروج است؛ تقاطع آن با کرهٔ سماوی عظیمهٔ دایرة‌البروج است.",
-        bodyEn: "The Earth revolves on an ellipse with the Sun at a focus (Kepler I). Relative to the Earth the Sun appears to describe the opposite ellipse. That plane is the ecliptic; its intersection with the celestial sphere is the ecliptic great circle.",
+        headingFa: "صفحه و اعتدال",
+        headingEn: "Plane and equinox",
+        bodyFa:
+          "دایرة‌البروج صفحهٔ مرجع مداری زمین است و روی کره عظیمه می‌سازد. اعتدال بهاری عبور شمال‌سوی خورشید از استوا و مبدأ λ و α است. میل ε میان دو صفحه با مبدأ زمانی تغییر می‌کند.",
+        bodyEn:
+          "The ecliptic is Earth’s orbital reference plane and cuts a great circle on the sphere. The vernal equinox is the Sun’s northward equator crossing and the origin of λ and α. Obliquity ε varies with epoch.",
       },
       {
-        headingFa: "میل دایرة‌البروج و نقطهٔ اعتدال (شکل ۲۱)",
-        headingEn: "Obliquity and the equinox (Fig. 21)",
-        bodyFa: "زاویهٔ میان دایرة‌البروج و استوا ε ≈ ۲۳°.۵ است. خورشید استوا را در ♈ حدود ۲۱ مارس (انحراف بهاری — مبدأ بعد و طول) و در ♎ حدود ۲۱ سپتامبر قطع می‌کند. در انقلاب خرداد α = ۶ʰ و δ ≈ +۲۳°.۵؛ در انقلاب آذر α = ۱۸ʰ و δ ≈ −۲۳°.۵.",
-        bodyEn: "The inclination of the ecliptic to the equator is the obliquity ε ≈ 23°.5. The Sun crosses the equator at ♈ (about March 21, vernal equinox — origin of RA and longitude) and at ♎ (about September 21). At the June solstice α = 6ʰ, δ ≈ +23°.5; at the December solstice α = 18ʰ, δ ≈ −23°.5.",
+        headingFa: "چرخش دستگاه",
+        headingEn: "Rotate the coordinate frame",
+        bodyFa:
+          "بردار دایرة‌البروجی را حول محور مشترک اعتدال به اندازهٔ ε می‌چرخانیم. مؤلفهٔ قائم sin δ و دو مؤلفهٔ استوایی بعد را با atan2 تعیین می‌کنند.",
+        bodyEn:
+          "Rotate the ecliptic vector by ε about the common equinox axis. The new vertical component is sin δ; the two equatorial components give RA through atan2.",
+        formula:
+          "\\sin\\delta=\\sin\\beta\\cos\\varepsilon+\\cos\\beta\\sin\\varepsilon\\sin\\lambda",
       },
       {
-        headingFa: "طول و عرض سماوی",
-        headingEn: "Celestial longitude and latitude",
-        bodyFa: "طول λ از ♈ روی دایرة‌البروج به شرق تا دایرهٔ عرض؛ عرض β از دایرة‌البروج به سوی قطب دایرة‌البروج. خورشید β = 0 دارد. تبدیل (α, δ) ↔ (λ, β) مثلث قطبی استوا–دایرة‌البروج با زاویهٔ ε است.",
-        bodyEn: "Longitude λ is measured from ♈ along the ecliptic eastwards; latitude β from the ecliptic towards the ecliptic pole. The Sun has β = 0. Transformation (α, δ) → (λ, β) is the equatorial–ecliptic polar triangle of angle ε.",
+        headingFa: "خورشید و واحد طول",
+        headingEn: "The Sun and longitude units",
+        bodyFa:
+          "برای β تقریباً صفر، در λ = ۹۰ درجه میل خورشید +ε و در ۲۷۰ درجه −ε است. طول دایرة‌البروجی را معمولاً درجه‌ای می‌نویسیم؛ آن را با بعد ساعتی مخلوط نکنید.",
+        bodyEn:
+          "For β approximately zero, solar declination is +ε at λ = 90° and −ε at 270°. Ecliptic longitude is normally in degrees; do not confuse it with RA in hours.",
       },
     ],
-
     exercises: [
       {
-        textFa: "ثابت کنید برای خورشید cos δ cos α = cos λ و cos δ sin α = cos ε sin λ.",
-        textEn: "For the Sun prove cos δ cos α = cos λ and cos δ sin α = cos ε sin λ.",
-        source: "Smart II §26",
+        textFa:
+          "برای β = صفر و طول‌های دایرة‌البروجی صفر، ۹۰، ۱۸۰ و ۲۷۰ درجه، میل را از فرمول به دست آورید.",
+        textEn:
+          "For β = 0 and ecliptic longitudes 0°,90°,180°,270°, derive the declinations.",
+        answer:
+          "\\delta=0,\\ +\\varepsilon,\\ 0,\\ -\\varepsilon\\quad\\text{respectively}",
+        source: "Original exercise based on Smart / تمرین تألیفی",
+      },
+      {
+        textFa:
+          "فرض‌ها و دامنهٔ اعتبار روابط این درس را بنویسید و یک حالت ویژه را با جایگذاری مستقیم بررسی کنید.",
+        textEn:
+          "State the assumptions and domain of the identities in this lesson. Verify a special case by direct substitution.",
+        source: "Original learning check / تمرین تألیفی",
       },
     ],
+    example: {
+      id: "check-ecliptic",
+      titleFa: "مثال حل‌شده و کنترل نتیجه",
+      titleEn: "Worked check",
+      source: "Original worked application / کاربرد تألیفی",
+      givenFa:
+        "برای β = صفر و طول‌های دایرة‌البروجی صفر، ۹۰، ۱۸۰ و ۲۷۰ درجه، میل را از فرمول به دست آورید.",
+      givenEn:
+        "For β = 0 and ecliptic longitudes 0°,90°,180°,270°, derive the declinations.",
+      findFa: "نتیجه را با روابط همین درس و کنترل واحدها به دست آورید.",
+      findEn: "Use this lesson’s identities and check the units.",
+      steps: [
+        {
+          fa: "ابتدا قرارداد علامت‌ها و داده‌های معلوم را مشخص کنید؛ سپس رابطهٔ متناسب را انتخاب کنید.",
+          en: "Identify the sign conventions and given parts, then select the corresponding identity.",
+        },
+        {
+          fa: "پس از جایگذاری و ساده‌سازی، نتیجهٔ زیر به دست می‌آید. شرایط وجود و ربع را نیز کنترل کنید.",
+          en: "Substitute and simplify to obtain the result below; check existence and quadrant conditions.",
+          formula:
+            "\\delta=0,\\ +\\varepsilon,\\ 0,\\ -\\varepsilon\\quad\\text{respectively}",
+        },
+      ],
+      resultFa:
+        "نتیجهٔ نهایی در رابطهٔ بالا آمده است؛ زاویه و طول را با یکدیگر مخلوط نکنید.",
+      resultEn:
+        "The result is shown above; keep angular and physical units distinct.",
+    },
   },
   {
     id: "time",
@@ -391,8 +682,10 @@ export const LESSONS_CH2: Lesson[] = [
     minutes: 45,
     spherePreset: "celestial",
     olympiad: "معادلهٔ زمان · زمان منطقه",
-    summaryFa: "بندهای ۲۸–۲۹: روز ظاهری ظهر تا ظهر ناهموار است چون خروج از مرکز مدار و میل دایرة‌البروج. خورشید متوسط و معادلهٔ زمان. مثال: از زمان منطقه به زاویهٔ ساعتی خورشید.",
-    summaryEn: "Smart II §§28–29: mean solar time; worked zone-time example (p. 45).",
+    summaryFa:
+      "روز خورشیدی ظاهری از عبورهای خورشید واقعی تعریف می‌شود و یکنواخت نیست. خورشید متوسط مرجعی قراردادی برای حرکت یکنواخت است. زمان مدنی منطقه‌ای و زمان نجومی نیز تعریف‌های دیگری دارند.",
+    summaryEn:
+      "Apparent solar days follow real-Sun transits and are unequal. The mean Sun is a conventional uniform reference. Zone civil time and sidereal time are separate concepts.",
     smart: {
       chapter: "II",
       sections: "§§28–29",
@@ -400,34 +693,329 @@ export const LESSONS_CH2: Lesson[] = [
     },
     figures: ["fig22"],
     englishFormulas: [
-      "Equation of time E = apparent solar time − mean solar time.",
-      "Zone time is mean time of a standard meridian (e.g. 165° E = 11ʰ E).",
+      "E=\\mathrm{AST}-\\mathrm{MST}",
+      "\\mathrm{LMST}\\simeq t_{\\rm zone}+\\frac{\\lambda_E-\\lambda_{\\rm zone}}{15}",
     ],
     formulas: [
-      { display: "E = AST − MST", nameFa: "معادلهٔ زمان", nameEn: "Equation of time" },
+      {
+        display: "E=\\mathrm{AST}-\\mathrm{MST}",
+        tex: "E=\\mathrm{AST}-\\mathrm{MST}",
+        nameFa: "معادلهٔ زمان",
+        nameEn: "Equation of time",
+      },
+      {
+        display:
+          "\\mathrm{LMST}\\simeq t_{\\rm zone}+\\frac{\\lambda_E-\\lambda_{\\rm zone}}{15}",
+        tex: "\\mathrm{LMST}\\simeq t_{\\rm zone}+\\frac{\\lambda_E-\\lambda_{\\rm zone}}{15}",
+        nameFa: "واحد ساعت؛ بدون ساعت تابستانی",
+        nameEn: "Hours; daylight saving removed",
+      },
     ],
     sections: [
       {
-        headingFa: "ظهر ظاهری و خورشید متوسط",
-        headingEn: "Apparent noon and the mean Sun",
-        bodyFa: "وقتی خورشید روی نصف‌النهار است ظهر ظاهری است. فاصلهٔ دو ظهر ظاهری — روز خورشیدی ظاهری — ناهموار است چون خروج از مرکز مدار و میل دایرة‌البروج یکنواخت نیست. خورشید متوسط روی استوا با حرکت یکنواخت تعریف می‌شود که روز متوسط خورشیدی را می‌سازد.",
-        bodyEn: "The Sun on the meridian is apparent noon. The interval between apparent noons — the apparent solar day — is uneven because of orbital eccentricity and the obliquity. A fictitious mean Sun is defined on the equator with uniform motion.",
+        headingFa: "چهار مفهوم متفاوت زمان",
+        headingEn: "Four distinct time concepts",
+        bodyFa:
+          "روز خورشیدی ظاهری از عبورهای خورشید واقعی تعریف می‌شود و یکنواخت نیست. خورشید متوسط مرجعی قراردادی برای حرکت یکنواخت است. زمان مدنی منطقه‌ای و زمان نجومی نیز تعریف‌های دیگری دارند.",
+        bodyEn:
+          "Apparent solar days follow real-Sun transits and are unequal. The mean Sun is a conventional uniform reference. Zone civil time and sidereal time are separate concepts.",
       },
       {
-        headingFa: "مثال بند ۲۹",
-        headingEn: "The §29 example",
-        bodyFa: "در طول ۱۶۳°۱۴′ E، زمان منطقه ۸ʰ۴۶ᵐ۲۲ˢ در ۱۰ مارس ۱۹۷۵ را به H.A. خورشید تبدیل کنید. زمان منطقه، زمان متوسط نصف‌النهار استاندارد ۱۶۵° E (۱۱ʰ شرق) است. مسیر: منطقه → زمان متوسط محلی → زمان ظاهری (با معادلهٔ زمان) → زاویهٔ ساعتی خورشید. اختلاف طول ۱۶۵°E − ۱۶۳°۱۴′E برابر ۱°۴۶′ = ۷ᵐ۴ˢ زمان است.",
-        bodyEn: "At longitude 163°14′ E, convert zone time 8ʰ46ᵐ22ˢ on 1975 March 10 to the Sun’s hour angle. Zone time is mean time of the 165° E (11ʰ E) standard meridian. Path: zone → local mean time → apparent time (equation of time) → solar hour angle.",
+        headingFa: "قرارداد علامت E",
+        headingEn: "Choose the E sign convention",
+        bodyFa:
+          "اینجا E برابر زمان ظاهری منهای متوسط است؛ E مثبت یعنی ساعت آفتابی جلوتر است. بعضی منابع علامت معکوس دارند. E را اگر دقیقه‌ای است قبل از جمع به ساعت تبدیل کنید.",
+        bodyEn:
+          "Here E is apparent minus mean solar time; positive E means a sundial is ahead. Some sources use the opposite sign. Convert E from minutes to hours before addition.",
+        formula: "E=\\mathrm{AST}-\\mathrm{MST}",
+      },
+      {
+        headingFa: "از ساعت منطقه‌ای به H خورشید",
+        headingEn: "From zone time to solar H",
+        bodyFa:
+          "پس از حذف ساعت تابستانی، اختلاف طول مکان و نصف‌النهار منطقه را بر ۱۵ تقسیم و به ساعت اضافه کنید؛ سپس E را اعمال کنید. ظهر ظاهری ۱۲ ساعت است. این تبدیل آموزشی اختلاف دقیق UTC با زمان خورشیدی متوسط را نادیده می‌گیرد.",
+        bodyEn:
+          "Remove daylight saving, add the location–zone-meridian longitude difference divided by 15, then apply E. Apparent noon is 12 h. This classroom conversion neglects the precision difference between UTC and mean solar time.",
+        formula: "H_{\\odot,deg}=15(\\mathrm{AST}_h-12)",
       },
     ],
-
     exercises: [
       {
-        textFa: "اختلاف طول ۱۶۵°E − ۱۶۳°۱۴′E را به زمان تبدیل کنید.",
-        textEn: "Convert the longitude difference 165°E − 163°14′E into time.",
-        source: "Smart II §29",
-        answer: "1°46′ = 7ᵐ4ˢ",
+        textFa:
+          "ساعت منطقه‌ای بدون تغییر تابستانی ۱۲:۰۰ است؛ نصف‌النهار منطقه ۴۵ و مکان ۵۱ درجه شرقی و E = مثبت ۸ دقیقه است. AST و H خورشید چیست؟",
+        textEn:
+          "Zone time is 12:00 with no DST; zone meridian 45° E, observer 51° E, E = +8 min. Find AST and solar H.",
+        answer:
+          "\\mathrm{LMST}\\simeq12{:}24,\\quad\\mathrm{AST}\\simeq12{:}32,\\quad H_{\\odot}=8^\\circ",
+        source: "Original exercise based on Smart / تمرین تألیفی",
       },
+      {
+        textFa:
+          "فرض‌ها و دامنهٔ اعتبار روابط این درس را بنویسید و یک حالت ویژه را با جایگذاری مستقیم بررسی کنید.",
+        textEn:
+          "State the assumptions and domain of the identities in this lesson. Verify a special case by direct substitution.",
+        source: "Original learning check / تمرین تألیفی",
+      },
+    ],
+    example: {
+      id: "check-time",
+      titleFa: "مثال حل‌شده و کنترل نتیجه",
+      titleEn: "Worked check",
+      source: "Original worked application / کاربرد تألیفی",
+      givenFa:
+        "ساعت منطقه‌ای بدون تغییر تابستانی ۱۲:۰۰ است؛ نصف‌النهار منطقه ۴۵ و مکان ۵۱ درجه شرقی و E = مثبت ۸ دقیقه است. AST و H خورشید چیست؟",
+      givenEn:
+        "Zone time is 12:00 with no DST; zone meridian 45° E, observer 51° E, E = +8 min. Find AST and solar H.",
+      findFa: "نتیجه را با روابط همین درس و کنترل واحدها به دست آورید.",
+      findEn: "Use this lesson’s identities and check the units.",
+      steps: [
+        {
+          fa: "اختلاف طول ۶ درجه معادل ۲۴ دقیقهٔ زمان است. آن را به ۱۲:۰۰ اضافه می‌کنیم تا زمان متوسط محلی ۱۲:۲۴ شود. با افزودن E، زمان ظاهری ۱۲:۳۲ است.",
+          en: "The 6° longitude offset is 24 minutes of time. Add it to 12:00 to get local mean solar time 12:24, then add E to get apparent solar time 12:32.",
+        },
+        {
+          fa: "پس از جایگذاری و ساده‌سازی، نتیجهٔ زیر به دست می‌آید. شرایط وجود و ربع را نیز کنترل کنید.",
+          en: "Substitute and simplify to obtain the result below; check existence and quadrant conditions.",
+          formula:
+            "\\mathrm{LMST}\\simeq12{:}24,\\quad\\mathrm{AST}\\simeq12{:}32,\\quad H_{\\odot}=8^\\circ",
+        },
+      ],
+      resultFa:
+        "نتیجهٔ نهایی در رابطهٔ بالا آمده است؛ زاویه و طول را با یکدیگر مخلوط نکنید.",
+      resultEn:
+        "The result is shown above; keep angular and physical units distinct.",
+    },
+  },
+  {
+    id: "sidereal-solar-intervals",
+    chapterId: "ch2",
+    titleFa: "تبدیل بازهٔ زمان خورشیدی و نجومی",
+    titleEn: "Solar and sidereal time intervals",
+    level: "المپیاد",
+    minutes: 35,
+    spherePreset: "horizon",
+    olympiad: "Smart II · geometry, units, and limiting cases",
+    summaryFa:
+      "زمین در مدار به جلو می‌رود؛ برای بازگشت خورشید به نصف‌النهار، کمی بیش از یک چرخش نسبت به ستارگان لازم است. پس روز نجومی کوتاه‌تر از روز خورشیدی متوسط است.",
+    summaryEn:
+      "Earth advances in orbit, so returning the Sun to the meridian requires slightly more than one stellar rotation. A sidereal day is shorter than a mean solar day.",
+    smart: {
+      chapter: "II",
+      sections: "§30",
+      pages: "44–46",
+    },
+    figures: ["geometry-horizon"],
+    formulas: [
+      {
+        display:
+          "1\\ \\mathrm{sidereal\\ day}\\simeq23\\,\\mathrm h\\ 56\\,\\mathrm{min}\\ 4.09\\,\\mathrm s",
+        nameFa: "طول متوسط روز نجومی",
+        nameEn: "Mean sidereal-day duration",
+      },
+    ],
+    sections: [
+      {
+        headingFa: "یک چرخش، دو مرجع",
+        headingEn: "One rotation, two references",
+        bodyFa:
+          "زمین در مدار به جلو می‌رود؛ برای بازگشت خورشید به نصف‌النهار، کمی بیش از یک چرخش نسبت به ستارگان لازم است. پس روز نجومی کوتاه‌تر از روز خورشیدی متوسط است.",
+        bodyEn:
+          "Earth advances in orbit, so returning the Sun to the meridian requires slightly more than one stellar rotation. A sidereal day is shorter than a mean solar day.",
+      },
+      {
+        headingFa: "نرخ و مبدأ را جدا کنید",
+        headingEn: "Separate rate from origin",
+        bodyFa:
+          "نسبت نرخ متوسط حدود ۱٫۰۰۲۷۳۷۹ است. این ضریب برای بازهٔ زمانی است؛ با ضرب ساعت مدنیِ مطلق در آن نمی‌توان LST به دست آورد. مبدأ تاریخ و زمان نجومی گرینویچ نیز لازم‌اند.",
+        bodyEn:
+          "The mean rate ratio is about 1.0027379. This converts intervals, not absolute clock readings. Multiplying a civil clock value alone cannot yield LST; a date-dependent Greenwich origin is also needed.",
+        formula:
+          "\\Delta t_{\\rm sid}\\simeq1.0027379\\,\\Delta t_{\\rm mean\\ solar}",
+      },
+      {
+        headingFa: "معنای واحد ساعت در حرکت ستاره",
+        headingEn: "Interpreting hour angle as time",
+        bodyFa:
+          "افزایش ۱۵ درجهٔ H برای ستاره تقریباً یک ساعت نجومی است. در مسئلهٔ دقیق زمان خورشیدی باید تبدیل نرخ انجام شود؛ در مدل ثابت‌میل خورشید، H نسبت به خود خورشید ساعت خورشیدی ظاهری را می‌سنجد.",
+        bodyEn:
+          "For a star, a 15° increase in H is one sidereal hour. Convert the rate when expressing this in mean solar time. For the fixed-declination Sun, solar H refers to apparent solar time.",
+      },
+    ],
+    exercises: [
+      {
+        textFa:
+          "یک بازهٔ ۶ ساعت خورشیدی متوسط، تقریباً چند ساعت و ثانیهٔ نجومی است؟",
+        textEn:
+          "Convert an interval of 6 mean solar hours to sidereal hours and seconds.",
+        source: "Original interval check",
+        answer:
+          "\\Delta t_{\\rm sid}\\simeq6.0164274\\,\\mathrm h\\simeq6\\,\\mathrm h\\ 59.14\\,\\mathrm s",
+      },
+    ],
+    englishFormulas: [
+      "1\\ \\mathrm{sidereal\\ day}\\simeq23\\,\\mathrm h\\ 56\\,\\mathrm{min}\\ 4.09\\,\\mathrm s",
+    ],
+  },
+  {
+    id: "daily-coordinate-rates",
+    chapterId: "ch2",
+    titleFa: "نرخ تغییر ارتفاع و سمت",
+    titleEn: "Daily rates of altitude and azimuth",
+    level: "المپیاد",
+    minutes: 35,
+    spherePreset: "horizon",
+    olympiad: "Smart II · geometry, units, and limiting cases",
+    summaryFa:
+      "در بازهٔ کوتاه φ و δ را ثابت می‌گیریم و H متغیر است. همهٔ مشتق‌های زاویه نسبت به زاویه در این درس رادیان بر رادیان‌اند؛ نرخ زمانی با ضرب در dH/dt به دست می‌آید.",
+    summaryEn:
+      "Over a short interval take φ and δ fixed and H variable. Angular derivatives here are radians per radian; multiply by dH/dt to obtain time rates.",
+    smart: {
+      chapter: "II",
+      sections: "§32",
+      pages: "48–51",
+    },
+    figures: ["geometry-horizon"],
+    formulas: [
+      {
+        display:
+          "\\frac{dh}{dH}=-\\frac{\\cos\\varphi\\cos\\delta\\sin H}{\\cos h}",
+        nameFa: "مشتق ارتفاع",
+        nameEn: "Altitude derivative",
+      },
+      {
+        display: "\\frac{dA}{dH}=\\sin\\varphi-\\cos\\varphi\\tan h\\cos A",
+        nameFa: "مشتق سمت شمال به شرق",
+        nameEn: "North-through-east azimuth derivative",
+      },
+    ],
+    sections: [
+      {
+        headingFa: "فرض تغییرات روزانه",
+        headingEn: "Assume fixed stellar coordinates",
+        bodyFa:
+          "در بازهٔ کوتاه φ و δ را ثابت می‌گیریم و H متغیر است. همهٔ مشتق‌های زاویه نسبت به زاویه در این درس رادیان بر رادیان‌اند؛ نرخ زمانی با ضرب در dH/dt به دست می‌آید.",
+        bodyEn:
+          "Over a short interval take φ and δ fixed and H variable. Angular derivatives here are radians per radian; multiply by dH/dt to obtain time rates.",
+      },
+      {
+        headingFa: "مشتق ارتفاع",
+        headingEn: "Differentiate altitude",
+        bodyFa:
+          "از sin h = sin φ sin δ + cos φ cos δ cos H نسبت به H مشتق می‌گیریم. تقسیم بر cos h فقط دور از سمت‌الرأس و سمت‌القدم مجاز است.",
+        bodyEn:
+          "Differentiate sin h = sin φ sin δ + cos φ cos δ cos H with respect to H. Division by cos h is valid away from zenith and nadir.",
+        formula:
+          "\\frac{dh}{dH}=-\\frac{\\cos\\varphi\\cos\\delta\\sin H}{\\cos h}",
+      },
+      {
+        headingFa: "مشتق سمت با قرارداد برنامه",
+        headingEn: "Differentiate azimuth in this app’s convention",
+        bodyFa:
+          "سمت این برنامه شمال به شرق است و با سمت شمال به غرب متن علامت مخالف دارد. از A = atan2(e,n)، مشتق برابر (n e′ − e n′) تقسیم بر (e² + n²) است. با جایگذاری، نتیجهٔ زیر می‌آید.",
+        bodyEn:
+          "This app uses north-through-east azimuth, opposite in sign to the text’s north-through-west convention. For A = atan2(e,n), the derivative is (n e′−e n′)/(e²+n²). Substitution gives the following result.",
+        formula: "\\frac{dA}{dH}=\\sin\\varphi-\\cos\\varphi\\tan h\\cos A",
+      },
+      {
+        headingFa: "تکینگی دستگاه مختصات",
+        headingEn: "A coordinate singularity",
+        bodyFa:
+          "نزدیک سمت‌الرأس، سمت می‌تواند بسیار سریع تغییر کند بدون اینکه حرکت زاویه‌ای واقعی ستاره بی‌نهایت شود. در H = صفر، ارتفاع در عبور معمولی اکسترمم دارد، مگر اینکه خود دستگاه مختصات تکین باشد.",
+        bodyEn:
+          "Near zenith azimuth may change very rapidly while the star’s actual angular speed remains finite. At ordinary upper transit H = 0, altitude is extremal unless the coordinate chart itself is singular.",
+      },
+    ],
+    exercises: [
+      {
+        textFa:
+          "در استوا و اعتدال، هنگام غروب هندسی H = ۹۰ درجه است. dh/dH و dA/dH را بیابید.",
+        textEn:
+          "At the equator and equinox, geometric setting has H = 90°. Find dh/dH and dA/dH.",
+        source: "Original derivative check",
+        answer: "dh/dH=-1,\\quad dA/dH=0",
+      },
+    ],
+    englishFormulas: [
+      "\\frac{dh}{dH}=-\\frac{\\cos\\varphi\\cos\\delta\\sin H}{\\cos h}",
+      "\\frac{dA}{dH}=\\sin\\varphi-\\cos\\varphi\\tan h\\cos A",
+    ],
+  },
+  {
+    id: "twilight",
+    chapterId: "ch2",
+    titleFa: "شفق و پایان تاریکی نجومی",
+    titleEn: "Twilight and astronomical darkness",
+    level: "المپیاد",
+    minutes: 35,
+    spherePreset: "horizon",
+    olympiad: "Smart II · geometry, units, and limiting cases",
+    summaryFa:
+      "بعد از غروب، پراکندگی نور جو آسمان را روشن نگه می‌دارد. آستانه‌های متداول ارتفاع هندسی مرکز خورشید منفی ۶، ۱۲ و ۱۸ درجه به‌ترتیب شفق مدنی، دریایی و نجومی‌اند. اسمارت پایان شفق را با فاصلهٔ سمت‌الرأسی ۱۰۸ درجه بحث می‌کند.",
+    summaryEn:
+      "Atmospheric scattering illuminates the sky after sunset. Conventional geometric solar-centre altitudes −6°,−12°,−18° define civil, nautical, and astronomical twilight. Smart discusses the end of twilight at zenith distance 108°.",
+    smart: {
+      chapter: "II",
+      sections: "§33",
+      pages: "51–52",
+    },
+    figures: ["geometry-horizon"],
+    formulas: [
+      {
+        display:
+          "\\Delta t\\simeq\\frac{H(-18^\\circ)-H(0^\\circ)}{15}\\ \\mathrm h",
+        nameFa: "مدت شفق در مدل ثابت‌میل",
+        nameEn: "Twilight duration in a fixed-declination model",
+      },
+    ],
+    sections: [
+      {
+        headingFa: "تعریف آستانه",
+        headingEn: "Define the threshold",
+        bodyFa:
+          "بعد از غروب، پراکندگی نور جو آسمان را روشن نگه می‌دارد. آستانه‌های متداول ارتفاع هندسی مرکز خورشید منفی ۶، ۱۲ و ۱۸ درجه به‌ترتیب شفق مدنی، دریایی و نجومی‌اند. اسمارت پایان شفق را با فاصلهٔ سمت‌الرأسی ۱۰۸ درجه بحث می‌کند.",
+        bodyEn:
+          "Atmospheric scattering illuminates the sky after sunset. Conventional geometric solar-centre altitudes −6°,−12°,−18° define civil, nautical, and astronomical twilight. Smart discusses the end of twilight at zenith distance 108°.",
+      },
+      {
+        headingFa: "حل دو عبور با یک فرمول",
+        headingEn: "Solve two crossings with one formula",
+        bodyFa:
+          "با ثابت گرفتن میل در یک شب، H را برای افق هندسی و سپس برای h = منفی ۱۸ درجه حساب کنید. اختلاف زاویه در شاخهٔ غروب، تقسیم بر ۱۵، مدت تقریبی شفق را به ساعت خورشیدی ظاهری می‌دهد.",
+        bodyEn:
+          "Assuming constant declination over a night, solve for H at the geometric horizon and at h = −18°. On the evening branch their difference divided by 15 gives the approximate duration in apparent solar hours.",
+        formula:
+          "\\cos H(h)=\\frac{\\sin h-\\sin\\varphi\\sin\\delta}{\\cos\\varphi\\cos\\delta}",
+      },
+      {
+        headingFa: "وقتی آستانه رخ نمی‌دهد",
+        headingEn: "When the threshold is never reached",
+        bodyFa:
+          "اگر طرف راست برای ارتفاع منفی ۱۸ درجه کمتر از منفی یک باشد، خورشید آن شب به آستانهٔ تاریکی نجومی نمی‌رسد. اگر خود غروب رخ ندهد، مدت پس از غروب تعریف معمول ندارد. این موارد را با arccos محدودشده به زور جواب نسازید.",
+        bodyEn:
+          "If the cosine at −18° is below −1, the Sun never reaches astronomical darkness that night. If sunset itself does not occur, an ordinary post-sunset duration is undefined. Do not force an answer by clamping arccos.",
+      },
+      {
+        headingFa: "نور واقعی و مدل هندسی",
+        headingEn: "Brightness and the geometric model",
+        bodyFa:
+          "این آستانه‌ها قرارداد هندسی‌اند؛ ماه، آلودگی نوری، ابر و جو بر تاریکی واقعی اثر دارند. تغییر میل و شکست برای پیش‌بینی دقیق زمان رویداد نیازمند مدل جداست.",
+        bodyEn:
+          "These are geometric conventions. Moonlight, light pollution, clouds, and atmosphere affect actual darkness. Changing declination and refraction require additional modelling for precision event times.",
+      },
+    ],
+    exercises: [
+      {
+        textFa:
+          "در استوا و اعتدال، مدت شفق از افق هندسی تا ارتفاع منفی ۱۸ درجه تقریباً چند دقیقه است؟",
+        textEn:
+          "At the equator and equinox, how long from the geometric horizon to altitude −18°?",
+        source: "Original twilight check",
+        answer:
+          "H(0)=90^\\circ,\\quad H(-18^\\circ)=108^\\circ,\\quad\\Delta t=72\\ \\mathrm{min}",
+      },
+    ],
+    englishFormulas: [
+      "\\Delta t\\simeq\\frac{H(-18^\\circ)-H(0^\\circ)}{15}\\ \\mathrm h",
     ],
   },
 ];

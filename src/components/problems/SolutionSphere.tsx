@@ -2,8 +2,9 @@
 
 import { useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Billboard, Line, OrbitControls, Text } from "@react-three/drei";
+import { Line, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
+import { SphereMarker as Marker } from "@/components/sphere/CelestialSphere";
 import type { SphereDiagram } from "@/lib/content/problems";
 import { deg } from "@/lib/astronomy/sphericalTrig";
 import {
@@ -316,9 +317,7 @@ function buildScene(diagram: SphereDiagram): Built {
         equator: true,
         axis: true,
         meridians: [0, 90],
-        small: [
-          { pole: eclPole, radius: 90, color: "#6f9e7a" },
-        ],
+        small: [{ pole: eclPole, radius: 90, color: "#6f9e7a" }],
         points: [
           { pos: lonLatToCart(0, 90), label: "N", color: "#e6d39a" },
           { pos: sun, label: "☉ λ=90°", color: "#e6d39a" },
@@ -406,9 +405,14 @@ export function SolutionSphere({ diagram }: { diagram: SphereDiagram }) {
     <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--ink-deep)]">
       <div className="h-[280px] w-full sm:h-[340px]">
         <Canvas
+          frameloop="demand"
           camera={{ position: [2.2, 1.2, 2.2], fov: 42 }}
           dpr={[1, 1.5]}
-          gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
+          gl={{
+            antialias: true,
+            alpha: false,
+            powerPreference: "high-performance",
+          }}
           onCreated={({ gl }) => {
             gl.setClearColor(new THREE.Color("#070d18"), 1);
           }}
@@ -476,7 +480,12 @@ function SphereFigure({ scene }: { scene: Built }) {
       </mesh>
       <mesh>
         <sphereGeometry args={[1.001, 48, 48]} />
-        <meshBasicMaterial color="#c9a227" wireframe transparent opacity={0.07} />
+        <meshBasicMaterial
+          color="#c9a227"
+          wireframe
+          transparent
+          opacity={0.07}
+        />
       </mesh>
 
       {scene.axis && (
@@ -510,7 +519,12 @@ function SphereFigure({ scene }: { scene: Built }) {
       {scene.fill && <TriangleCap vertices={scene.fill} />}
 
       {(scene.arcs ?? []).map((a, i) => (
-        <Poly key={`a${i}`} pts={a.pts} color={a.color} width={a.width ?? 2.5} />
+        <Poly
+          key={`a${i}`}
+          pts={a.pts}
+          color={a.color}
+          width={a.width ?? 2.5}
+        />
       ))}
 
       {(scene.points ?? []).map((p, i) => (
@@ -622,37 +636,5 @@ function Poly({
       transparent
       opacity={0.95}
     />
-  );
-}
-
-function Marker({
-  pos,
-  label,
-  color,
-}: {
-  pos: Vec3;
-  label: string;
-  color: string;
-}) {
-  return (
-    <group position={pos}>
-      <mesh>
-        <sphereGeometry args={[0.032, 16, 16]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.45} />
-      </mesh>
-      <Billboard position={[0.07, 0.07, 0]}>
-        <Text
-          fontSize={0.085}
-          color="#e6d39a"
-          anchorX="left"
-          anchorY="middle"
-          outlineWidth={0.006}
-          outlineColor="#070d18"
-          maxWidth={1.2}
-        >
-          {label}
-        </Text>
-      </Billboard>
-    </group>
   );
 }

@@ -37,7 +37,7 @@ export const SMART_CHAPTERS: SmartChapter[] = [
     pages: "25–57",
     titleEn: "The Celestial Sphere",
     titleFa: "کرهٔ سماوی",
-    sections: "§§17–29 · PZX (3)–(7) · RA, ST · Figs. 10–22",
+    sections: "§§17–33 · PZX (3)–(7) · RA, ST · Figs. 10–22",
   },
   {
     id: "ch3",
@@ -45,7 +45,7 @@ export const SMART_CHAPTERS: SmartChapter[] = [
     pages: "58–73",
     titleEn: "Refraction",
     titleFa: "شکست نور",
-    sections: "true/apparent z · Cassini · integral (20)",
+    sections: "§§34–39 · Snell · spherical layers · integral (20) · series · sunset",
   },
   {
     id: "ch4",

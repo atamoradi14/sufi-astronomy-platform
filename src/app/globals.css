@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 :root {
+  --font-body: "Vazirmatn Variable";
+  --font-display: "Amiri";
   --ink: #0c1424;
   --ink-deep: #070d18;
   --panel: #152238;
@@ -9,8 +11,8 @@
   --gold-soft: #e6d39a;
   --parchment: #e8e2d4;
   --muted: #9aa6b8;
-  --teal: #3d7a7a;
-  --rose-ink: #8b4557;
+  --teal: #73c9c4;
+  --rose-ink: #ed94aa;
   --sky-line: #5b7c99;
   --success: #6f9e7a;
   --danger: #c45c5c;
@@ -38,10 +40,25 @@ body {
   min-height: 100dvh;
   color: var(--parchment);
   background:
-    radial-gradient(ellipse 70% 45% at 15% 0%, rgba(61, 122, 122, 0.2), transparent 55%),
-    radial-gradient(ellipse 50% 35% at 95% 5%, rgba(201, 162, 39, 0.1), transparent 50%),
-    linear-gradient(165deg, #050a12 0%, var(--ink-deep) 28%, #0e1830 72%, #0a1220 100%);
+    radial-gradient(
+      ellipse 70% 45% at 15% 0%,
+      rgba(61, 122, 122, 0.2),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 50% 35% at 95% 5%,
+      rgba(201, 162, 39, 0.1),
+      transparent 50%
+    ),
+    linear-gradient(
+      165deg,
+      #050a12 0%,
+      var(--ink-deep) 28%,
+      #0e1830 72%,
+      #0a1220 100%
+    );
   background-attachment: fixed;
+  background-color: var(--ink-deep);
   font-family: var(--font-body), Tahoma, sans-serif;
 }
 
@@ -93,7 +110,11 @@ body::before {
   background-image:
     radial-gradient(1px 1px at 10% 20%, rgba(230, 211, 154, 0.7), transparent),
     radial-gradient(1px 1px at 30% 80%, rgba(230, 211, 154, 0.5), transparent),
-    radial-gradient(1.5px 1.5px at 70% 30%, rgba(232, 226, 212, 0.55), transparent),
+    radial-gradient(
+      1.5px 1.5px at 70% 30%,
+      rgba(232, 226, 212, 0.55),
+      transparent
+    ),
     radial-gradient(1px 1px at 85% 60%, rgba(230, 211, 154, 0.45), transparent),
     radial-gradient(1px 1px at 55% 15%, rgba(232, 226, 212, 0.4), transparent),
     radial-gradient(1px 1px at 15% 55%, rgba(230, 211, 154, 0.35), transparent);
@@ -187,4 +208,192 @@ a {
 
 .prose-fa p {
   line-height: 1.9;
+}
+
+/* Shared learning and observing workspaces */
+.dir-ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.math-block {
+  overflow-x: auto;
+  max-width: 100%;
+  padding: 1rem 1.25rem;
+  border: 1px solid #73c9c433;
+  border-radius: 12px;
+  background: #07121f;
+  color: #f1e7c9;
+  text-align: center;
+}
+.math-block .katex-display {
+  margin: 0.25em 0;
+}
+.math-block .katex {
+  font-size: 1.12em;
+}
+.math-plain {
+  white-space: pre-wrap;
+  font:
+    500 1rem/2 Georgia,
+    serif;
+  overflow-wrap: anywhere;
+}
+.workspace {
+  border: 1px solid #8ba6c330;
+  border-radius: 22px;
+  background: #0c1728;
+  overflow: hidden;
+  box-shadow: 0 24px 80px #0005;
+}
+.workspace-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #8ba6c325;
+  background: #132138;
+}
+.workspace-stage {
+  background: radial-gradient(ellipse at center, #182e48, #060e1b 75%);
+  position: relative;
+}
+.workspace-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0.85rem 1.25rem;
+  border-top: 1px solid #8ba6c325;
+  font-size: 0.75rem;
+  color: #b1c1d2;
+}
+.workspace-legend i {
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  margin-inline-end: 0.4rem;
+}
+.lesson-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 2rem;
+  align-items: start;
+}
+.lesson-body {
+  min-width: 0;
+  max-width: 900px;
+}
+.lesson-nav {
+  position: sticky;
+  top: 6rem;
+  display: grid;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  border: 1px solid #8ba6c330;
+  border-radius: 16px;
+  background: #101d30;
+}
+.lesson-nav a {
+  color: #acbfd1;
+  font-size: 0.8rem;
+  padding: 0.3rem 0;
+}
+.lesson-nav a:hover {
+  color: #f1d998;
+}
+.lesson-section {
+  scroll-margin-top: 6rem;
+  padding: 1.75rem 0;
+  border-top: 1px solid #8ba6c325;
+}
+.lesson-section p {
+  line-height: 2.15;
+}
+.lesson-english {
+  border-inline-start: 2px solid #73c9c445;
+  padding-inline-start: 1rem;
+  margin-top: 1rem;
+  color: #adbed0;
+  line-height: 1.9 !important;
+}
+.study-kicker {
+  font:
+    600 0.7rem/1.6 ui-monospace,
+    monospace;
+  letter-spacing: 0.15em;
+  color: #73c9c4;
+}
+.control-input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #8ba6c345;
+  border-radius: 8px;
+  background: #07121f;
+  color: #e8e2d4;
+  color-scheme: dark;
+}
+button,
+a,
+input,
+select,
+summary {
+  touch-action: manipulation;
+}
+input[type="range"] {
+  min-height: 30px;
+}
+:focus-visible {
+  outline: 2px solid #8ddbd3;
+  outline-offset: 4px;
+}
+summary {
+  cursor: pointer;
+}
+@media (max-width: 900px) {
+  .lesson-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .lesson-nav {
+    position: static;
+    order: -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.workspace:fullscreen {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0;
+  background: #081322;
+}
+.workspace:fullscreen .workspace-stage {
+  flex: 1;
+  min-height: 0;
+}
+.workspace:fullscreen .workspace-stage > div,
+.workspace:fullscreen canvas {
+  height: 100% !important;
+  min-height: 0;
+}
+
+.math-block {
+  min-width: 0;
+}
+.math-block .katex-display {
+  width: max-content;
+  min-width: 100%;
 }

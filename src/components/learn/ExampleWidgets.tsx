@@ -36,13 +36,22 @@ function GcDistance() {
   const nmi = nauticalMiles(AB);
   return (
     <div className="space-y-2">
-      <p className="text-xs text-[var(--teal)] dir-ltr text-left">Live check of Smart I §12, Fig. 9</p>
-      <Row k="PA, PB, ∠APB" v={`${formatDms(PA, 0)}, ${formatDms(PB, 0)}, ${formatDms(APB, 0)}`} />
-      <Row k="AB from (A)" v={`${formatDms(AB, 1)} = ${toPersianDigits(nmi.toFixed(1))} nmi`} />
+      <p className="text-xs text-[var(--teal)] dir-ltr text-left">
+        Live check of Smart I §12, Fig. 9
+      </p>
+      <Row
+        k="PA, PB, ∠APB"
+        v={`${formatDms(PA, 0)}, ${formatDms(PB, 0)}, ${formatDms(APB, 0)}`}
+      />
+      <Row
+        k="AB from (A)"
+        v={`${formatDms(AB, 1)} = ${toPersianDigits(nmi.toFixed(1))} nmi`}
+      />
       <Row k="AB from hav (23)" v={formatDms(havAB, 1)} />
       <Row k="angle at A from (9)" v={formatDms(A, 1)} />
       <p className="text-[11px] text-[var(--muted)]">
-        اعداد کتاب با لگاریتم پنج‌رقمی AB = ۸۳°۴۹′٫۸ ≈ ۸۳°۴۹′ و ۵۰۲۸٫۸ مایل دریایی؛ زاویه در A ≈ ۵۲°۱۶′.
+        نتیجهٔ محاسبه با داده‌های مثال کتاب؛ تبدیل فاصله به مایل دریایی بر مدل
+        کروی و تقریب ۶۰ مایل بر درجه تکیه دارد.
       </p>
     </div>
   );
@@ -56,7 +65,9 @@ function PzxDemo() {
   const zHav = deg.zenithHaversine(phi, delta, H);
   return (
     <div className="space-y-2">
-      <p className="text-xs text-[var(--teal)] dir-ltr text-left">Smart II (3) and (4) · Tehran-like φ</p>
+      <p className="text-xs text-[var(--teal)] dir-ltr text-left">
+        Smart II (3) and (4) · Tehran-like φ
+      </p>
       <Row k="φ, δ, H" v={`${phi}°, ${delta}°, ${H}°`} />
       <Row k="z from (3)" v={formatDms(z, 1)} />
       <Row k="z from hav (4)" v={formatDms(zHav, 1)} />
@@ -72,10 +83,18 @@ function RisingDemo() {
   const hours = H0 == null ? null : (2 * H0) / 15;
   return (
     <div className="space-y-2">
-      <p className="text-xs text-[var(--teal)] dir-ltr text-left">cos H₀ = −tan φ tan δ</p>
+      <p className="text-xs text-[var(--teal)] dir-ltr text-left">
+        cos H₀ = −tan φ tan δ
+      </p>
       <Row k="φ, δ" v={`${phi}° N, ${delta}°`} />
-      <Row k="H₀" v={H0 == null ? "circumpolar / never rises" : formatDms(H0, 1)} />
-      <Row k="time above horizon" v={hours == null ? "—" : `${toPersianDigits(hours.toFixed(2))}ʰ`} />
+      <Row
+        k="H₀"
+        v={H0 == null ? "circumpolar / never rises" : formatDms(H0, 1)}
+      />
+      <Row
+        k="time above horizon"
+        v={hours == null ? "—" : `${toPersianDigits(hours.toFixed(2))}ʰ`}
+      />
     </div>
   );
 }
@@ -86,10 +105,15 @@ function SmallCircleDemo() {
   const hx = deg.parallelArc(ly, theta);
   return (
     <div className="space-y-2">
-      <p className="text-xs text-[var(--teal)] dir-ltr text-left">Smart (2): HX = LY cos θ</p>
+      <p className="text-xs text-[var(--teal)] dir-ltr text-left">
+        Smart (2): HX = LY cos θ
+      </p>
       <Row k="LY, θ" v={`${ly}°, ${theta}°`} />
       <Row k="HX" v={formatDms(hx, 1)} />
-      <Row k="nautical miles" v={toPersianDigits(nauticalMiles(hx).toFixed(0))} />
+      <Row
+        k="nautical miles"
+        v={toPersianDigits(nauticalMiles(hx).toFixed(0))}
+      />
     </div>
   );
 }

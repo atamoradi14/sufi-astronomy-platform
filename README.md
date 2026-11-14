@@ -35,12 +35,12 @@ Runs in the browser (including Android Chrome). Device **GPS** and **compass** a
 
 | Area | What you get |
 |------|----------------|
-| **Interactive celestial sphere** (`/lab`) | OrbitControls pan/tilt, great & small circles, spherical triangles, live formula overlays |
+| **Interactive celestial sphere** (`/lab`) | Focused presets, surface point placement, camera reset, fullscreen, colour-matched sides, and geometry-derived measurements |
 | **Smart proofs** (`/proofs`) | Formulae (A)(B)(C)(D), polar triangle, Napier, haversine, PZX, Delambre, Girard — reconstructed figures, live identities |
 | **Spherical area** | Girard + L’Huilier (olympiad supplement; not a numbered Smart I section) |
-| **Curriculum** (`/learn`) | Nine chapters of Smart *Textbook on Spherical Astronomy* Part 1 (pp. 1–222): sections, numbered formulae, reconstructed Figs. 1–22, worked examples (§12 great-circle, PZX, rising), end-of-chapter exercises |
+| **Curriculum** (`/learn`) | Nine chapters of Smart *Textbook on Spherical Astronomy* Part 1 (pp. 1–222): rewritten bilingual chapters I–III, connected proofs, locally typeset equations, computed geometric figures, worked examples and original practice |
 | **Problem bank** (`/problems`) | Sample olympiad/Smart problems; each solution opens a **3D sphere diagram** matched to the math (PZX, great/small circles, polar dual, etc.) |
-| **Live sky** (`/sky`) | Stellarium-style free-look sky: **15 544 stars to mag ≤ 7**, IAU constellation lines, time scrubbing, star pick |
+| **Live sky** (`/sky`) | Rectangular gnomonic sky: **15 544 J2000 stars to mag ≤ 7**, constellation figures, manual/GPS location, UTC time controls, search, picking, keyboard navigation, and pinch zoom |
 | **Sufi atlas** (`/atlas`) | All **48** Ptolemaic constellations with **real manuscript plates** (globe / sky / tables) from a six-part *Ṣuwar al-Kawākib* scan, plus Persian commentary |
 | **Compass & Qibla** (`/compass`) | Device heading + great-circle Qibla bearing/distance |
 | **Map** (`/map`) | Leaflet tracker with observer position |
@@ -56,7 +56,7 @@ Runs in the browser (including Android Chrome). Device **GPS** and **compass** a
 - **Three.js** + **React Three Fiber** / **drei** — sphere lab, proofs, problem diagrams
 - **Leaflet** / **react-leaflet** — maps
 - **Recharts** — charts
-- Fonts: **Amiri** (display) + **Vazirmatn** (UI), RTL Persian shell
+- Fonts: locally bundled **Amiri** (display) + **Vazirmatn** (UI), RTL Persian shell; no build-time Google Fonts download
 - Node **22** recommended (Docker base image matches)
 
 ---
@@ -77,7 +77,7 @@ Runs in the browser (including Android Chrome). Device **GPS** and **compass** a
 │       ├── geo/             # Qibla
 │       └── sky/             # gnomonic projection / free-look
 ├── public/data/
-│   ├── stars-mag7.json      # Packed HYG/Hipparcos-derived catalog (mag ≤ 7)
+│   ├── stars-mag7.json      # Packed HYG/Hipparcos-derived J2000 catalog (mag ≤ 7)
 │   └── constellations-iau.json
 ├── services/                # Target microservice folders + Dockerfiles
 ├── deploy/k8s/              # Namespace, Deployments, Services, Ingress stubs
@@ -403,7 +403,7 @@ curl "http://127.0.0.1:3847/api/catalog/constellations"
 | URL | Description |
 |-----|-------------|
 | `/data/stars-mag7.json` | Packed mag ≤ 7 star catalog (client expands v2 base64 typed arrays) |
-| `/data/constellations-iau.json` | IAU line segments for the live sky |
+| `/data/constellations-iau.json` | Illustrative constellation line segments for the live sky (IAU standardises constellation boundaries, not these connecting figures) |
 
 ---
 
@@ -476,3 +476,31 @@ No `.env` secrets are required for the default educational build. Do not commit 
 
 Contributions welcome via GitHub Pull Requests on  
 [atamoradi14/sufi-astronomy-platform](https://github.com/atamoradi14/sufi-astronomy-platform).
+
+
+## Reviewed spherical mathematics and observing workspaces
+
+The lessons in Smart chapters I–III have been rewritten as original Persian/English teaching adaptations against the local scanned `refrences/Spherical_Astronomy_Part_1.pdf`. Formula references identify the source topic; the new diagrams are independently computed constructions, not reproductions of the printed figures. Later chapters remain supplementary overviews.
+
+- Chapter I: great/small circles, ordinary-triangle existence, cosine/sine/analogue/four-parts laws, right and polar triangles, haversines, half angles, Delambre/Napier, and the separately labelled Girard/L’Huilier supplement. The Delambre derivation now obtains all four identities from the half-angle formulae before taking ratios.
+- Chapter II: explicit coordinate conventions, circumpolar boundary cases in both hemispheres, forward/inverse PZX transformations, sidereal/solar intervals, ecliptic rotations, coordinate rates, and twilight. The app measures azimuth **north through east**; Smart’s north-through-west convention is sign-reversed where necessary.
+- Chapter III (§§34–39, pp. 58–73): Snell’s law, true/apparent zenith distance, plane-parallel approximation using **observed** zenith distance, spherical-layer invariant and general integral, signed refraction-series coefficients, fitting from observations, and the sunset correction. Near-horizon limitations are explicit.
+- The lesson reader supports Persian, English, and bilingual layouts, a contents rail, full translated example steps, locally rendered KaTeX/MathML, revealable practice answers, and previous/next lessons.
+- Great-circle and small-circle diagrams use the same vector geometry as the numerical calculations. Rear arcs are dashed in static diagrams and occluded on the interactive sphere. Degenerate triangle arrangements show a status message rather than fabricated angles/areas.
+- The sky renderer uses a vertical FOV with rectangular viewport clipping, a continuous zenith camera frame, consistent draw/pick coordinates, and geometric-horizon clipping. The initial location is explicitly the Tehran example until manually changed or GPS is requested. Time input is explicitly **UTC**. The visualisation does not simulate daylight brightness.
+
+### Precision and source boundaries
+
+The sky uses approximate mean sidereal time and J2000 catalogue positions. It does **not** apply precession, nutation, proper motion, atmospheric refraction, or a terrain horizon. It is an educational geometric sky, not an observatory astrometry or rise/set prediction service. Displayed decimals are numerical formatting, not a precision claim. A geographic pole or zenith is handled without dividing by a vanishing cosine; azimuth at the zenith/nadir is mathematically undefined (`azDefined: false` in the domain result).
+
+Original exercises are labelled as original. Historical numerical examples are recomputed from their inputs; the nautical-mile conversion used in the spherical examples is an approximation. The modern nautical mile is exactly 1852 m.
+
+### Validation
+
+```bash
+npm test
+npm run lint
+npm run build
+```
+
+`npm test` uses Node’s test runner through `tsx`. It independently checks analytic octants, 120 vector-built triangles against the trigonometric identities, circle planes/unit norms, antipodal arcs, 245 PZX cases including geographic poles, sky projection/zenith continuity, the J2000 time reference, worked numerical values, lesson/proof links, bilingual content fields, and authored TeX parsing. Browser checks cover the sphere, sky, proof navigation, lessons, and responsive layouts.

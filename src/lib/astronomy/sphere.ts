@@ -6,20 +6,20 @@ export function equatorialToHorizontal(
   decDeg: number,
   latDeg: number,
   lstHours: number,
-): { az: number; alt: number; ha: number } {
+): { az: number; alt: number; ha: number; azDefined: boolean } {
   const ha = ((lstHours - raHours) * 15 + 540) % 360 - 180;
   const δ = toRad(decDeg);
   const φ = toRad(latDeg);
   const H = toRad(ha);
   const sinAlt =
     Math.sin(δ) * Math.sin(φ) + Math.cos(δ) * Math.cos(φ) * Math.cos(H);
-  const alt = toDeg(Math.asin(clampAsin(sinAlt)));
-  const cosAz =
-    (Math.sin(δ) - Math.sin(toRad(alt)) * Math.sin(φ)) /
-    (Math.cos(toRad(alt)) * Math.cos(φ) + 1e-12);
-  let az = toDeg(Math.acos(clampAsin(cosAz)));
-  if (Math.sin(H) > 0) az = 360 - az;
-  return { az: (az + 360) % 360, alt, ha };
+  const east = -Math.cos(δ) * Math.sin(H);
+  const north = Math.sin(δ) * Math.cos(φ) - Math.cos(δ) * Math.sin(φ) * Math.cos(H);
+  // Azimuth is undefined exactly at zenith/nadir; atan2 avoids division by cos altitude.
+  const azDefined = Math.hypot(east, north) > 1e-12;
+  const az = azDefined ? toDeg(Math.atan2(east, north)) : 0;
+  const alt = toDeg(Math.atan2(sinAlt, Math.hypot(east, north)));
+  return { az: (az + 360) % 360, alt, ha, azDefined };
 }
 
 function clampAsin(x: number) {
