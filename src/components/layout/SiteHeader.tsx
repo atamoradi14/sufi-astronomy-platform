@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { cn, setDigitScript } from "@/lib/utils";
+import { useDigitScript } from "@/components/digits/DigitScript";
 import { Menu, X, Star } from "lucide-react";
 import { useState } from "react";
 
@@ -19,6 +20,7 @@ const NAV = [
 export function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const digits = useDigitScript();
 
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--ink)]/85 backdrop-blur-md">
@@ -55,6 +57,41 @@ export function SiteHeader() {
           ))}
         </nav>
 
+        <div className="flex items-center gap-2">
+        <div
+          className="flex items-center gap-1 rounded-md border border-[var(--border)] p-0.5"
+          dir="ltr"
+          role="group"
+          aria-label="digits"
+        >
+          <button
+            type="button"
+            aria-pressed={digits === "en"}
+            onClick={() => setDigitScript("en")}
+            className={cn(
+              "rounded px-2 py-1 font-mono text-xs tabular-nums",
+              digits === "en"
+                ? "bg-[var(--gold)]/20 text-[var(--gold-soft)]"
+                : "text-[var(--muted)]",
+            )}
+          >
+            123
+          </button>
+          <button
+            type="button"
+            aria-pressed={digits === "fa"}
+            onClick={() => setDigitScript("fa")}
+            className={cn(
+              "rounded px-2 py-1 text-xs",
+              digits === "fa"
+                ? "bg-[var(--gold)]/20 text-[var(--gold-soft)]"
+                : "text-[var(--muted)]",
+            )}
+          >
+            ۱۲۳
+          </button>
+        </div>
+
         <button
           type="button"
           className="lg:hidden rounded-md border border-[var(--border)] p-2 text-[var(--parchment)]"
@@ -63,6 +100,7 @@ export function SiteHeader() {
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
+        </div>
       </div>
 
       {open && (

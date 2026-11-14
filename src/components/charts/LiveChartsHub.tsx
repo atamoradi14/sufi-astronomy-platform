@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   earthOrbitTrack,
   liveSnapshot,
@@ -13,7 +13,7 @@ import {
 import { AreaSeries, PlotCard } from "@/components/charts/AstroPlot";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { downloadCsv } from "@/lib/charts/csv";
-import { formatDeg, formatHours, toPersianDigits } from "@/lib/utils";
+import { formatDeg, formatHours, formatLat, formatLon, toPersianDigits } from "@/lib/utils";
 import { CopyValue } from "@/components/charts/CopyValue";
 import { EarthOrbitView } from "@/components/charts/EarthOrbitView";
 import { MoonPhaseDisc } from "@/components/charts/MoonPhaseDisc";
@@ -65,6 +65,8 @@ export function LiveChartsHub() {
   const [tab, setTab] = useState<Tab>("overview");
   const [iss, setIss] = useState<IssState | null>(null);
   const [issError, setIssError] = useState<string | null>(null);
+  const [issAscending, setIssAscending] = useState(true);
+  const prevIssLat = useRef<number | null>(null);
 
   useEffect(() => {
     setNow(new Date());
@@ -77,6 +79,12 @@ export function LiveChartsHub() {
       const res = await fetch("/api/astro/iss", { cache: "no-store" });
       if (!res.ok) throw new Error("iss http");
       const j = (await res.json()) as IssState;
+      const before = prevIssLat.current;
+      if (before != null) {
+        const dLat = j.lat - before;
+        if (Math.abs(dLat) > 0.02 && Math.abs(dLat) < 15) setIssAscending(dLat > 0);
+      }
+      prevIssLat.current = j.lat;
       setIss(j);
       setIssError(j.source === "sample-fallback" ? "نمونهٔ جایگزین (سرویس بالادستی در دسترس نبود)" : null);
     } catch {
@@ -95,25 +103,52 @@ export function LiveChartsHub() {
     return liveSnapshot(now, lat, lon, altM);
   }, [now, lat, lon, altM]);
 
+  const localDayKey = now
+    ? new Date(now.getTime() + (lon / 15) * 3_600_000).toISOString().slice(0, 10)
+    : "";
+  const yearKey = now ? now.getUTCFullYear() : 0;
+
   const daySeries = useMemo(() => {
     if (!now) return [];
     return sunDaySeries(now, lat, lon, altM);
-  }, [now, lat, lon, altM]);
+    // Recompute when the local civil date or the observer changes, not every second.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localDayKey, lat, lon, altM]);
+
+  const azPlot = useMemo(() => {
+    let prev = daySeries[0]?.az ?? 0;
+    let offset = 0;
+    return daySeries.map((p, i) => {
+      if (i === 0) return p;
+      const d = p.az - prev;
+      if (d > 180) offset -= 360;
+      if (d < -180) offset += 360;
+      prev = p.az;
+      return { ...p, az: +(p.az + offset).toFixed(3) };
+    });
+  }, [daySeries]);
 
   const yearSeries = useMemo(() => {
-    if (!now) return [];
-    return sunYearSeries(now.getUTCFullYear(), lat, lon, altM);
-  }, [now, lat, lon, altM]);
+    if (!yearKey) return [];
+    return sunYearSeries(yearKey, lat, lon, altM);
+  }, [yearKey, lat, lon, altM]);
 
   const moonSeries = useMemo(() => {
     if (!now) return [];
     return moonMonthSeries(now, lat, lon);
-  }, [now, lat, lon]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localDayKey, lat, lon]);
 
   const orbitTrack = useMemo(() => {
-    if (!now) return [];
-    return earthOrbitTrack(now.getUTCFullYear());
-  }, [now]);
+    if (!yearKey) return [];
+    return earthOrbitTrack(yearKey);
+  }, [yearKey]);
+
+  const subsolar = useMemo(() => {
+    if (!snap) return null;
+    const lonSun = ((snap.sun.ra - snap.observer.gmst) * 15 + 540) % 360 - 180;
+    return { lat: snap.sun.dec, lon: lonSun };
+  }, [snap]);
 
   const exportAll = () => {
     if (!snap || !now) return;
@@ -201,12 +236,12 @@ export function LiveChartsHub() {
               display={toPersianDigits(snap.et.ttIso.replace("T", " ").slice(0, 23))}
             />
             <CopyValue
-              label="ET — دقیقهٔ روز (اعشاری)"
+              label="ET · دقیقهٔ روز"
               value={snap.et.minutesOfDay.toFixed(6)}
               display={toPersianDigits(snap.et.minutesOfDay.toFixed(6))}
             />
             <CopyValue
-              label="ΔT (ثانیه)"
+              label="ΔT · ثانیه"
               value={snap.et.deltaTSec.toFixed(3)}
               display={toPersianDigits(snap.et.deltaTSec.toFixed(3))}
             />
@@ -214,7 +249,7 @@ export function LiveChartsHub() {
             <CopyValue label="GMST" value={snap.observer.gmst.toFixed(8)} display={formatHours(snap.observer.gmst, 6)} />
             <CopyValue label="LST" value={snap.observer.lst.toFixed(8)} display={formatHours(snap.observer.lst, 6)} />
             <CopyValue
-              label="معادلهٔ زمان (دقیقه)"
+              label="EoT · معادلهٔ زمان"
               value={snap.sun.equationOfTimeMin.toFixed(4)}
               display={toPersianDigits(snap.sun.equationOfTimeMin.toFixed(4))}
             />
@@ -227,12 +262,12 @@ export function LiveChartsHub() {
                 <CardDescription>δ, α, a, A, λ, β — کلیک برای کپی</CardDescription>
               </CardHeader>
               <CardContent className="grid gap-2 sm:grid-cols-2">
-                <CopyValue label="میل δ" value={snap.sun.dec.toFixed(6)} display={formatDeg(snap.sun.dec, 4)} />
-                <CopyValue label="بعد α" value={snap.sun.ra.toFixed(8)} display={formatHours(snap.sun.ra, 5)} />
-                <CopyValue label="ارتفاع a" value={snap.sun.alt.toFixed(6)} display={formatDeg(snap.sun.alt, 4)} />
-                <CopyValue label="سمت A" value={snap.sun.az.toFixed(6)} display={formatDeg(snap.sun.az, 3)} />
-                <CopyValue label="طول دایرة‌البروجی λ" value={snap.sun.lambda.toFixed(6)} display={formatDeg(snap.sun.lambda, 4)} />
-                <CopyValue label="عرض دایرة‌البروجی β" value={snap.sun.beta.toFixed(6)} display={formatDeg(snap.sun.beta, 4)} />
+                <CopyValue label="Dec · میل" value={snap.sun.dec.toFixed(6)} display={formatDeg(snap.sun.dec, 4)} />
+                <CopyValue label="RA · بعد" value={snap.sun.ra.toFixed(8)} display={formatHours(snap.sun.ra, 5)} />
+                <CopyValue label="alt · ارتفاع" value={snap.sun.alt.toFixed(6)} display={formatDeg(snap.sun.alt, 4)} />
+                <CopyValue label="az · سمت" value={snap.sun.az.toFixed(6)} display={formatDeg(snap.sun.az, 3)} />
+                <CopyValue label="λ · طول دایرة‌البروجی" value={snap.sun.lambda.toFixed(6)} display={formatDeg(snap.sun.lambda, 4)} />
+                <CopyValue label="β · عرض دایرة‌البروجی" value={snap.sun.beta.toFixed(6)} display={formatDeg(snap.sun.beta, 4)} />
               </CardContent>
             </Card>
 
@@ -246,13 +281,13 @@ export function LiveChartsHub() {
                   <MoonPhaseDisc illumination={snap.moon.illumination} waxing={snap.moon.waxing} />
                 </div>
                 <CopyValue
-                  label="درخشش (بخش روشن)"
+                  label="illum · درخشش"
                   value={(snap.moon.illumination * 100).toFixed(4)}
-                  display={`${toPersianDigits((snap.moon.illumination * 100).toFixed(2))}٪`}
+                  display={`${toPersianDigits((snap.moon.illumination * 100).toFixed(2))}%`}
                 />
-                <CopyValue label="سن هلال (روز)" value={snap.moon.ageDays.toFixed(5)} display={toPersianDigits(snap.moon.ageDays.toFixed(3))} />
-                <CopyValue label="میل" value={snap.moon.dec.toFixed(6)} display={formatDeg(snap.moon.dec, 3)} />
-                <CopyValue label="بعد" value={snap.moon.ra.toFixed(8)} display={formatHours(snap.moon.ra, 4)} />
+                <CopyValue label="age · سن هلال" value={snap.moon.ageDays.toFixed(5)} display={toPersianDigits(snap.moon.ageDays.toFixed(3))} />
+                <CopyValue label="Dec · میل" value={snap.moon.dec.toFixed(6)} display={formatDeg(snap.moon.dec, 3)} />
+                <CopyValue label="RA · بعد" value={snap.moon.ra.toFixed(8)} display={formatHours(snap.moon.ra, 4)} />
               </CardContent>
             </Card>
           </div>
@@ -264,8 +299,8 @@ export function LiveChartsHub() {
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             <CopyValue label="δ" value={snap.sun.dec.toFixed(6)} display={formatDeg(snap.sun.dec, 4)} />
             <CopyValue label="α" value={snap.sun.ra.toFixed(8)} display={formatHours(snap.sun.ra, 5)} />
-            <CopyValue label="ارتفاع" value={snap.sun.alt.toFixed(6)} display={formatDeg(snap.sun.alt, 4)} />
-            <CopyValue label="سمت" value={snap.sun.az.toFixed(6)} display={formatDeg(snap.sun.az, 3)} />
+            <CopyValue label="alt · ارتفاع" value={snap.sun.alt.toFixed(6)} display={formatDeg(snap.sun.alt, 4)} />
+            <CopyValue label="az · سمت" value={snap.sun.az.toFixed(6)} display={formatDeg(snap.sun.az, 3)} />
             <CopyValue label="λ" value={snap.sun.lambda.toFixed(6)} display={formatDeg(snap.sun.lambda, 4)} />
             <CopyValue label="β" value={snap.sun.beta.toFixed(6)} display={formatDeg(snap.sun.beta, 4)} />
             <CopyValue label="R (AU)" value={snap.sun.distanceAu.toFixed(8)} display={toPersianDigits(snap.sun.distanceAu.toFixed(6))} />
@@ -280,22 +315,22 @@ export function LiveChartsHub() {
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
             <PlotCard title="ارتفاع خورشید در شبانه‌روز محلی" desc="درجه از افق · خط صورتی = افق · محور افقی ساعت محلی">
-              <AreaSeries data={daySeries} xKey="hour" yKey="alt" color="#e6d39a" name="ارتفاع" unit="°" zeroLine yLabel="°" />
+              <AreaSeries data={daySeries} xKey="hour" yKey="alt" color="#e6d39a" name="alt" unit="°" zeroLine yLabel="°" />
             </PlotCard>
             <PlotCard title="سمت خورشید در شبانه‌روز" desc="آزیموت از شمال، ساعت‌گرد">
-              <AreaSeries data={daySeries} xKey="hour" yKey="az" color="#7eb6e8" name="سمت" unit="°" domain={[0, 360]} yLabel="°" />
+              <AreaSeries data={azPlot} xKey="hour" yKey="az" color="#7eb6e8" name="az" unit="°" yLabel="°" />
             </PlotCard>
             <PlotCard title="میل خورشید در سال" desc="ظهر محلی · محور = روز سال">
-              <AreaSeries data={yearSeries} xKey="day" yKey="dec" color="#e6d39a" name="δ" unit="°" domain={[-24, 24]} yLabel="°" />
+              <AreaSeries data={yearSeries} xKey="day" yKey="dec" color="#e6d39a" name="Dec" unit="°" domain={[-24, 24]} yLabel="°" />
             </PlotCard>
             <PlotCard title="طول دایرة‌البروجی در سال" desc="λ از اعتدال بهاری">
               <AreaSeries data={yearSeries} xKey="day" yKey="lambda" color="#7ec8c8" name="λ" unit="°" domain={[0, 360]} yLabel="°" />
             </PlotCard>
             <PlotCard title="بعد خورشید در سال" desc="ساعت اعتدالی">
-              <AreaSeries data={yearSeries} xKey="day" yKey="ra" color="#e08aa0" name="α" unit="h" domain={[0, 24]} yLabel="h" />
+              <AreaSeries data={yearSeries} xKey="day" yKey="ra" color="#e08aa0" name="RA" unit="h" domain={[0, 24]} yLabel="h" />
             </PlotCard>
             <PlotCard title="ارتفاع ظهر محلی در سال" desc="گذر نصف‌النهار برای عرض شما">
-              <AreaSeries data={yearSeries} xKey="day" yKey="alt" color="#8fd4a4" name="ارتفاع ظهر" unit="°" yLabel="°" />
+              <AreaSeries data={yearSeries} xKey="day" yKey="alt" color="#8fd4a4" name="alt" unit="°" yLabel="°" />
             </PlotCard>
             <PlotCard title="معادلهٔ زمان در سال" desc="دقیقه · ظاهری منهای میانگین">
               <AreaSeries data={yearSeries} xKey="day" yKey="eot" color="#d4a574" name="EoT" unit="min" zeroLine yLabel="min" />
@@ -320,17 +355,17 @@ export function LiveChartsHub() {
             </CardContent>
           </Card>
           <div className="grid gap-2 sm:grid-cols-2">
-            <CopyValue label="درخشش" value={(snap.moon.illumination * 100).toFixed(6)} display={`${toPersianDigits((snap.moon.illumination * 100).toFixed(3))}٪`} />
-            <CopyValue label="زاویهٔ فاز" value={snap.moon.phaseAngle.toFixed(4)} display={formatDeg(snap.moon.phaseAngle, 3)} />
-            <CopyValue label="سن هلال" value={snap.moon.ageDays.toFixed(6)} display={toPersianDigits(snap.moon.ageDays.toFixed(4))} />
-            <CopyValue label="فاصله (km)" value={snap.moon.distanceKm.toFixed(2)} display={toPersianDigits(snap.moon.distanceKm.toFixed(1))} />
+            <CopyValue label="illum · درخشش" value={(snap.moon.illumination * 100).toFixed(6)} display={`${toPersianDigits((snap.moon.illumination * 100).toFixed(3))}%`} />
+            <CopyValue label="phase · زاویهٔ فاز" value={snap.moon.phaseAngle.toFixed(4)} display={formatDeg(snap.moon.phaseAngle, 3)} />
+            <CopyValue label="age · سن هلال" value={snap.moon.ageDays.toFixed(6)} display={toPersianDigits(snap.moon.ageDays.toFixed(4))} />
+            <CopyValue label="Δ · km" value={snap.moon.distanceKm.toFixed(2)} display={toPersianDigits(snap.moon.distanceKm.toFixed(1))} />
             <CopyValue label="λ" value={snap.moon.lambda.toFixed(6)} display={formatDeg(snap.moon.lambda, 4)} />
             <CopyValue label="β" value={snap.moon.beta.toFixed(6)} display={formatDeg(snap.moon.beta, 4)} />
             <CopyValue label="α" value={snap.moon.ra.toFixed(8)} display={formatHours(snap.moon.ra, 5)} />
             <CopyValue label="δ" value={snap.moon.dec.toFixed(6)} display={formatDeg(snap.moon.dec, 4)} />
-            <CopyValue label="ارتفاع" value={snap.moon.alt.toFixed(6)} display={formatDeg(snap.moon.alt, 3)} />
-            <CopyValue label="سمت" value={snap.moon.az.toFixed(6)} display={formatDeg(snap.moon.az, 3)} />
-            <CopyValue label="ازدیاد طول از خورشید" value={snap.moon.elongation.toFixed(4)} display={formatDeg(snap.moon.elongation, 3)} />
+            <CopyValue label="alt · ارتفاع" value={snap.moon.alt.toFixed(6)} display={formatDeg(snap.moon.alt, 3)} />
+            <CopyValue label="az · سمت" value={snap.moon.az.toFixed(6)} display={formatDeg(snap.moon.az, 3)} />
+            <CopyValue label="elong · ازدیاد طول" value={snap.moon.elongation.toFixed(4)} display={formatDeg(snap.moon.elongation, 3)} />
             <Button
               className="sm:col-span-2"
               variant="outline"
@@ -362,7 +397,7 @@ export function LiveChartsHub() {
             xKey="day"
             yKey="illum"
             color="#f3ebd4"
-            name="روشنایی"
+            name="illum"
             unit="%"
             domain={[0, 100]}
             yLabel="%"
@@ -376,18 +411,20 @@ export function LiveChartsHub() {
           <Card>
             <CardHeader>
               <CardTitle>مدار بیضوی زمین حول خورشید</CardTitle>
-              <CardDescription>خط‌چین: اعتدال بهاری ♈ · نقطهٔ درخشان: زمین</CardDescription>
+              <CardDescription>
+                خط طلایی: اعتدال‌ها. زمین در مارس روی L = 180° است و در سپتامبر روی L = 0°.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <EarthOrbitView earth={snap.earth} track={orbitTrack} />
             </CardContent>
           </Card>
           <div className="grid gap-2 content-start">
-            <CopyValue label="طول خورشیدمرکزی زمین" value={snap.earth.heliocentricLon.toFixed(6)} display={formatDeg(snap.earth.heliocentricLon, 4)} />
-            <CopyValue label="R (AU)" value={snap.earth.rAu.toFixed(8)} display={toPersianDigits(snap.earth.rAu.toFixed(6))} />
-            <CopyValue label="x (AU) در صفحهٔ دایرة‌البروج" value={snap.earth.x.toFixed(8)} />
-            <CopyValue label="y (AU) در صفحهٔ دایرة‌البروج" value={snap.earth.y.toFixed(8)} />
-            <CopyValue label="ET دقیقهٔ روز" value={snap.et.minutesOfDay.toFixed(6)} display={toPersianDigits(snap.et.minutesOfDay.toFixed(6))} />
+            <CopyValue label="L · طول خورشیدمرکزی" value={snap.earth.heliocentricLon.toFixed(6)} display={formatDeg(snap.earth.heliocentricLon, 4)} />
+            <CopyValue label="R · AU" value={snap.earth.rAu.toFixed(8)} display={toPersianDigits(snap.earth.rAu.toFixed(6))} />
+            <CopyValue label="x · AU" value={snap.earth.x.toFixed(8)} display={toPersianDigits(snap.earth.x.toFixed(6))} />
+            <CopyValue label="y · AU" value={snap.earth.y.toFixed(8)} display={toPersianDigits(snap.earth.y.toFixed(6))} />
+            <CopyValue label="ET · دقیقهٔ روز" value={snap.et.minutesOfDay.toFixed(6)} display={toPersianDigits(snap.et.minutesOfDay.toFixed(6))} />
             <Button
               variant="outline"
               onClick={() =>
@@ -420,19 +457,27 @@ export function LiveChartsHub() {
               <ObserverGlobe
                 lat={lat}
                 lon={lon}
-                iss={iss ? { lat: iss.lat, lon: iss.lon } : null}
+                altM={altM}
+                iss={iss ? { lat: iss.lat, lon: iss.lon, altKm: iss.altKm, velocityKms: iss.velocityKms } : null}
+                subsolar={subsolar}
+                ascending={issAscending}
+                focus="observer"
               />
             </CardContent>
           </Card>
           <div className="grid gap-2 content-start">
-            <CopyValue label="عرض جغرافیایی" value={lat.toFixed(8)} display={formatDeg(lat, 6)} />
-            <CopyValue label="طول جغرافیایی" value={lon.toFixed(8)} display={formatDeg(lon, 6)} />
+            <CopyValue label="lat · عرض جغرافیایی" value={lat.toFixed(8)} display={formatLat(lat, 6)} />
+            <CopyValue label="lon · طول جغرافیایی" value={lon.toFixed(8)} display={formatLon(lon, 6)} />
             <CopyValue
-              label="ارتفاع GPS (m)"
+              label="h · ارتفاع GPS"
               value={altM == null ? "null" : altM.toFixed(3)}
               display={altM == null ? "—" : toPersianDigits(altM.toFixed(2))}
             />
-            <CopyValue label="دقت GPS (m)" value={geo.reading?.accuracy?.toFixed(2) ?? "null"} />
+            <CopyValue
+              label="σ · دقت GPS"
+              value={geo.reading?.accuracy == null ? "null" : geo.reading.accuracy.toFixed(2)}
+              display={geo.reading?.accuracy == null ? "—" : toPersianDigits(geo.reading.accuracy.toFixed(1))}
+            />
             <CopyValue label="LST" value={snap.observer.lst.toFixed(8)} display={formatHours(snap.observer.lst, 6)} />
             <CopyValue label="GMST" value={snap.observer.gmst.toFixed(8)} display={formatHours(snap.observer.gmst, 6)} />
             <Button
@@ -468,7 +513,11 @@ export function LiveChartsHub() {
               <ObserverGlobe
                 lat={lat}
                 lon={lon}
-                iss={iss ? { lat: iss.lat, lon: iss.lon } : null}
+                altM={altM}
+                iss={iss ? { lat: iss.lat, lon: iss.lon, altKm: iss.altKm, velocityKms: iss.velocityKms } : null}
+                subsolar={subsolar}
+                ascending={issAscending}
+                focus="iss"
               />
             </CardContent>
           </Card>
@@ -476,22 +525,22 @@ export function LiveChartsHub() {
             {issError && <p className="text-xs text-[var(--muted)]">{issError}</p>}
             {iss ? (
               <>
-                <CopyValue label="عرض ISS" value={iss.lat.toFixed(6)} display={formatDeg(iss.lat, 4)} />
-                <CopyValue label="طول ISS" value={iss.lon.toFixed(6)} display={formatDeg(iss.lon, 4)} />
+                <CopyValue label="lat · عرض ISS" value={iss.lat.toFixed(6)} display={formatLat(iss.lat, 4)} />
+                <CopyValue label="lon · طول ISS" value={iss.lon.toFixed(6)} display={formatLon(iss.lon, 4)} />
                 <CopyValue
-                  label="ارتفاع (km)"
+                  label="h · km"
                   value={iss.altKm == null ? "null" : iss.altKm.toFixed(3)}
                   display={iss.altKm == null ? "—" : toPersianDigits(iss.altKm.toFixed(2))}
                 />
                 <CopyValue
-                  label="سرعت (km/s)"
+                  label="v · km/s"
                   value={iss.velocityKms == null ? "null" : iss.velocityKms.toFixed(5)}
                   display={
                     iss.velocityKms == null ? "—" : toPersianDigits(iss.velocityKms.toFixed(3))
                   }
                 />
                 <CopyValue
-                  label="سرعت (km/h)"
+                  label="v · km/h"
                   value={
                     iss.velocityKmh == null && iss.velocityKms == null
                       ? "null"

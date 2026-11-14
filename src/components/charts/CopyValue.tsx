@@ -45,7 +45,11 @@ export function CopyValue({
           {copied ? "کپی شد" : "کلیک = کپی"}
         </span>
       </div>
-      <div className="mt-1 font-[family-name:var(--font-display)] text-[var(--gold-soft)] dir-ltr text-left break-all">
+      <div
+        lang="en"
+        className="mt-1 text-left break-all font-[family-name:var(--font-body)] text-[var(--gold-soft)] tabular-nums tracking-tight dir-ltr"
+        style={{ fontFeatureSettings: '"locl" 0' }}
+      >
         {display ?? value}
       </div>
     </button>

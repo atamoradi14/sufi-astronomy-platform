@@ -12,6 +12,17 @@ import {
   YAxis,
 } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useDigitScript } from "@/components/digits/DigitScript";
+import { localizeDigits } from "@/lib/utils";
+
+function tickText(value: unknown) {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    const abs = Math.abs(value);
+    const text = abs >= 100 || Number.isInteger(value) ? String(Math.round(value * 1000) / 1000) : value.toFixed(1);
+    return localizeDigits(text);
+  }
+  return localizeDigits(String(value ?? ""));
+}
 
 const tipStyle = {
   background: "#101a2c",
@@ -66,6 +77,7 @@ export function AreaSeries({
   zeroLine?: boolean;
   yLabel?: string;
 }) {
+  useDigitScript();
   const id = `fill-${yKey}-${color.replace("#", "")}`;
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -83,12 +95,14 @@ export function AreaSeries({
           tick={{ fontSize: 11, fill: "#c5d0de" }}
           interval="preserveStartEnd"
           minTickGap={28}
+          tickFormatter={tickText}
         />
         <YAxis
           stroke="#9aa6b8"
           tick={{ fontSize: 11, fill: "#c5d0de" }}
           domain={domain ?? ["auto", "auto"]}
-          width={48}
+          width={52}
+          tickFormatter={tickText}
           label={
             yLabel
               ? { value: yLabel, angle: -90, position: "insideLeft", fill: "#9aa6b8", fontSize: 11 }
@@ -99,7 +113,7 @@ export function AreaSeries({
           contentStyle={tipStyle}
           formatter={(value) => {
             const n = typeof value === "number" ? value : Number(value);
-            return [`${Number.isFinite(n) ? n.toFixed(3) : value} ${unit}`, name];
+            return [`${localizeDigits(Number.isFinite(n) ? n.toFixed(3) : String(value))} ${unit}`, name];
           }}
         />
         {zeroLine ? (
@@ -139,13 +153,14 @@ export function DualLine({
   aColor: string;
   bColor: string;
 }) {
+  useDigitScript();
   return (
     <ResponsiveContainer width="100%" height="100%">
       <ComposedChart data={data} margin={{ top: 12, right: 12, left: 0, bottom: 4 }}>
         <CartesianGrid stroke="rgba(154,166,184,0.16)" vertical={false} />
-        <XAxis dataKey={xKey} stroke="#9aa6b8" tick={{ fontSize: 11, fill: "#c5d0de" }} minTickGap={28} />
-        <YAxis yAxisId="l" stroke={aColor} tick={{ fontSize: 11, fill: aColor }} width={46} />
-        <YAxis yAxisId="r" orientation="right" stroke={bColor} tick={{ fontSize: 11, fill: bColor }} width={46} />
+        <XAxis dataKey={xKey} stroke="#9aa6b8" tick={{ fontSize: 11, fill: "#c5d0de" }} minTickGap={28} tickFormatter={tickText} />
+        <YAxis yAxisId="l" stroke={aColor} tick={{ fontSize: 11, fill: aColor }} width={52} tickFormatter={tickText} />
+        <YAxis yAxisId="r" orientation="right" stroke={bColor} tick={{ fontSize: 11, fill: bColor }} width={52} tickFormatter={tickText} />
         <Tooltip contentStyle={tipStyle} />
         <Line yAxisId="l" type="monotone" dataKey={aKey} name={aName} stroke={aColor} strokeWidth={2.6} dot={false} />
         <Line yAxisId="r" type="monotone" dataKey={bKey} name={bName} stroke={bColor} strokeWidth={2.4} dot={false} />

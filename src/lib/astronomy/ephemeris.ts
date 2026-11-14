@@ -186,23 +186,21 @@ export type EarthOrbitState = {
 
 export function earthOrbitState(date: Date): EarthOrbitState {
   const time = MakeTime(date);
-  const v = HelioVector(Body.Earth, time);
-  const ecl = Ecliptic(v);
-  const r = v.Length();
-  const lon = ecl.elon * (Math.PI / 180);
+  const hv = HelioVector(Body.Earth, time);
+  const ecl = Ecliptic(hv);
   return {
     heliocentricLon: ecl.elon,
-    rAu: r,
-    x: r * Math.cos(lon),
-    y: r * Math.sin(lon),
-    z: v.z,
+    rAu: hv.Length(),
+    x: ecl.vec.x,
+    y: ecl.vec.y,
+    z: ecl.vec.z,
   };
 }
 
 /** Full-year heliocentric ecliptic track (of date), equinox = +x. */
 export function earthOrbitTrack(year: number) {
   const pts: { x: number; y: number; lon: number; r: number; day: number }[] = [];
-  for (let day = 0; day < 366; day += 2) {
+  for (let day = 0; day < 366; day += 1) {
     const date = new Date(Date.UTC(year, 0, 1 + day, 12, 0, 0));
     if (date.getUTCFullYear() !== year) break;
     const e = earthOrbitState(date);

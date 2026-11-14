@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Amiri, Vazirmatn } from "next/font/google";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { DigitRemount } from "@/components/digits/DigitScript";
 import "./globals.css";
 
 const display = Amiri({
@@ -49,8 +50,10 @@ export default function RootLayout({
       <body className={`${display.variable} ${body.variable} antialiased`}>
         <div className="app-shell flex min-h-dvh flex-col">
           <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
+          <DigitRemount>
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
+          </DigitRemount>
         </div>
       </body>
     </html>

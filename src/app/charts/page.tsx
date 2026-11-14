@@ -11,7 +11,8 @@ export default function ChartsPage() {
         </h1>
         <p className="max-w-3xl text-sm leading-8 text-[var(--muted)]">
           مختصات خورشید و ماه از مدل VSOP/ELP (astronomy-engine)، زمان نجومی TT، مدار واقعی زمین،
-          قرص ماه، و ISS. هر کمیت روی محور خودش است. کلیک = کپی، و CSV جدا برای هر سری.
+          قرص ماه، و ISS. هر کمیت روی محور خودش است. اعداد و نمادها انگلیسی‌اند؛ کلید 123 / ۱۲۳
+          بالای صفحه خط را عوض می‌کند. کلیک = کپی، و CSV جدا برای هر سری.
         </p>
       </header>
       <LiveChartsHub />
