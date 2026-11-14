@@ -1,46 +1,85 @@
 "use client";
+import { useLanguage } from "@/components/language/Language";
+import { PROBLEMS_EN } from "@/lib/content/problemsEn";
 import { LocalizedDigits } from "@/components/digits/DigitScript";
 import { useMemo, useState } from "react";
 import { PROBLEMS, type Problem } from "@/lib/content/problems";
 import { COURSES } from "@/lib/content/courses";
 import { SolutionSphere } from "@/components/problems/SolutionSphere";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toPersianDigits } from "@/lib/utils";
-export function ProblemList({ problems = PROBLEMS }: {
-    problems?: Problem[];
-}) {
-    const [filter, setFilter] = useState<string>("all");
-    const [openId, setOpenId] = useState<string | null>(null);
-    const [showSolution, setShowSolution] = useState<Record<string, boolean>>({});
-    const [showHint, setShowHint] = useState<Record<string, boolean>>({});
-    const list = useMemo(() => {
-        if (filter === "all")
-            return problems;
-        return problems.filter((p) => p.lessonId === filter);
-    }, [filter, problems]);
-    return (<LocalizedDigits>
-      {<div className="space-y-4">
+export function ProblemList({ problems = PROBLEMS }: { problems?: Problem[] }) {
+  const { fa, t } = useLanguage();
+  const [filter, setFilter] = useState<string>("all");
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [showSolution, setShowSolution] = useState<Record<string, boolean>>({});
+  const [showHint, setShowHint] = useState<Record<string, boolean>>({});
+  const list = useMemo(() => {
+    if (filter === "all") return problems;
+    return problems.filter((p) => p.lessonId === filter);
+  }, [filter, problems]);
+  return (
+    <LocalizedDigits>
+      {
+        <div className="space-y-4">
           <div className="flex flex-wrap gap-2">
-            <FilterChip active={filter === "all"} onClick={() => setFilter("all")}>
-              همه
+            <FilterChip
+              active={filter === "all"}
+              onClick={() => setFilter("all")}
+            >
+              {t("همه", "All")}
             </FilterChip>
-            {COURSES.filter((l) => problems.some((p) => p.lessonId === l.id)).map((l) => (<FilterChip key={l.id} active={filter === l.id} onClick={() => setFilter(l.id)}>
-                {l.titleFa}
-              </FilterChip>))}
+            {COURSES.filter((l) =>
+              problems.some((p) => p.lessonId === l.id),
+            ).map((l) => (
+              <FilterChip
+                key={l.id}
+                active={filter === l.id}
+                onClick={() => setFilter(l.id)}
+              >
+                {fa ? l.titleFa : l.titleEn}
+              </FilterChip>
+            ))}
           </div>
 
           <div className="space-y-3">
-            {list.map((p, idx) => {
-                const open = openId === p.id;
-                return (<LocalizedDigits key={p.id}>
-                  {<Card key={p.id}>
-                      <CardHeader role="button" tabIndex={0} aria-expanded={open} aria-controls={`problem-${p.id}`} className="cursor-pointer" onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") {
-                                e.preventDefault();
-                                setOpenId(open ? null : p.id);
-                            }
-                        }} onClick={() => setOpenId(open ? null : p.id)}>
+            {list.map((original, idx) => {
+              const p = fa
+                ? original
+                : {
+                    ...original,
+                    ...PROBLEMS_EN[original.id],
+                    diagram: {
+                      ...original.diagram,
+                      caption: PROBLEMS_EN[original.id].caption,
+                    },
+                  };
+              const open = openId === p.id;
+              return (
+                <LocalizedDigits key={p.id}>
+                  {
+                    <Card key={p.id}>
+                      <CardHeader
+                        role="button"
+                        tabIndex={0}
+                        aria-expanded={open}
+                        aria-controls={`problem-${p.id}`}
+                        className="cursor-pointer"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            setOpenId(open ? null : p.id);
+                          }
+                        }}
+                        onClick={() => setOpenId(open ? null : p.id)}
+                      >
                         <div className="flex flex-wrap items-start justify-between gap-2">
                           <div>
                             <CardTitle className="text-lg">
@@ -52,7 +91,13 @@ export function ProblemList({ problems = PROBLEMS }: {
                           </div>
                           <div className="flex flex-col items-end gap-1">
                             <span className="rounded-md border border-[var(--border)] px-2 py-1 text-[11px] text-[var(--gold-soft)]">
-                              {p.difficulty}
+                              {fa
+                                ? p.difficulty
+                                : {
+                                    آسان: "Easy",
+                                    متوسط: "Intermediate",
+                                    المپیاد: "Olympiad",
+                                  }[p.difficulty]}
                             </span>
                             <span className="max-w-[12rem] text-left text-[10px] text-[var(--muted)] dir-ltr">
                               {p.source}
@@ -60,53 +105,93 @@ export function ProblemList({ problems = PROBLEMS }: {
                           </div>
                         </div>
                       </CardHeader>
-                      {open && (<CardContent id={`problem-${p.id}`} className="space-y-3 border-t border-[var(--border)] pt-4">
-                          <SolutionSphere diagram={p.diagram}/>
+                      {open && (
+                        <CardContent
+                          id={`problem-${p.id}`}
+                          className="space-y-3 border-t border-[var(--border)] pt-4"
+                        >
+                          <SolutionSphere diagram={p.diagram} />
                           <div className="flex flex-wrap gap-2">
-                            <Button size="sm" variant="secondary" onClick={() => setShowHint((s) => ({ ...s, [p.id]: !s[p.id] }))}>
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={() =>
+                                setShowHint((s) => ({ ...s, [p.id]: !s[p.id] }))
+                              }
+                            >
                               {showHint[p.id]
-                                ? "پنهان کردن راهنما"
-                                : "نمایش راهنما"}
+                                ? t("پنهان کردن راهنما", "Hide hint")
+                                : t("نمایش راهنما", "Show hint")}
                             </Button>
-                            <Button size="sm" variant="outline" onClick={() => setShowSolution((s) => ({
-                                ...s,
-                                [p.id]: !s[p.id],
-                            }))}>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() =>
+                                setShowSolution((s) => ({
+                                  ...s,
+                                  [p.id]: !s[p.id],
+                                }))
+                              }
+                            >
                               {showSolution[p.id]
-                                ? "پنهان کردن پاسخ"
-                                : "نمایش راه‌حل"}
+                                ? t("پنهان کردن پاسخ", "Hide solution")
+                                : t("نمایش راه‌حل", "Show solution")}
                             </Button>
                           </div>
-                          {showHint[p.id] && (<div className="rounded-lg border border-[var(--teal)]/40 bg-[var(--teal)]/10 px-3 py-2 text-sm leading-7">
+                          {showHint[p.id] && (
+                            <div className="rounded-lg border border-[var(--teal)]/40 bg-[var(--teal)]/10 px-3 py-2 text-sm leading-7">
                               <strong className="text-[var(--gold-soft)]">
-                                راهنما:{" "}
+                                {t("راهنما: ", "Hint: ")}
                               </strong>
                               {p.hint}
-                            </div>)}
-                          {showSolution[p.id] && (<div className="space-y-2 rounded-lg border border-[var(--gold)]/30 bg-[var(--gold)]/5 px-3 py-3 text-sm leading-7">
+                            </div>
+                          )}
+                          {showSolution[p.id] && (
+                            <div className="space-y-2 rounded-lg border border-[var(--gold)]/30 bg-[var(--gold)]/5 px-3 py-3 text-sm leading-7">
                               <p>{p.solution}</p>
                               <p className="text-[var(--gold-soft)]">
-                                پاسخ نهایی: {p.answer}
+                                {t("پاسخ نهایی: ", "Answer: ")}
+                                {p.answer}
                               </p>
-                            </div>)}
-                        </CardContent>)}
-                    </Card>}
-                </LocalizedDigits>);
+                            </div>
+                          )}
+                        </CardContent>
+                      )}
+                    </Card>
+                  }
+                </LocalizedDigits>
+              );
             })}
           </div>
-        </div>}
-    </LocalizedDigits>);
+        </div>
+      }
+    </LocalizedDigits>
+  );
 }
-function FilterChip({ active, onClick, children, }: {
-    active: boolean;
-    onClick: () => void;
-    children: React.ReactNode;
+function FilterChip({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
 }) {
-    return (<LocalizedDigits>
-      {<button type="button" onClick={onClick} className={`rounded-md border px-3 py-1.5 text-sm transition-colors ${active
-                ? "border-[var(--gold)] bg-[var(--gold)]/15 text-[var(--gold-soft)]"
-                : "border-[var(--border)] text-[var(--muted)]"}`}>
+  return (
+    <LocalizedDigits>
+      {
+        <button
+          type="button"
+          onClick={onClick}
+          className={`rounded-md border px-3 py-1.5 text-sm transition-colors ${
+            active
+              ? "border-[var(--gold)] bg-[var(--gold)]/15 text-[var(--gold-soft)]"
+              : "border-[var(--border)] text-[var(--muted)]"
+          }`}
+        >
           {children}
-        </button>}
-    </LocalizedDigits>);
+        </button>
+      }
+    </LocalizedDigits>
+  );
 }

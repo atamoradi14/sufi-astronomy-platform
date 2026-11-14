@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "@/components/language/Language";
 import { LocalizedDigits } from "@/components/digits/DigitScript";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
@@ -17,6 +18,7 @@ import { MathBlock } from "@/components/ui/MathBlock";
 import { GeometryFigure } from "@/components/learn/GeometryFigure";
 import { toPersianDigits } from "@/lib/utils";
 export function ProofWorkbench({ kind }: { kind: ProofKind }) {
+  const { fa, t } = useLanguage();
   const proof = getProof(kind);
   const [step, setStep] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -41,9 +43,9 @@ export function ProofWorkbench({ kind }: { kind: ProofKind }) {
           <div className="min-w-0 space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>{proof.titleFa}</CardTitle>
+                <CardTitle>{fa ? proof.titleFa : proof.titleEn}</CardTitle>
                 <CardDescription className="dir-ltr text-left">
-                  {proof.titleEn} · {proof.source}
+                  {proof.source}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -57,17 +59,13 @@ export function ProofWorkbench({ kind }: { kind: ProofKind }) {
                 </div>
                 <div className="min-h-[300px] space-y-3 rounded-xl border border-[var(--border)] bg-[var(--ink-deep)] p-5">
                   <h3 className="font-[family-name:var(--font-display)] text-xl text-[var(--gold-soft)]">
-                    {s.titleFa}
+                    {fa ? s.titleFa : s.titleEn}
                   </h3>
-                  <p className="text-xs text-[var(--muted)] dir-ltr text-left">
-                    {s.titleEn}
-                  </p>
+
                   <p className="text-sm leading-8 text-[var(--parchment)]/90">
-                    {s.bodyFa}
+                    {fa ? s.bodyFa : s.bodyEn}
                   </p>
-                  <p className="text-sm leading-7 text-[var(--muted)] dir-ltr text-left">
-                    {s.bodyEn}
-                  </p>
+
                   <MathBlock>{s.formula}</MathBlock>
                 </div>
                 <div
@@ -80,7 +78,7 @@ export function ProofWorkbench({ kind }: { kind: ProofKind }) {
                       key={i}
                       type="button"
                       aria-current={i === step ? "step" : undefined}
-                      title={st.titleEn}
+                      title={fa ? st.titleFa : st.titleEn}
                       onClick={() => {
                         setStep(i);
                         setPlaying(false);
@@ -98,14 +96,14 @@ export function ProofWorkbench({ kind }: { kind: ProofKind }) {
                     disabled={step === 0}
                     onClick={() => setStep((x) => x - 1)}
                   >
-                    قبل
+                    {t("قبل", "Previous")}
                   </Button>
                   <Button
                     size="sm"
                     disabled={step === proof.steps.length - 1}
                     onClick={() => setStep((x) => x + 1)}
                   >
-                    بعد
+                    {t("بعد", "Next")}
                   </Button>
                   <Button
                     size="sm"
@@ -113,7 +111,7 @@ export function ProofWorkbench({ kind }: { kind: ProofKind }) {
                     onClick={() => setPlaying(false)}
                     disabled={!playing}
                   >
-                    توقف
+                    {t("توقف", "Pause")}
                   </Button>
                   <Button
                     size="sm"
@@ -123,10 +121,12 @@ export function ProofWorkbench({ kind }: { kind: ProofKind }) {
                       setPlaying(true);
                     }}
                   >
-                    پخش
+                    {t("پخش", "Play")}
                   </Button>
                   <Button asChild size="sm" variant="secondary">
-                    <Link href={`/learn/${proof.lessonId}`}>درس کامل</Link>
+                    <Link href={`/learn/${proof.lessonId}`}>
+                      {t("درس کامل", "Full lesson")}
+                    </Link>
                   </Button>
                 </div>
               </CardContent>
@@ -139,6 +139,7 @@ export function ProofWorkbench({ kind }: { kind: ProofKind }) {
   );
 }
 function NumericPanel({ kind }: { kind: ProofKind }) {
+  const { t } = useLanguage();
   const [a, setA] = useState(50);
   const [b, setB] = useState(65);
   const [C, setC] = useState(40);
@@ -176,9 +177,14 @@ function NumericPanel({ kind }: { kind: ProofKind }) {
       {
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">آزمایش عددی</CardTitle>
+            <CardTitle className="text-lg">
+              {t("آزمایش عددی", "Numerical exploration")}
+            </CardTitle>
             <CardDescription className="dir-ltr text-left">
-              Live identities from Smart’s formulae
+              {t(
+                "بررسی زندهٔ همانی‌های اسمارت",
+                "Live identities from Smart’s formulae",
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -214,7 +220,10 @@ function NumericPanel({ kind }: { kind: ProofKind }) {
                 kind === "analogue" ||
                 kind === "four-parts" ||
                 kind === "napier") && (
-                <Metric label="c from (A)" value={formatDms(c, 2)} />
+                <Metric
+                  label={t("c از (A)", "c from (A)")}
+                  value={formatDms(c, 2)}
+                />
               )}
               {kind === "sine" && (
                 <Metric
@@ -224,7 +233,10 @@ function NumericPanel({ kind }: { kind: ProofKind }) {
               )}
               {kind === "analogue" && (
                 <Metric
-                  label="(C): cos B vs analogueCosB"
+                  label={t(
+                    "(C): مقایسهٔ دو محاسبهٔ cos B",
+                    "(C): cos B vs analogueCosB",
+                  )}
                   value={
                     Math.abs(analogue - cosB) < 1e-10
                       ? "< 10⁻¹⁰"
@@ -234,24 +246,33 @@ function NumericPanel({ kind }: { kind: ProofKind }) {
               )}
               {kind === "haversine" && (
                 <>
-                  <Metric label="c from (A)" value={formatDms(c, 2)} />
-                  <Metric label="c from hav (23)" value={formatDms(havC, 2)} />
                   <Metric
-                    label="Smart §12 AB"
+                    label={t("c از (A)", "c from (A)")}
+                    value={formatDms(c, 2)}
+                  />
+                  <Metric
+                    label={t("c از هاورساین (۲۳)", "c from hav (23)")}
+                    value={formatDms(havC, 2)}
+                  />
+                  <Metric
+                    label={t("اسمارت بند ۱۲، AB", "Smart §12 AB")}
                     value={`${formatDms(AB, 1)} = ${toPersianDigits(nauticalMiles(AB).toFixed(1))} nmi`}
                   />
                 </>
               )}
               {kind === "polar" && (
                 <Metric
-                  label="A from three sides (9)"
+                  label={t("A از سه ضلع (۹)", "A from three sides (9)")}
                   value={formatDms(Aang, 2)}
                 />
               )}
               {kind === "girard" && (
                 <>
                   <Metric label="E = A+B+C−180°" value={formatDms(E, 3)} />
-                  <Metric label="E from L’Huilier" value={formatDms(El, 3)} />
+                  <Metric
+                    label={t("E از لویلیر", "E from L’Huilier")}
+                    value={formatDms(El, 3)}
+                  />
                 </>
               )}
               {kind === "pzx" && (
@@ -267,12 +288,18 @@ function NumericPanel({ kind }: { kind: ProofKind }) {
               {kind === "sidereal" && (
                 <>
                   <Metric label="ST = H + α" value="Smart II (9)" />
-                  <Metric label="example: H=2ʰ, α=5ʰ" value="ST = 7ʰ" />
+                  <Metric
+                    label={t("مثال: H=2ʰ, α=5ʰ", "example: H=2ʰ, α=5ʰ")}
+                    value="ST = 7ʰ"
+                  />
                 </>
               )}
               {kind === "delambre" && (
                 <Metric
-                  label="c from (A) — check analogies against this"
+                  label={t(
+                    "c از (A)؛ همانی‌ها را با آن مقایسه کنید",
+                    "c from (A) — check analogies against this",
+                  )}
                   value={formatDms(c, 2)}
                 />
               )}

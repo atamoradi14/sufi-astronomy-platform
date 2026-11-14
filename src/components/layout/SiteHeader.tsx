@@ -1,4 +1,6 @@
 "use client";
+import { useLanguage } from "@/components/language/Language";
+import { setLanguage } from "@/lib/language";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn, setDigitScript } from "@/lib/utils";
@@ -9,15 +11,16 @@ import {
 import { Menu, X, Star } from "lucide-react";
 import { useState } from "react";
 const NAV = [
-  { href: "/", label: "خانه" },
-  { href: "/course", label: "درس‌نامه" },
-  { href: "/lab", label: "کره" },
-  { href: "/sky", label: "آسمان" },
-  { href: "/atlas", label: "اطلس" },
-  { href: "/charts", label: "زنده" },
-  { href: "/map", label: "نقشه" },
+  { href: "/", label: "خانه", en: "Home" },
+  { href: "/course", label: "درس‌نامه", en: "Course" },
+  { href: "/lab", label: "کره", en: "Sphere" },
+  { href: "/sky", label: "آسمان", en: "Sky" },
+  { href: "/atlas", label: "اطلس", en: "Atlas" },
+  { href: "/charts", label: "زنده", en: "Live charts" },
+  { href: "/map", label: "نقشه", en: "Map" },
 ];
 export function SiteHeader() {
+  const { language, fa, t } = useLanguage();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const digits = useDigitScript();
@@ -25,17 +28,17 @@ export function SiteHeader() {
     <LocalizedDigits>
       {
         <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--ink)]/85 backdrop-blur-md">
-          <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-3">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-3">
             <Link href="/" className="flex items-center gap-2 group">
               <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--gold)]/40 bg-[var(--panel)] text-[var(--gold)] group-hover:border-[var(--gold)] transition-colors">
                 <Star className="h-4 w-4" />
               </span>
               <span className="leading-tight">
                 <span className="block font-[family-name:var(--font-display)] text-lg text-[var(--gold-soft)]">
-                  صوفی‌آسمان
+                  {t("صوفی‌آسمان", "Sufi Sky")}
                 </span>
                 <span className="block text-[10px] text-[var(--muted)] tracking-wide">
-                  به یاد عبدالرحمن صوفی
+                  {t("به یاد عبدالرحمن صوفی", "In memory of al-Sufi")}
                 </span>
               </span>
             </Link>
@@ -53,12 +56,42 @@ export function SiteHeader() {
                       : "text-[var(--muted)] hover:text-[var(--parchment)]",
                   )}
                 >
-                  {item.label}
+                  {fa ? item.label : item.en}
                 </Link>
               ))}
             </nav>
 
-            <div className="flex items-center gap-2">
+            <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-end">
+              <div
+                role="group"
+                aria-label="Content language"
+                className="flex items-center rounded-md border border-[var(--border)] p-0.5"
+                dir="ltr"
+                data-digit-literal
+              >
+                {(
+                  [
+                    ["fa", "فارسی", "Persian language"],
+                    ["en", "English", "English language"],
+                  ] as const
+                ).map(([id, label, name]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    aria-label={name}
+                    aria-pressed={language === id}
+                    onClick={() => setLanguage(id)}
+                    className={cn(
+                      "rounded px-2 py-1 text-xs",
+                      language === id
+                        ? "bg-[var(--gold)]/20 text-[var(--gold-soft)]"
+                        : "text-[var(--muted)]",
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
               <div
                 className="flex items-center gap-1 rounded-md border border-[var(--border)] p-0.5"
                 dir="ltr"
@@ -100,7 +133,7 @@ export function SiteHeader() {
                 type="button"
                 className="xl:hidden rounded-md border border-[var(--border)] p-2 text-[var(--parchment)]"
                 onClick={() => setOpen((v) => !v)}
-                aria-label="منو"
+                aria-label={t("منو", "Menu")}
               >
                 {open ? (
                   <X className="h-5 w-5" />
@@ -126,7 +159,7 @@ export function SiteHeader() {
                         : "text-[var(--muted)]",
                     )}
                   >
-                    {item.label}
+                    {fa ? item.label : item.en}
                   </Link>
                 ))}
               </div>

@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "@/components/language/Language";
 import { LocalizedDigits } from "@/components/digits/DigitScript";
 import { useEffect, useMemo, useState, useRef, Suspense } from "react";
 import dynamic from "next/dynamic";
@@ -35,11 +36,13 @@ const CelestialSphere = dynamic(
 const PRESETS: Array<{
   id: string;
   label: string;
+  en: string;
   patch: Partial<SphereViewState>;
 }> = [
   {
     id: "circles",
     label: "عظیمه / صغیره",
+    en: "Great / small circles",
     patch: {
       showEquator: true,
       showMeridians: true,
@@ -54,6 +57,7 @@ const PRESETS: Array<{
   {
     id: "basics",
     label: "پایه",
+    en: "Basics",
     patch: {
       showEquator: true,
       showMeridians: true,
@@ -66,6 +70,7 @@ const PRESETS: Array<{
   {
     id: "triangle",
     label: "مثلث ABC",
+    en: "Triangle ABC",
     patch: {
       showEquator: true,
       showMeridians: false,
@@ -83,6 +88,7 @@ const PRESETS: Array<{
   {
     id: "area",
     label: "مساحت / زیادی",
+    en: "Area / excess",
     patch: {
       showEquator: false,
       showMeridians: false,
@@ -98,6 +104,7 @@ const PRESETS: Array<{
   {
     id: "astro-tri",
     label: "مثلث نجومی PZX",
+    en: "Astronomical triangle PZX",
     patch: {
       showEquator: true,
       showMeridians: true,
@@ -114,6 +121,7 @@ const PRESETS: Array<{
   {
     id: "horizon",
     label: "افق ناظر",
+    en: "Observer horizon",
     patch: {
       showEquator: true,
       showHorizon: true,
@@ -128,6 +136,7 @@ const PRESETS: Array<{
   {
     id: "celestial",
     label: "کرهٔ سماوی",
+    en: "Celestial sphere",
     patch: {
       showEquator: true,
       showMeridians: true,
@@ -142,6 +151,7 @@ const PRESETS: Array<{
   {
     id: "ecliptic",
     label: "دایرة‌البروج",
+    en: "Ecliptic",
     patch: {
       showEquator: true,
       showEcliptic: true,
@@ -185,6 +195,7 @@ export function SphereLab() {
   );
 }
 function SphereLabInner() {
+  const { fa, t } = useLanguage();
   const search = useSearchParams();
   const [state, setState] = useState<SphereViewState>(INITIAL);
   const [active, setActive] = useState("triangle");
@@ -240,13 +251,13 @@ function SphereLabInner() {
     metrics.valid && Number.isFinite(v) ? `${v.toFixed(n)}°` : "—";
   const isPzx = active === "astro-tri";
   const layerKeys: Array<[keyof SphereViewState, string]> = [
-    ["showEquator", "استوا · Equator"],
-    ["showMeridians", "نصف‌النهارها · Meridians"],
-    ["showParallels", "مدارهای میل · Parallels"],
-    ["showHorizon", "افق · Horizon"],
-    ["showEcliptic", "دایرة‌البروج · Ecliptic"],
-    ["showTriangle", "مثلث · Triangle"],
-    ["showSmallDemo", "صغیرهٔ حول A · Small circle"],
+    ["showEquator", t("استوا", "Equator")],
+    ["showMeridians", t("نصف‌النهارها", "Meridians")],
+    ["showParallels", t("مدارهای میل", "Parallels")],
+    ["showHorizon", t("افق", "Horizon")],
+    ["showEcliptic", t("دایرة‌البروج", "Ecliptic")],
+    ["showTriangle", t("مثلث", "Triangle")],
+    ["showSmallDemo", t("صغیرهٔ حول A", "Small circle")],
   ];
   return (
     <LocalizedDigits>
@@ -255,7 +266,9 @@ function SphereLabInner() {
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_330px] items-start">
             <div className="workspace lg:sticky lg:top-24" ref={stageRef}>
               <div className="workspace-toolbar">
-                <span className="study-kicker">SPHERE / LAB</span>
+                <span className="study-kicker">
+                  {t("کره / آزمایشگاه", "SPHERE / LAB")}
+                </span>
                 <select
                   aria-label="Sphere preset / نمای کره"
                   className="control-input !w-auto max-w-full"
@@ -264,7 +277,7 @@ function SphereLabInner() {
                 >
                   {PRESETS.filter((p) => p.id !== "basics").map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.label}
+                      {fa ? p.label : p.en}
                     </option>
                   ))}
                 </select>
@@ -274,7 +287,7 @@ function SphereLabInner() {
                   onClick={() => setCameraKey((k) => k + 1)}
                 >
                   <RotateCcw size={15} />
-                  بازنشانی نما
+                  {t("بازنشانی نما", "Reset view")}
                 </Button>
                 <Button
                   size="sm"
@@ -316,29 +329,36 @@ function SphereLabInner() {
                   <i style={{ background: "#91b9ff" }} />b = CA
                 </span>
                 <span>
-                  <i style={{ background: "#f1cf7b" }} />c = AB / استوا
+                  <i style={{ background: "#f1cf7b" }} />c = AB /{" "}
+                  {t("استوا", "Equator")}
                 </span>
                 <span>
                   <i style={{ background: "#ed94aa" }} />
-                  افق
+                  {t("افق", "Horizon")}
                 </span>
                 <span>
                   <i style={{ background: "#ad9bff" }} />
-                  دایرة‌البروج / صغیره
+                  {t("دایرة‌البروج / صغیره", "Ecliptic / small circle")}
                 </span>
               </div>
               <p className="px-5 pb-4 text-xs leading-7 text-[var(--muted)]">
-                کشیدن: چرخش · اسکرول یا دو انگشت: بزرگ‌نمایی · برای جابه‌جایی
-                رأس، نام آن را انتخاب و روی سطح کلیک کنید. خطوط پشت کره
-                پنهان‌اند.
+                {t(
+                  "کشیدن: چرخش · اسکرول یا دو انگشت: بزرگ‌نمایی · برای جابه‌جایی         رأس، نام آن را انتخاب و روی سطح کلیک کنید. خطوط پشت کره         پنهان‌اند.",
+                  "Drag to rotate; scroll or pinch to zoom. To move a vertex, select its name and click the surface. Lines behind the sphere are hidden.",
+                )}
               </p>
             </div>
             <aside className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">لایه‌های راهنما</CardTitle>
+                  <CardTitle className="text-lg">
+                    {t("لایه‌های راهنما", "Reference layers")}
+                  </CardTitle>
                   <CardDescription>
-                    هر بار یک مفهوم را جدا بررسی کنید.
+                    {t(
+                      "هر بار یک مفهوم را جدا بررسی کنید.",
+                      "Explore one concept at a time.",
+                    )}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 gap-2">
@@ -355,11 +375,19 @@ function SphereLabInner() {
               {state.showTriangle && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">رأس‌های مثلث</CardTitle>
+                    <CardTitle className="text-lg">
+                      {t("رأس‌های مثلث", "Triangle vertices")}
+                    </CardTitle>
                     <CardDescription>
                       {isPzx
-                        ? "A=P، B=Z، C=X؛ عرض ناظر، رأس Z و افق را با هم تغییر می‌دهد."
-                        : "طول و عرضِ جهت هر رأس روی کره؛ همهٔ ورودی‌ها درجه‌اند."}
+                        ? t(
+                            "A=P، B=Z، C=X؛ عرض ناظر، رأس Z و افق را با هم تغییر می‌دهد.",
+                            "A=P, B=Z, C=X. Changing observer latitude moves Z and the horizon together.",
+                          )
+                        : t(
+                            "طول و عرضِ جهت هر رأس روی کره؛ همهٔ ورودی‌ها درجه‌اند.",
+                            "Longitude and latitude of each vertex direction; all inputs are degrees.",
+                          )}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-3">
@@ -386,8 +414,11 @@ function SphereLabInner() {
                         role="status"
                         className="text-xs leading-7 text-[var(--teal)]"
                       >
-                        رأس {editing.slice(-1)} را با کلیک روی سطح جای‌گذاری
-                        کنید یا با همان دکمه لغو کنید.
+                        {t(
+                          "با کلیک روی سطح، رأس را جای‌گذاری کنید؛ برای لغو، همان دکمه را بزنید.",
+                          "Click the surface to place the selected vertex; click its button again to cancel.",
+                        )}{" "}
+                        ({editing.slice(-1)})
                       </p>
                     )}
                     {(["pointA", "pointB", "pointC"] as const).map((key, i) => (
@@ -412,12 +443,17 @@ function SphereLabInner() {
               {(state.showHorizon || state.showSmallDemo) && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">پارامترهای هندسی</CardTitle>
+                    <CardTitle className="text-lg">
+                      {t("پارامترهای هندسی", "Geometry parameters")}
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {state.showSmallDemo && (
                       <Slider
-                        label="فاصلهٔ قطبی صغیره θ"
+                        label={t(
+                          "فاصلهٔ قطبی صغیره θ",
+                          "Small-circle polar radius θ",
+                        )}
                         min={5}
                         max={175}
                         value={state.smallRadius}
@@ -427,7 +463,7 @@ function SphereLabInner() {
                     )}{" "}
                     {state.showHorizon && (
                       <Slider
-                        label="عرض ناظر φ"
+                        label={t("عرض ناظر φ", "Observer latitude φ")}
                         min={-90}
                         max={90}
                         value={state.observerLat}
@@ -450,10 +486,17 @@ function SphereLabInner() {
           {state.showTriangle && (
             <Card>
               <CardHeader>
-                <CardTitle>اندازه‌گیری و کنترل سازگاری</CardTitle>
+                <CardTitle>
+                  {t(
+                    "اندازه‌گیری و کنترل سازگاری",
+                    "Measurements and consistency",
+                  )}
+                </CardTitle>
                 <CardDescription>
-                  محاسبه از همان بردارهایی که روی کره رسم شده‌اند؛ اضلاع درجه‌ای
-                  و مساحت روی کرهٔ واحد است.
+                  {t(
+                    "محاسبه از همان بردارهایی که روی کره رسم شده‌اند؛ اضلاع درجه‌ای          و مساحت روی کرهٔ واحد است.",
+                    "Computed from the vectors drawn on the sphere. Sides are in degrees; area is for a unit sphere.",
+                  )}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -462,9 +505,10 @@ function SphereLabInner() {
                     role="status"
                     className="rounded-lg border border-[var(--rose-ink)]/40 p-3 text-sm leading-7 text-[var(--rose-ink)]"
                   >
-                    این آرایش، مثلث محدب معمول و غیرمنحط نمی‌سازد. رأس‌های
-                    متمایز و غیرپادپا را در یک نیم‌کرهٔ باز انتخاب کنید؛ زاویه و
-                    مساحت برای حالت منحط گزارش نمی‌شود.
+                    {t(
+                      "این آرایش، مثلث محدب معمول و غیرمنحط نمی‌سازد. رأس‌های           متمایز و غیرپادپا را در یک نیم‌کرهٔ باز انتخاب کنید؛ زاویه و           مساحت برای حالت منحط گزارش نمی‌شود.",
+                      "This configuration is not an ordinary convex, nondegenerate triangle. Choose distinct, non-antipodal vertices within one open hemisphere. Angles and area are not reported for degenerate configurations.",
+                    )}
                   </p>
                 )}
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
@@ -484,13 +528,22 @@ function SphereLabInner() {
                   ))}
                 </div>
                 <div className="grid gap-3 md:grid-cols-3">
-                  <Metric label="زیادی کروی · E" value={metric(metrics.E)} />
                   <Metric
-                    label="مساحت واحد · S / R² (sr)"
+                    label={t("زیادی کروی · E", "Spherical excess · E")}
+                    value={metric(metrics.E)}
+                  />
+                  <Metric
+                    label={t(
+                      "مساحت واحد · S / R² (sr)",
+                      "Unit area · S / R² (sr)",
+                    )}
                     value={metrics.valid ? metrics.area.toFixed(7) : "—"}
                   />
                   <Metric
-                    label="اختلاف ضلع محاسبه‌شده و هندسی (deg)"
+                    label={t(
+                      "اختلاف ضلع محاسبه‌شده و هندسی (deg)",
+                      "Computed minus geometric side (deg)",
+                    )}
                     value={
                       metrics.valid
                         ? Math.abs(metrics.cFromCos - metrics.c) < 1e-10
@@ -527,7 +580,7 @@ function Toggle({
           type="button"
           aria-pressed={on}
           onClick={() => onChange(!on)}
-          className={`rounded-lg border px-3 py-2 text-right transition-colors ${
+          className={`rounded-lg border px-3 py-2 text-start transition-colors ${
             on
               ? "border-[var(--gold)]/50 bg-[var(--gold)]/10 text-[var(--gold-soft)]"
               : "border-[var(--border)] text-[var(--muted)]"
@@ -551,13 +604,16 @@ function PointEditor({
   };
   onChange: (v: { lon: number; lat: number }) => void;
 }) {
+  const { t } = useLanguage();
   return (
     <LocalizedDigits>
       {
         <div className="rounded-lg border border-[var(--border)] bg-[var(--ink)]/40 p-3 space-y-2">
-          <div className="text-sm text-[var(--gold-soft)]">نقطه {label}</div>
+          <div className="text-sm text-[var(--gold-soft)]">
+            {t("نقطه", "Point")} {label}
+          </div>
           <Slider
-            label={`طول رأس ${label}`}
+            label={`${t("طول رأس", "Vertex longitude")} ${label}`}
             min={-180}
             max={180}
             value={value.lon}
@@ -565,7 +621,7 @@ function PointEditor({
             format={(v) => formatDeg(v, 0)}
           />
           <Slider
-            label={`عرض / میل رأس ${label}`}
+            label={`${t("عرض / میل رأس", "Vertex latitude / declination")} ${label}`}
             min={-90}
             max={90}
             value={value.lat}

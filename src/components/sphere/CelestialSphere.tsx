@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "@/components/language/Language";
 import {
   useDigitScript,
   LocalizedDigits,
@@ -62,6 +63,7 @@ export function CelestialSphere({
   onPlace,
   resetKey = 0,
 }: Props) {
+  const { t } = useLanguage();
   return (
     <LocalizedDigits>
       {
@@ -98,8 +100,11 @@ export function CelestialSphere({
           <div className="pointer-events-none absolute start-4 top-4 rounded-lg bg-[#07121fe6] px-3 py-2 text-xs text-[#a9bdd1]">
             R = 1 ·{" "}
             {onPlace
-              ? "برای جای‌گذاری روی سطح کلیک کنید"
-              : "نمای بیرونی · External view"}
+              ? t(
+                  "برای جای‌گذاری روی سطح کلیک کنید",
+                  "Click the surface to place the vertex",
+                )
+              : t("نمای بیرونی", "External view")}
           </div>
         </div>
       }
@@ -113,6 +118,7 @@ function SphereMesh({
   state: SphereViewState;
   onPlace?: Props["onPlace"];
 }) {
+  const { t } = useLanguage();
   const A = useMemo(
     () => lonLatToCart(state.pointA.lon, state.pointA.lat),
     [state.pointA],
@@ -234,7 +240,11 @@ function SphereMesh({
             width={2.5}
           />
           {!state.showTriangle && (
-            <SphereMarker pos={A} label="A · pole" color="#b2a5ff" />
+            <SphereMarker
+              pos={A}
+              label={t("A · قطب", "A · pole")}
+              color="#b2a5ff"
+            />
           )}
         </>
       )}

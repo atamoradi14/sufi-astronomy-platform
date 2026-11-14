@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "@/components/language/Language";
 import { LocalizedDigits } from "@/components/digits/DigitScript";
 import { useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
@@ -403,6 +404,7 @@ function poleOfSide(U: Vec3, V: Vec3, toward: Vec3): Vec3 {
   return p;
 }
 export function SolutionSphere({ diagram }: { diagram: SphereDiagram }) {
+  const { t } = useLanguage();
   const scene = useMemo(() => buildScene(diagram), [diagram]);
   return (
     <LocalizedDigits>
@@ -445,7 +447,10 @@ export function SolutionSphere({ diagram }: { diagram: SphereDiagram }) {
               </p>
             )}
             <p className="text-center text-[10px] text-[var(--muted)]">
-              بکشید تا بچرخد · اسکرول برای بزرگ‌نمایی
+              {t(
+                "بکشید تا بچرخد · اسکرول برای بزرگ‌نمایی",
+                "Drag to rotate · scroll to zoom",
+              )}
             </p>
           </div>
         </div>

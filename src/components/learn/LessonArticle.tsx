@@ -1,7 +1,8 @@
 "use client";
+import { selectSourceText } from "@/lib/language";
 import { LocalizedDigits } from "@/components/digits/DigitScript";
 import Link from "next/link";
-import { useState } from "react";
+import { useLanguage } from "@/components/language/Language";
 import type { Lesson } from "@/lib/content/lessonTypes";
 import { chapterOf, LESSONS } from "@/lib/content/lessons";
 import { PROOFS } from "@/lib/content/proofs";
@@ -9,12 +10,10 @@ import { BookFigure } from "./BookFigures";
 import { ExampleWidget } from "./ExampleWidgets";
 import { Button } from "@/components/ui/button";
 import { MathBlock } from "@/components/ui/MathBlock";
-import { ArrowLeft, BookOpen, Box, Languages } from "lucide-react";
-type Language = "fa" | "en" | "both";
+import { ArrowLeft, BookOpen, Box } from "lucide-react";
 export function LessonArticle({ lesson }: { lesson: Lesson }) {
-  const [lang, setLang] = useState<Language>("both");
-  const fa = lang !== "en",
-    en = lang !== "fa";
+  const { language: lang, fa, t } = useLanguage();
+  const en = !fa;
   const ch = chapterOf(lesson);
   const proof = PROOFS.find((p) => p.kind === lesson.proofId);
   const siblings = LESSONS.filter((l) => l.chapterId === lesson.chapterId);
@@ -30,16 +29,12 @@ export function LessonArticle({ lesson }: { lesson: Lesson }) {
           <div className="lesson-body space-y-7">
             <header className="space-y-5 pb-3">
               <p className="study-kicker" dir="ltr">
-                SMART / CHAPTER {lesson.smart.chapter} / {lesson.smart.sections}
+                {t("اسمارت / فصل", "SMART / CHAPTER")} {lesson.smart.chapter} /{" "}
+                {lesson.smart.sections}
               </p>
               <h1 className="font-[family-name:var(--font-display)] text-3xl leading-relaxed text-[var(--gold-soft)] md:text-4xl">
                 {fa ? lesson.titleFa : lesson.titleEn}
               </h1>
-              {fa && en && (
-                <p dir="ltr" className="text-lg text-[var(--muted)]">
-                  {lesson.titleEn}
-                </p>
-              )}
               {fa && <p className="text-sm leading-8">{lesson.summaryFa}</p>}
               {en && (
                 <p dir="ltr" className="lesson-english text-sm">
@@ -59,20 +54,6 @@ export function LessonArticle({ lesson }: { lesson: Lesson }) {
                     {fa ? "همهٔ درس‌ها" : "All lessons"}
                   </Link>
                 </Button>
-                <label className="flex gap-2 items-center text-xs">
-                  <Languages size={16} />
-                  <span className="sr-only">Language / زبان</span>
-                  <select
-                    className="control-input"
-                    aria-label="Language / زبان"
-                    value={lang}
-                    onChange={(e) => setLang(e.target.value as Language)}
-                  >
-                    <option value="both">فارسی + English</option>
-                    <option value="fa">فارسی</option>
-                    <option value="en">English</option>
-                  </select>
-                </label>
               </div>
             </header>
             <section
@@ -105,10 +86,11 @@ export function LessonArticle({ lesson }: { lesson: Lesson }) {
               </h2>
               {lesson.formulas.map((f, i) => (
                 <div key={i} className="space-y-2">
-                  <MathBlock label={f.nameEn}>{f.tex ?? f.display}</MathBlock>
+                  <MathBlock label={fa ? f.nameFa : f.nameEn}>
+                    {f.tex ?? f.display}
+                  </MathBlock>
                   <p className="px-2 text-xs text-[var(--muted)]">
                     {fa && f.nameFa}
-                    {fa && en && " · "}
                     {en && f.nameEn}
                   </p>
                 </div>
@@ -127,9 +109,6 @@ export function LessonArticle({ lesson }: { lesson: Lesson }) {
                 {fa && <p className="text-sm">{s.bodyFa}</p>}
                 {en && (
                   <div className="lesson-english text-sm" dir="ltr">
-                    {fa && (
-                      <h3 className="mb-2 font-semibold">{s.headingEn}</h3>
-                    )}
                     <p>{s.bodyEn}</p>
                   </div>
                 )}
@@ -162,7 +141,7 @@ export function LessonArticle({ lesson }: { lesson: Lesson }) {
                   </Link>
                 </div>
                 <p className="text-xs text-[var(--muted)]" dir="ltr">
-                  {proof.source}
+                  {selectSourceText(proof.source, lang)}
                 </p>
                 {proof.steps.map((s, i) => (
                   <div
@@ -192,7 +171,7 @@ export function LessonArticle({ lesson }: { lesson: Lesson }) {
                   {fa ? lesson.example.titleFa : lesson.example.titleEn}
                 </h2>
                 <p className="text-xs text-[var(--muted)]" dir="ltr">
-                  {lesson.example.source}
+                  {selectSourceText(lesson.example.source, lang)}
                 </p>
                 {fa && (
                   <>
@@ -221,7 +200,9 @@ export function LessonArticle({ lesson }: { lesson: Lesson }) {
                 <ol className="space-y-4">
                   {lesson.example.steps.map((st, i) => (
                     <li key={i} className="space-y-2">
-                      <span className="study-kicker">STEP {i + 1}</span>
+                      <span className="study-kicker">
+                        {t("گام", "STEP")} {i + 1}
+                      </span>
                       {fa && <p className="text-sm leading-8">{st.fa}</p>}
                       {en && (
                         <p className="lesson-english text-sm" dir="ltr">
@@ -263,7 +244,7 @@ export function LessonArticle({ lesson }: { lesson: Lesson }) {
                     </p>
                   )}
                   <p dir="ltr" className="text-xs text-[var(--muted)]">
-                    {ex.source}
+                    {selectSourceText(ex.source, lang)}
                   </p>
                   {ex.answer && (
                     <details>
@@ -282,10 +263,16 @@ export function LessonArticle({ lesson }: { lesson: Lesson }) {
             </section>
             <footer className="border-t border-[var(--border)] pt-5 space-y-4">
               <p className="text-xs leading-7 text-[var(--muted)]" dir="ltr">
-                W. M. Smart, Textbook on Spherical Astronomy · Chapter{" "}
-                {lesson.smart.chapter} · {lesson.smart.sections} · pp.{" "}
-                {lesson.smart.pages}. Original teaching adaptation; diagrams are
-                independently generated constructions.
+                {t(
+                  "و. م. اسمارت، نجوم کروی · فصل",
+                  "W. M. Smart, Textbook on Spherical Astronomy · Chapter",
+                )}{" "}
+                {lesson.smart.chapter} · {lesson.smart.sections} ·{" "}
+                {t("ص.", "pp.")} {lesson.smart.pages}.{" "}
+                {t(
+                  "بازنویسی آموزشی؛ شکل‌ها به‌صورت مستقل محاسبه و رسم شده‌اند.",
+                  "Original teaching adaptation; diagrams are independently generated constructions.",
+                )}
               </p>
               <div className="flex flex-wrap justify-between gap-3">
                 {index > 0 && (

@@ -1,3 +1,4 @@
+import { LanguageRoot } from "@/components/language/Language";
 import type { Metadata, Viewport } from "next";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { DigitRemount } from "@/components/digits/DigitScript";
@@ -39,13 +40,15 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl" data-scroll-behavior="smooth">
       <body className="antialiased">
-        <DigitRemount>
-          <div className="app-shell flex min-h-dvh flex-col">
-            <SiteHeader />
-            <main className="flex-1">{children}</main>
-            <SiteFooter />
-          </div>
-        </DigitRemount>
+        <LanguageRoot>
+          <DigitRemount>
+            <div className="app-shell flex min-h-dvh flex-col">
+              <SiteHeader />
+              <main className="flex-1">{children}</main>
+              <SiteFooter />
+            </div>
+          </DigitRemount>
+        </LanguageRoot>
       </body>
     </html>
   );

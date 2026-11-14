@@ -485,7 +485,7 @@ The lessons in Smart chapters I–III have been rewritten as original Persian/En
 - Chapter I: great/small circles, ordinary-triangle existence, cosine/sine/analogue/four-parts laws, right and polar triangles, haversines, half angles, Delambre/Napier, and the separately labelled Girard/L’Huilier supplement. The Delambre derivation now obtains all four identities from the half-angle formulae before taking ratios.
 - Chapter II: explicit coordinate conventions, circumpolar boundary cases in both hemispheres, forward/inverse PZX transformations, sidereal/solar intervals, ecliptic rotations, coordinate rates, and twilight. The app measures azimuth **north through east**; Smart’s north-through-west convention is sign-reversed where necessary.
 - Chapter III (§§34–39, pp. 58–73): Snell’s law, true/apparent zenith distance, plane-parallel approximation using **observed** zenith distance, spherical-layer invariant and general integral, signed refraction-series coefficients, fitting from observations, and the sunset correction. Near-horizon limitations are explicit.
-- The lesson reader supports Persian, English, and bilingual layouts, a contents rail, full translated example steps, locally rendered KaTeX/MathML, revealable practice answers, and previous/next lessons.
+- The lesson reader supports separate Persian and English layouts with a persistent language switch, a contents rail, full translated example steps, locally rendered KaTeX/MathML, revealable practice answers, and previous/next lessons.
 - Great-circle and small-circle diagrams use the same vector geometry as the numerical calculations. Rear arcs are dashed in static diagrams and occluded on the interactive sphere. Degenerate triangle arrangements show a status message rather than fabricated angles/areas.
 - The sky renderer uses a vertical FOV with rectangular viewport clipping, a continuous zenith camera frame, consistent draw/pick coordinates, and geometric-horizon clipping. The initial location is explicitly the Tehran example until manually changed or GPS is requested. Time input is explicitly **UTC**. The visualisation does not simulate daylight brightness.
 
@@ -513,3 +513,8 @@ The `sync/latest` Cursor branch is integrated with the reviewed lesson, proof, s
 The header offers **123 / ۱۲۳** throughout the app. English digits are the default. The choice is stored locally as `sufi-digits` and synchronises across tabs. Switching changes rendered text, equations, plot ticks, and scene labels without remounting the workspace or resetting its state. Numeric input values, dates, coordinates, URLs, source TeX annotations, copied values, and CSV payloads retain their machine-readable form. The setting remains usable when browser storage is unavailable.
 
 The unrelated Dependabot branch proposing Next.js 16 was inspected and remains separate from this feature integration; the application continues to use its validated Next.js 15 version.
+
+
+## Learning-content language
+
+Use **فارسی / English** in the header to choose one content language. Persian is the initial default; there is no bilingual lesson mode. The choice applies to lesson titles and paragraphs, course tabs, examples, problem statements and solutions, proof steps, diagram captions, and the sphere lab. It is saved in `sufi-language` and synchronised across browser tabs. Direction changes between RTL and LTR without remounting the workspace. The separate **123 / ۱۲۳** control continues to choose numeral glyphs independently. Mathematical symbols and bibliographic names remain as authored.

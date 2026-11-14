@@ -311,10 +311,7 @@ a {
   line-height: 2.15;
 }
 .lesson-english {
-  border-inline-start: 2px solid #73c9c445;
-  padding-inline-start: 1rem;
-  margin-top: 1rem;
-  color: #adbed0;
+  color: inherit;
   line-height: 1.9 !important;
 }
 .study-kicker {

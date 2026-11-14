@@ -1,9 +1,15 @@
 "use client";
 import { LocalizedDigits } from "@/components/digits/DigitScript";
+import { useLanguage } from "@/components/language/Language";
+import { LESSONS } from "@/lib/content/lessons";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Box, PenLine, Stars, BookOpen } from "lucide-react";
 export function Hero() {
+  const { t } = useLanguage();
+  const count = LESSONS.filter((l) =>
+    ["ch1", "ch2", "ch3"].includes(l.chapterId),
+  ).length;
   return (
     <LocalizedDigits>
       {
@@ -12,39 +18,43 @@ export function Hero() {
           <div className="relative mx-auto max-w-6xl px-4 pb-14 pt-12 md:pt-16">
             <div className="animate-in-fade max-w-3xl">
               <p className="mb-3 text-sm text-[var(--teal)]">
-                المپیاد نجوم · Smart · Stellarium-style sky
+                {t(
+                  "المپیاد نجوم · اسمارت · آسمان تعاملی",
+                  "Astronomy olympiad · Smart · Interactive sky",
+                )}
               </p>
               <h1 className="font-[family-name:var(--font-display)] text-4xl leading-[1.15] text-[var(--gold-soft)] md:text-6xl">
-                صوفی‌آسمان
+                {t("صوفی‌آسمان", "Sufi Sky")}
               </h1>
               <p className="mt-5 text-base leading-8 text-[var(--parchment)]/90 md:text-lg">
-                درس‌نامهٔ نه فصل Textbook on Spherical Astronomy (اسمارت، Part
-                1)، اثبات‌های (A)–(D)، آسمان زنده تا قدر ۷، اطلس صور الکواکب، و
-                مسائل با شکل کروی.
+                {t(
+                  "آموزش فصل‌های اول تا سوم نجوم کروی اسمارت، اثبات‌های پیوسته، آسمان تعاملی تا قدر ۷، اطلس صور الکواکب و مسئله‌های همراه با شکل کروی.",
+                  "Explore Smart’s Spherical Astronomy Chapters I–III through connected proofs, an interactive sky to magnitude 7, the Book of Fixed Stars atlas, and problems with spherical diagrams.",
+                )}
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Button asChild size="lg">
                   <Link href="/lab">
                     <Box className="h-4 w-4" />
-                    کرهٔ تعاملی
+                    {t("کرهٔ تعاملی", "Interactive sphere")}
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg">
                   <Link href="/sky">
                     <Stars className="h-4 w-4" />
-                    آسمان زنده
+                    {t("آسمان زنده", "Live sky")}
                   </Link>
                 </Button>
                 <Button asChild variant="secondary" size="lg">
                   <Link href="/proofs?kind=girard">
                     <PenLine className="h-4 w-4" />
-                    اثبات مساحت
+                    {t("اثبات مساحت", "Area proof")}
                   </Link>
                 </Button>
                 <Button asChild variant="secondary" size="lg">
                   <Link href="/learn">
                     <BookOpen className="h-4 w-4" />
-                    درس‌نامه
+                    {t("درس‌نامه", "Course")}
                   </Link>
                 </Button>
               </div>
@@ -52,9 +62,21 @@ export function Hero() {
 
             <div className="mt-10 grid gap-3 sm:grid-cols-3 animate-in-fade animate-delay-1">
               {[
-                { t: "۱۷ درس", d: "Smart I–II–VI + المپیاد" },
-                { t: "۱۵٬۵۴۴ ستاره", d: "قدر ≤ ۷ · J2000" },
-                { t: "شکل‌محور", d: "۵۰٪+ آموزش روی کره" },
+                {
+                  t: `${count} ${t("درس", "lessons")}`,
+                  d: t("فصل‌های ۱–۳ اسمارت", "Smart Chapters I–III"),
+                },
+                {
+                  t: t("۱۵٬۵۴۴ ستاره", "15,544 stars"),
+                  d: t("قدر ≤ ۷ · J2000", "Magnitude ≤ 7 · J2000"),
+                },
+                {
+                  t: t("شکل‌محور", "Visual learning"),
+                  d: t(
+                    "هندسهٔ دقیق و اندازه‌گیری زنده",
+                    "Computed geometry and live measurements",
+                  ),
+                },
               ].map((x) => (
                 <div
                   key={x.t}
