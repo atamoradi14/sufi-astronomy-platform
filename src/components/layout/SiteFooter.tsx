@@ -9,7 +9,7 @@ export function SiteFooter() {
           <span className="text-[var(--gold-soft)]">صور الکواکب</span>.
         </p>
         <div className="flex flex-wrap gap-4">
-          <Link href="/learn" className="hover:text-[var(--parchment)]">
+          <Link href="/course" className="hover:text-[var(--parchment)]">
             دروس
           </Link>
           <Link href="/architecture" className="hover:text-[var(--parchment)]">
