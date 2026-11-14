@@ -1,9 +1,14 @@
 "use client";
 
 import { useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
-import { Billboard, Line, OrbitControls, Text } from "@react-three/drei";
 import * as THREE from "three";
+import { GlobeCanvas } from "@/components/sphere/GlobeCanvas";
+import {
+  AxisLine,
+  GlobeShell,
+  NativeLine,
+  PointMarker,
+} from "@/components/sphere/GlobePrimitives";
 import type { SphereDiagram } from "@/lib/content/problems";
 import { deg } from "@/lib/astronomy/sphericalTrig";
 import {
@@ -405,26 +410,9 @@ export function SolutionSphere({ diagram }: { diagram: SphereDiagram }) {
   return (
     <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--ink-deep)]">
       <div className="h-[280px] w-full sm:h-[340px]">
-        <Canvas
-          camera={{ position: [2.2, 1.2, 2.2], fov: 42 }}
-          dpr={[1, 1.5]}
-          gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
-          onCreated={({ gl }) => {
-            gl.setClearColor(new THREE.Color("#070d18"), 1);
-          }}
-        >
-          <ambientLight intensity={0.6} />
-          <directionalLight position={[4, 5, 2]} intensity={1.05} />
+        <GlobeCanvas className="h-full w-full">
           <SphereFigure scene={scene} />
-          <OrbitControls
-            makeDefault
-            enablePan={false}
-            minDistance={1.55}
-            maxDistance={4.5}
-            rotateSpeed={0.7}
-            zoomSpeed={0.65}
-          />
-        </Canvas>
+        </GlobeCanvas>
       </div>
       <div className="space-y-1 border-t border-[var(--border)] px-3 py-2.5">
         <p className="text-center text-[12px] leading-6 text-[var(--muted)]">
@@ -464,45 +452,21 @@ function SphereFigure({ scene }: { scene: Built }) {
 
   return (
     <group>
-      <mesh>
-        <sphereGeometry args={[0.992, 64, 64]} />
-        <meshStandardMaterial
-          color="#121c30"
-          transparent
-          opacity={0.52}
-          metalness={0.12}
-          roughness={0.88}
-        />
-      </mesh>
-      <mesh>
-        <sphereGeometry args={[1.001, 48, 48]} />
-        <meshBasicMaterial color="#c9a227" wireframe transparent opacity={0.07} />
-      </mesh>
+      <GlobeShell />
+      {scene.axis ? <AxisLine /> : null}
 
-      {scene.axis && (
-        <Line
-          points={[
-            [0, -1.12, 0],
-            [0, 1.12, 0],
-          ]}
-          color="#e6d39a"
-          lineWidth={1.4}
-        />
-      )}
-
-      {scene.equator && <Poly pts={equator} color="#c9a227" width={1.8} />}
+      {scene.equator && <NativeLine pts={equator} color="#c9a227" />}
       {meridians.map((m, i) => (
-        <Poly key={`m${i}`} pts={m} color="#5b7c99" width={1} />
+        <NativeLine key={`m${i}`} pts={m} color="#8eb4d4" />
       ))}
       {parallels.map((p, i) => (
-        <Poly key={`p${i}`} pts={p} color="#3d7a7a" width={1} dashed />
+        <NativeLine key={`p${i}`} pts={p} color="#5aa3a3" dashed />
       ))}
       {smalls.map((s, i) => (
-        <Poly
+        <NativeLine
           key={`s${i}`}
           pts={s.pts}
-          color={s.color ?? "#3d7a7a"}
-          width={2}
+          color={s.color ?? "#5aa3a3"}
           dashed={s.dashed}
         />
       ))}
@@ -510,11 +474,11 @@ function SphereFigure({ scene }: { scene: Built }) {
       {scene.fill && <TriangleCap vertices={scene.fill} />}
 
       {(scene.arcs ?? []).map((a, i) => (
-        <Poly key={`a${i}`} pts={a.pts} color={a.color} width={a.width ?? 2.5} />
+        <NativeLine key={`a${i}`} pts={a.pts} color={a.color} />
       ))}
 
       {(scene.points ?? []).map((p, i) => (
-        <Marker key={`pt${i}`} pos={p.pos} label={p.label} color={p.color} />
+        <PointMarker key={`pt${i}`} pos={p.pos} label={p.label} color={p.color} />
       ))}
     </group>
   );
@@ -566,10 +530,10 @@ function TriangleCap({ vertices }: { vertices: [Vec3, Vec3, Vec3] }) {
 
   return (
     <mesh geometry={geom}>
-      <meshStandardMaterial
+      <meshBasicMaterial
         color="#c9a227"
         transparent
-        opacity={0.22}
+        opacity={0.38}
         side={THREE.DoubleSide}
         depthWrite={false}
       />
@@ -596,63 +560,3 @@ function slerpV(a: Vec3 | THREE.Vector3, b: Vec3 | THREE.Vector3, t: number) {
   ).normalize();
 }
 
-function Poly({
-  pts,
-  color,
-  width = 1.5,
-  dashed,
-}: {
-  pts: Vec3[];
-  color: string;
-  width?: number;
-  dashed?: boolean;
-}) {
-  const points = useMemo(
-    () => pts.map((p) => new THREE.Vector3(p[0], p[1], p[2])),
-    [pts],
-  );
-  return (
-    <Line
-      points={points}
-      color={color}
-      lineWidth={width}
-      dashed={dashed}
-      dashSize={0.045}
-      gapSize={0.035}
-      transparent
-      opacity={0.95}
-    />
-  );
-}
-
-function Marker({
-  pos,
-  label,
-  color,
-}: {
-  pos: Vec3;
-  label: string;
-  color: string;
-}) {
-  return (
-    <group position={pos}>
-      <mesh>
-        <sphereGeometry args={[0.032, 16, 16]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.45} />
-      </mesh>
-      <Billboard position={[0.07, 0.07, 0]}>
-        <Text
-          fontSize={0.085}
-          color="#e6d39a"
-          anchorX="left"
-          anchorY="middle"
-          outlineWidth={0.006}
-          outlineColor="#070d18"
-          maxWidth={1.2}
-        >
-          {label}
-        </Text>
-      </Billboard>
-    </group>
-  );
-}

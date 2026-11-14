@@ -5,7 +5,7 @@ const CSP = [
   "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.arcgisonline.com",
-  "font-src 'self' data:",
+  "font-src 'self' data: blob:",
   "connect-src 'self'",
   "worker-src 'self' blob:",
   "frame-ancestors 'none'",
