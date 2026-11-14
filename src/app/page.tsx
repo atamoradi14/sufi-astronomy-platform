@@ -17,6 +17,7 @@ import {
   Orbit,
   PenLine,
   ScrollText,
+  Crosshair,
   Stars,
 } from "lucide-react";
 const FEATURES = [
@@ -55,6 +56,15 @@ const FEATURES = [
     descEn:
       "Over 15,000 stars to magnitude 7, constellation lines, and al-Sufi’s atlas.",
     icon: Stars,
+  },
+  {
+    href: "/sensor",
+    title: "ستاره‌سنج",
+    titleEn: "Star sensor",
+    desc: "عکس آسمان را بخوانید: صورت‌ها، بعد و میل، و ارتفاع و سمت تا چند ثانیه قوسی.",
+    descEn:
+      "Read a sky photo: constellations, RA/Dec, and altitude/azimuth to a few arcseconds.",
+    icon: Crosshair,
   },
   {
     href: "/atlas",

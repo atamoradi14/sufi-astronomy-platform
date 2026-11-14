@@ -41,6 +41,7 @@ Runs in the browser (including Android Chrome). Device **GPS** and **compass** a
 | **Curriculum** (`/learn`) | Nine chapters of Smart *Textbook on Spherical Astronomy* Part 1 (pp. 1–222): rewritten bilingual chapters I–III, connected proofs, locally typeset equations, computed geometric figures, worked examples and original practice |
 | **Problem bank** (`/problems`) | Sample olympiad/Smart problems; each solution opens a **3D sphere diagram** matched to the math (PZX, great/small circles, polar dual, etc.) |
 | **Live sky** (`/sky`) | Rectangular gnomonic sky: **15 544 J2000 stars to mag ≤ 7**, constellation figures, manual/GPS location, UTC time controls, search, picking, keyboard navigation, and pinch zoom |
+| **Star sensor** (`/sensor`) | Upload or camera photo of the sky. A geometric lost-in-space solve (HYG to magnitude 6.5, triangle index, Wahba camera fit) reports ICRS RA/Dec and apparent altitude/azimuth of the center and every star, with plate scale and formal uncertainty in arcseconds |
 | **Sufi atlas** (`/atlas`) | All **48** Ptolemaic constellations with **real manuscript plates** (globe / sky / tables) from a six-part *Ṣuwar al-Kawākib* scan, plus Persian commentary |
 | **Compass & Qibla** (`/compass`) | Device heading + great-circle Qibla bearing/distance |
 | **Map** (`/map`) | Leaflet tracker with observer position |
@@ -359,6 +360,7 @@ curl "http://127.0.0.1:3847/api/catalog/constellations"
 | `/learn/[id]` | Full lesson: formulae, reconstructed figures, example, exercises |
 | `/problems` | Olympiad/Smart bank + **3D solution spheres** |
 | `/sky` | Interactive all-sky (mag ≤ 7) |
+| `/sensor` | Star sensor: photo or camera, constellation identification, RA/Dec and alt/az in arcseconds |
 | `/compass` | Compass + Qibla |
 | `/map` | Leaflet observer map |
 | `/charts` | Charts |
@@ -372,6 +374,7 @@ curl "http://127.0.0.1:3847/api/catalog/constellations"
 
 - **Stars:** HYG / Hipparcos-derived selection, magnitude ≤ 7, ~15 544 objects, shipped as quantized base64 columns (`v: 2`) for smaller payload.
 - **IAU lines:** `public/data/constellations-iau.json` for stick figures on the sky canvas.
+- **Star sensor:** `public/data/sensor-catalog.json`, HYG v4 stars to magnitude 6.5 with proper motion, parallax, and a triangle index. Rebuild with `npx tsx scripts/build-sensor-catalog.ts /path/to/hyg.csv`.
 - **Courses / problems:** `src/lib/content/lessonsCh1.ts` … `lessonsLater.ts`, `src/lib/content/problems.ts`. Curriculum follows W.M. Smart, *Textbook on Spherical Astronomy*, Part 1.
 
 ---
@@ -380,8 +383,9 @@ curl "http://127.0.0.1:3847/api/catalog/constellations"
 
 | Hook | API | Use |
 |------|-----|-----|
-| `useGeolocation` | Geolocation API | Map, sky observer, Qibla |
+| `useGeolocation` | Geolocation API | Map, sky observer, Qibla, star sensor |
 | `useCompass` | DeviceOrientation | Compass / Qibla overlay |
+| Camera | `getUserMedia` | Star-sensor capture. A file upload works when the camera is refused |
 
 **Notes**
 
@@ -394,6 +398,8 @@ curl "http://127.0.0.1:3847/api/catalog/constellations"
 ## Scripts
 
 Curriculum source is `src/lib/content/lessonsCh1.ts`, `lessonsCh2.ts`, `lessonsLater.ts` (Smart Part 1 chapters, formulae, examples). `scripts/gen-courses.mjs` is a legacy generator and is not used at runtime.
+
+`scripts/sensor.test.ts` checks the star-sensor math, a narrow lost-in-space plate, a wide distorted plate, the detector, and apparent altitude. `scripts/build-sensor-catalog.ts` rebuilds the packed catalog from a HYG CSV.
 
 ---
 
