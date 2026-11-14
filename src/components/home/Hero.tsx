@@ -24,7 +24,7 @@ export function Hero() {
                 )}
               </p>
               <h1 className="font-[family-name:var(--font-display)] text-4xl leading-[1.15] text-[var(--gold-soft)] md:text-6xl">
-                {t("صوفی‌آسمان", "Sufi Sky")}
+                {t("ماندریا", "Manderia")}
               </h1>
               <p className="mt-5 text-base leading-8 text-[var(--parchment)]/90 md:text-lg">
                 {t(

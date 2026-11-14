@@ -11,18 +11,32 @@ import "@fontsource/amiri/arabic-700.css";
 import "@fontsource/amiri/latin-400.css";
 
 export const metadata: Metadata = {
-  title: "صوفی‌آسمان | آموزش ریاضیات کروی و نجوم",
+  metadataBase: new URL("https://manderia.daryajan.com"),
+  title: "ماندریا | Manderia | آموزش ریاضیات کروی و نجوم",
   description:
     "آموزش تعاملی ریاضیات کروی، قطب‌نما و قبله، نقشه ماهواره‌ای، نمودارهای نجومی و صورت‌های فلکی به سبک عبدالرحمن صوفی — به زبان فارسی.",
-  applicationName: "صوفی‌آسمان",
+  applicationName: "ماندریا",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
-    title: "صوفی‌آسمان",
+    title: "ماندریا",
     statusBarStyle: "black-translucent",
   },
   formatDetection: { telephone: false },
-  icons: { icon: "/icon.svg" },
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "32x32" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+  openGraph: {
+    title: "ماندریا | Manderia",
+    siteName: "Manderia",
+    url: "https://manderia.daryajan.com",
+    type: "website",
+    locale: "fa_IR",
+  },
 };
 
 export const viewport: Viewport = {

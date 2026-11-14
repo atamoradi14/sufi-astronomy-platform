@@ -10,7 +10,7 @@ export default function AtlasPage() {
               صور الکواکب · عبدالرحمن صوفی
             </p>
             <h1 className="mt-2 font-[family-name:var(--font-display)] text-3xl text-[var(--gold-soft)] md:text-4xl">
-              اطلس نسخهٔ خطی
+              اطلس صوفی
             </h1>
             <p className="mt-3 max-w-3xl text-sm leading-8 text-[var(--muted)]">
               چهل‌وهشت صورت بطلمیوسی با نگاره‌های واقعی شش دفتر نسخه، شرح فارسی،

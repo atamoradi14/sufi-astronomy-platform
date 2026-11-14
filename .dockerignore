@@ -1,0 +1,15 @@
+.git
+.next
+node_modules
+tmp
+output
+.playwright-cli
+.local
+.releases
+refrences
+books
+.env*
+*.pem
+*.key
+*.tsbuildinfo
+npm-debug.log*

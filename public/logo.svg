@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <title>Manderia — geometry of the sky</title>
+  <rect width="128" height="128" rx="30" fill="#0b1728"/>
+  <circle cx="64" cy="64" r="43" stroke="#d8b55c" stroke-width="2" opacity=".7"/>
+  <ellipse cx="64" cy="64" rx="49" ry="18" transform="rotate(-32 64 64)" stroke="#79d5ca" stroke-width="2.5"/>
+  <path d="m35 87 12-43 17 25 17-25 12 43" stroke="#f2d891" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="m94 18 2.8 8.2L105 29l-8.2 2.8L94 40l-2.8-8.2L83 29l8.2-2.8Z" fill="#f2d891"/>
+  <circle cx="27" cy="84" r="4" fill="#79d5ca"/>
+</svg>

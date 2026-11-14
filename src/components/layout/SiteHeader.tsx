@@ -1,6 +1,7 @@
 "use client";
 import { useLanguage } from "@/components/language/Language";
 import { setLanguage } from "@/lib/language";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn, setDigitScript } from "@/lib/utils";
@@ -8,15 +9,15 @@ import {
   useDigitScript,
   LocalizedDigits,
 } from "@/components/digits/DigitScript";
-import { Menu, X, Star } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
 const NAV = [
   { href: "/", label: "خانه", en: "Home" },
   { href: "/course", label: "درس‌نامه", en: "Course" },
   { href: "/lab", label: "کره", en: "Sphere" },
   { href: "/sky", label: "آسمان", en: "Sky" },
-  { href: "/atlas", label: "اطلس", en: "Atlas" },
-  { href: "/charts", label: "زنده", en: "Live charts" },
+  { href: "/atlas", label: "اطلس صوفی", en: "Sufi atlas" },
+  { href: "/charts", label: "داده های لایو", en: "Live data" },
   { href: "/map", label: "نقشه", en: "Map" },
 ];
 export function SiteHeader() {
@@ -31,14 +32,17 @@ export function SiteHeader() {
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-3">
             <Link href="/" className="flex items-center gap-2 group">
               <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--gold)]/40 bg-[var(--panel)] text-[var(--gold)] group-hover:border-[var(--gold)] transition-colors">
-                <Star className="h-4 w-4" />
+                <Image src="/logo.svg" alt="" width={36} height={36} priority />
               </span>
               <span className="leading-tight">
                 <span className="block font-[family-name:var(--font-display)] text-lg text-[var(--gold-soft)]">
-                  {t("صوفی‌آسمان", "Sufi Sky")}
+                  {t("ماندریا", "Manderia")}
                 </span>
                 <span className="block text-[10px] text-[var(--muted)] tracking-wide">
-                  {t("به یاد عبدالرحمن صوفی", "In memory of al-Sufi")}
+                  {t(
+                    "هندسهٔ آسمان را کشف کنید",
+                    "Explore the geometry of the sky",
+                  )}
                 </span>
               </span>
             </Link>

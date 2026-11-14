@@ -1,10 +1,10 @@
-# Sufi Astronomy Platform (صوفی‌آسمان)
+# Manderia (ماندریا)
 
 Persian-first web app for **spherical trigonometry**, olympiad astronomy, and observational practice — inspired by **Abd al-Rahman al-Sufi** and *Ṣuwar al-Kawākib*.
 
 Runs in the browser (including Android Chrome). Device **GPS** and **compass** are used where available; no APK install is required.
 
-**Live demo:** [https://sufi-astronomy.apps.grok.bot](https://sufi-astronomy.apps.grok.bot)  
+**Live demo:** [https://manderia.daryajan.com](https://manderia.daryajan.com)
 **Public GitHub:** [https://github.com/atamoradi14/sufi-astronomy-platform](https://github.com/atamoradi14/sufi-astronomy-platform)
 
 ---
@@ -168,88 +168,29 @@ git push -u origin main --force   # only when intentionally replacing history
 
 ## Docker deploy
 
-The root `Dockerfile` is a three-stage build (deps → build → runner) producing a **standalone** image on port **3847**.
+The three-stage root `Dockerfile` builds a non-root Node.js standalone image on port **3847**. Release scripts build a clean Git archive for Linux amd64, push `docker.io/atamoradi/manderia`, and record its immutable digest under ignored `.releases/`.
+
+```powershell
+./scripts/build-and-push.ps1 -Tag release-YYYYMMDD-NN
+./scripts/deploy.ps1 apply -Tag release-YYYYMMDD-NN
+```
 
 ```bash
-docker build -t sufi-astronomy/web-gateway:latest .
-docker run --rm -p 3847:3847 sufi-astronomy/web-gateway:latest
+./scripts/build-and-push.sh --tag release-YYYYMMDD-NN
+./scripts/deploy.sh apply --tag release-YYYYMMDD-NN
 ```
-
-Then open http://127.0.0.1:3847
-
-Image layout (runner stage):
-
-- `public/` static assets (star catalog, etc.)
-- `.next/standalone` → `node server.js`
-- `.next/static` copied beside standalone output
-
-Optional Compose sketch:
-
-```yaml
-services:
-  web:
-    image: sufi-astronomy/web-gateway:latest
-    ports:
-      - "3847:3847"
-    environment:
-      PORT: "3847"
-      NODE_ENV: production
-```
-
-Stub Dockerfiles under `services/*/Dockerfile` mark future extracted services; domain logic still lives in the Next BFF today.
-
----
 
 ## Kubernetes deploy
 
-Manifests live in `deploy/k8s/`:
+Production: **https://manderia.daryajan.com**. Context **ravand**, namespace **astronomy**, deployment/service **manderia**, node **ravand-worker-01**. One Next.js image provides both the UI and APIs; the future service extraction stubs are not deployed.
 
-| File | Role |
-|------|------|
-| `namespace.yaml` | `sufi-astronomy` namespace |
-| `web-gateway.yaml` | Next UI Deployment + Service (port 80 → 3847) |
-| `services.yaml` | Deployments/Services for astro-time, sphere-math, qibla, catalog |
-| `ingress.yaml` | Path-based routing example host `sufi-astronomy.example.com` |
+The shared Caddy in **hamafarin-apps** serves this hostname and proxies to `manderia.astronomy.svc.cluster.local:80`. It also serves Hamafarin and Darvazeh. A gateway update validates the complete configuration, saves private snapshots locally and on the worker, checks for concurrent changes, and reloads Caddy without restarting it. The gateway's owning `hamafarin-cluster/manifests/Caddyfile` and `apps.json` are updated together.
 
-Apply stubs (customize images/host first):
-
-```bash
-kubectl apply -f deploy/k8s/namespace.yaml
-kubectl apply -f deploy/k8s/services.yaml
-kubectl apply -f deploy/k8s/web-gateway.yaml
-kubectl apply -f deploy/k8s/ingress.yaml
-```
-
-Gateway env vars prepared for the split:
-
-| Variable | Default intent |
-|----------|----------------|
-| `SERVICE_ASTRO_TIME_URL` | `http://astro-time:8081` |
-| `SERVICE_SPHERE_MATH_URL` | `http://sphere-math:8082` |
-| `SERVICE_QIBLA_URL` | `http://qibla:8083` |
-| `SERVICE_CATALOG_URL` | `http://catalog:8084` |
-
-Until services are extracted, the monolith image alone is enough:
-
-```bash
-kubectl -n sufi-astronomy set image deploy/web-gateway web=YOUR_REGISTRY/sufi-astronomy/web-gateway:TAG
-```
-
----
+See [deployment and recovery instructions](deploy/README.md). Never apply the manifest image placeholders directly; use the scripts to insert the pushed image digest and source revision.
 
 ## Cursor / hosted publish
 
-This app can be published with Cursor’s **publish-app** flow (public demo currently at `sufi-astronomy.apps.grok.bot`).
-
-Typical agent/maintainer loop:
-
-1. `npm run build` must succeed locally
-2. Commit and push the branch Cursor tracks
-3. Keep a local preview server running (`npm run dev` on 3847)
-4. Confirm the publish dialog in Cursor (3.29.8+) when prompted
-5. Security review must finish before a new version goes live
-
-No app secrets are required for core features (catalogs ship in `public/data`; sensors are browser APIs).
+The former Grok/hosted preview is historical. The production release path is Docker Hub → the `astronomy` namespace → the existing shared worker Caddy. The GitHub repository URL remains unchanged.
 
 ---
 

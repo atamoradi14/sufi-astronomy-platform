@@ -17,7 +17,7 @@ export async function generateMetadata({
   const lesson = getLesson(id);
   if (!lesson) return { title: "درس" };
   return {
-    title: `${lesson.titleFa} · صوفی‌آسمان`,
+    title: `${lesson.titleFa} · ماندریا`,
     description: lesson.summaryFa,
   };
 }
