@@ -5,14 +5,16 @@ import { clientKey, rateLimit } from "@/lib/api/rateLimit";
 
 /** Catalog service — later extract to services/catalog */
 export async function GET(req: NextRequest) {
-  const rl = rateLimit(clientKey(req.headers, "catalog"), 30);
-  if (!rl.ok) {
+  const limited = rateLimit(clientKey(req.headers, "catalog"), 30);
+  if (!limited.ok) {
     return NextResponse.json(
-      { error: "rate limit exceeded" },
-      { status: 429, headers: { "Retry-After": String(rl.retryAfterSec) } },
+      { error: "درخواست زیاد است" },
+      {
+        status: 429,
+        headers: { "Retry-After": String(limited.retryAfterSec) },
+      },
     );
   }
-
   return NextResponse.json({
     service: "catalog",
     source: SUWAR_META.titleFa,

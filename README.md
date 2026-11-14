@@ -504,3 +504,12 @@ npm run build
 ```
 
 `npm test` uses Node’s test runner through `tsx`. It independently checks analytic octants, 120 vector-built triangles against the trigonometric identities, circle planes/unit norms, antipodal arcs, 245 PZX cases including geographic poles, sky projection/zenith continuity, the J2000 time reference, worked numerical values, lesson/proof links, bilingual content fields, and authored TeX parsing. Browser checks cover the sphere, sky, proof navigation, lessons, and responsive layouts.
+
+
+## Cursor integration and number display
+
+The `sync/latest` Cursor branch is integrated with the reviewed lesson, proof, sphere, and sky implementations taking priority in overlapping files. `/course` collects the reviewed curriculum, examples, problems, proofs, and lab. `/charts` retains the Astronomy Engine ephemeris, separate-scale plots, observer/Earth/ISS views, copyable values, and CSV downloads. The learning path resolves to the reviewed chapter III sequence.
+
+The header offers **123 / ۱۲۳** throughout the app. English digits are the default. The choice is stored locally as `sufi-digits` and synchronises across tabs. Switching changes rendered text, equations, plot ticks, and scene labels without remounting the workspace or resetting its state. Numeric input values, dates, coordinates, URLs, source TeX annotations, copied values, and CSV payloads retain their machine-readable form. The setting remains usable when browser storage is unavailable.
+
+The unrelated Dependabot branch proposing Next.js 16 was inspected and remains separate from this feature integration; the application continues to use its validated Next.js 15 version.

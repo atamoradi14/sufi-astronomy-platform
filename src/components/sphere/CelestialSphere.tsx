@@ -1,5 +1,8 @@
 "use client";
-
+import {
+  useDigitScript,
+  LocalizedDigits,
+} from "@/components/digits/DigitScript";
 import { Suspense, useMemo, useEffect, useRef } from "react";
 import {
   Canvas,
@@ -9,6 +12,7 @@ import {
 } from "@react-three/fiber";
 import { Line, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
+import { formatDigits } from "@/lib/digits";
 import {
   equatorCircle,
   greatArc,
@@ -20,7 +24,6 @@ import {
   cartToLonLat,
   type Vec3,
 } from "@/lib/astronomy/sphereGeom";
-
 export type SphereViewState = {
   showEquator: boolean;
   showMeridians: boolean;
@@ -31,9 +34,18 @@ export type SphereViewState = {
   showSmallDemo: boolean;
   smallRadius: number;
   observerLat: number;
-  pointA: { lon: number; lat: number };
-  pointB: { lon: number; lat: number };
-  pointC: { lon: number; lat: number };
+  pointA: {
+    lon: number;
+    lat: number;
+  };
+  pointB: {
+    lon: number;
+    lat: number;
+  };
+  pointC: {
+    lon: number;
+    lat: number;
+  };
   vertexLabels?: [string, string, string];
   highlight: "none" | "great" | "small" | "triangle";
 };
@@ -51,43 +63,47 @@ export function CelestialSphere({
   resetKey = 0,
 }: Props) {
   return (
-    <div
-      className={`relative ${className ?? ""}`}
-      role="img"
-      aria-label="Interactive unit sphere: drag to orbit, scroll or pinch to zoom. Select a vertex, then click the surface to place it."
-    >
-      <Canvas
-        key={resetKey}
-        camera={{ position: [2.1, 1.45, 2.5], fov: 40 }}
-        dpr={[1, 2]}
-        frameloop="demand"
-        gl={{ antialias: true, alpha: false }}
-        onCreated={({ gl }) => gl.setClearColor("#081322", 1)}
-      >
-        <ambientLight intensity={1.4} />
-        <directionalLight position={[3, 5, 4]} intensity={1.8} />
-        <Suspense fallback={null}>
-          <SphereMesh state={state} onPlace={onPlace} />
-        </Suspense>
-        <FitCamera />
-        <OrbitControls
-          makeDefault
-          enablePan={false}
-          minDistance={2}
-          maxDistance={6}
-          rotateSpeed={0.65}
-          zoomSpeed={0.65}
-          enableDamping
-          dampingFactor={0.12}
-        />
-      </Canvas>
-      <div className="pointer-events-none absolute start-4 top-4 rounded-lg bg-[#07121fe6] px-3 py-2 text-xs text-[#a9bdd1]">
-        R = 1 ·{" "}
-        {onPlace
-          ? "برای جای‌گذاری روی سطح کلیک کنید"
-          : "نمای بیرونی · External view"}
-      </div>
-    </div>
+    <LocalizedDigits>
+      {
+        <div
+          className={`relative ${className ?? ""}`}
+          role="img"
+          aria-label="Interactive unit sphere: drag to orbit, scroll or pinch to zoom. Select a vertex, then click the surface to place it."
+        >
+          <Canvas
+            key={resetKey}
+            camera={{ position: [2.1, 1.45, 2.5], fov: 40 }}
+            dpr={[1, 2]}
+            frameloop="demand"
+            gl={{ antialias: true, alpha: false }}
+            onCreated={({ gl }) => gl.setClearColor("#081322", 1)}
+          >
+            <ambientLight intensity={1.4} />
+            <directionalLight position={[3, 5, 4]} intensity={1.8} />
+            <Suspense fallback={null}>
+              <SphereMesh state={state} onPlace={onPlace} />
+            </Suspense>
+            <FitCamera />
+            <OrbitControls
+              makeDefault
+              enablePan={false}
+              minDistance={2}
+              maxDistance={6}
+              rotateSpeed={0.65}
+              zoomSpeed={0.65}
+              enableDamping
+              dampingFactor={0.12}
+            />
+          </Canvas>
+          <div className="pointer-events-none absolute start-4 top-4 rounded-lg bg-[#07121fe6] px-3 py-2 text-xs text-[#a9bdd1]">
+            R = 1 ·{" "}
+            {onPlace
+              ? "برای جای‌گذاری روی سطح کلیک کنید"
+              : "نمای بیرونی · External view"}
+          </div>
+        </div>
+      }
+    </LocalizedDigits>
   );
 }
 function SphereMesh({
@@ -302,6 +318,8 @@ export function SphereMarker({
   color: string;
   small?: boolean;
 }) {
+  const script = useDigitScript();
+  const displayLabel = formatDigits(label, script);
   const sprite = useRef<THREE.Sprite>(null);
   useFrame(({ camera, size }) => {
     if (sprite.current && camera instanceof THREE.PerspectiveCamera) {
@@ -315,7 +333,7 @@ export function SphereMarker({
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d")!;
     ctx.font = "600 24px sans-serif";
-    const width = Math.ceil(ctx.measureText(label).width) + 24;
+    const width = Math.ceil(ctx.measureText(displayLabel).width) + 24;
     canvas.width = width * 2;
     canvas.height = 72;
     ctx.scale(2, 2);
@@ -329,11 +347,11 @@ export function SphereMarker({
     ctx.fillStyle = color;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(label, width / 2, 19);
+    ctx.fillText(displayLabel, width / 2, 19);
     const map = new THREE.CanvasTexture(canvas);
     map.colorSpace = THREE.SRGBColorSpace;
     return { map, ratio: width / 36 };
-  }, [label, color]);
+  }, [displayLabel, color]);
   useEffect(() => () => texture.map.dispose(), [texture]);
   return (
     <group position={pos.map((v) => v * 1.025) as Vec3}>
@@ -360,7 +378,6 @@ export function SphereMarker({
     </group>
   );
 }
-
 function FitCamera() {
   const { camera, size, invalidate } = useThree();
   useEffect(() => {

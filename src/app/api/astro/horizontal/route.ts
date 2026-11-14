@@ -9,7 +9,10 @@ export async function GET(req: NextRequest) {
   if (!limited.ok) {
     return NextResponse.json(
       { error: "درخواست زیاد است" },
-      { status: 429, headers: { "Retry-After": String(limited.retryAfterSec) } },
+      {
+        status: 429,
+        headers: { "Retry-After": String(limited.retryAfterSec) },
+      },
     );
   }
   const sp = req.nextUrl.searchParams;
@@ -26,7 +29,10 @@ export async function GET(req: NextRequest) {
     !inRange(lat, -90, 90) ||
     !inRange(lon, -180, 180)
   ) {
-    return NextResponse.json({ error: "ra, dec, lat الزامی است" }, { status: 400 });
+    return NextResponse.json(
+      { error: "ra, dec, lat الزامی است" },
+      { status: 400 },
+    );
   }
 
   const lst = lstHours(date, lon);

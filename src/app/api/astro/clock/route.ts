@@ -8,7 +8,10 @@ export async function GET(req: NextRequest) {
   if (!limited.ok) {
     return NextResponse.json(
       { error: "درخواست زیاد است" },
-      { status: 429, headers: { "Retry-After": String(limited.retryAfterSec) } },
+      {
+        status: 429,
+        headers: { "Retry-After": String(limited.retryAfterSec) },
+      },
     );
   }
   const sp = req.nextUrl.searchParams;

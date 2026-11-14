@@ -17,7 +17,7 @@ export const SUWAR_META = {
   "titleEn": "Book of the Fixed Stars",
   "authorFa": "عبدالرحمن صوفی",
   "authorEn": "Abd al-Rahman al-Sufi",
-  "sourceNoteFa": "برگ‌های نسخه‌خطی بارگذاری‌شده در شش دفتر؛ نگاره‌ها برای وب به WebP فشرده شده‌اند.",
+  "sourceNoteFa": "نگاره‌های نسخهٔ خطی شش‌دفتری؛ برای استقرار وب به صورت فشرده نگه داشته شده‌اند.",
   "covers": [
     {
       "id": "cover",

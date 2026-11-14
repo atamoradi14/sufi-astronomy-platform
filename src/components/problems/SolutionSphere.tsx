@@ -1,5 +1,5 @@
 "use client";
-
+import { LocalizedDigits } from "@/components/digits/DigitScript";
 import { useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Line, OrbitControls } from "@react-three/drei";
@@ -23,13 +23,10 @@ import {
   type Vec3,
 } from "@/lib/astronomy/sphereGeom";
 import { toPersianDigits } from "@/lib/utils";
-
 const DEG = Math.PI / 180;
-
 function clamp(x: number, lo = -1, hi = 1) {
   return Math.min(hi, Math.max(lo, x));
 }
-
 /** Sides from three angles (degrees) via polar cosine rearrangement. */
 function sidesFromAngles(A: number, B: number, C: number) {
   const Ar = A * DEG;
@@ -64,24 +61,34 @@ function sidesFromAngles(A: number, B: number, C: number) {
     Math.PI;
   return { a, b, c };
 }
-
 function acuteAsin(x: number) {
   return (Math.asin(clamp(x)) * 180) / Math.PI;
 }
-
 type Built = {
   caption: string;
   metric?: string;
   equator?: boolean;
   meridians?: number[];
   parallels?: number[];
-  small?: { pole: Vec3; radius: number; color?: string; dashed?: boolean }[];
-  arcs?: { pts: Vec3[]; color: string; width?: number }[];
-  points?: { pos: Vec3; label: string; color: string }[];
+  small?: {
+    pole: Vec3;
+    radius: number;
+    color?: string;
+    dashed?: boolean;
+  }[];
+  arcs?: {
+    pts: Vec3[];
+    color: string;
+    width?: number;
+  }[];
+  points?: {
+    pos: Vec3;
+    label: string;
+    color: string;
+  }[];
   fill?: [Vec3, Vec3, Vec3];
   axis?: boolean;
 };
-
 function buildScene(diagram: SphereDiagram): Built {
   switch (diagram.kind) {
     case "small-circle": {
@@ -374,7 +381,6 @@ function buildScene(diagram: SphereDiagram): Built {
     }
   }
 }
-
 function triangleArcs(A: Vec3, B: Vec3, C: Vec3) {
   return [
     { pts: greatArc(A, B, 64), color: "#e6d39a", width: 2.8 },
@@ -382,7 +388,6 @@ function triangleArcs(A: Vec3, B: Vec3, C: Vec3) {
     { pts: greatArc(C, A, 64), color: "#5b7c99", width: 2.8 },
   ];
 }
-
 /** Pole of great circle through U,V, oriented into the hemisphere of toward. */
 function poleOfSide(U: Vec3, V: Vec3, toward: Vec3): Vec3 {
   const n: Vec3 = [
@@ -397,56 +402,57 @@ function poleOfSide(U: Vec3, V: Vec3, toward: Vec3): Vec3 {
   }
   return p;
 }
-
 export function SolutionSphere({ diagram }: { diagram: SphereDiagram }) {
   const scene = useMemo(() => buildScene(diagram), [diagram]);
-
   return (
-    <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--ink-deep)]">
-      <div className="h-[280px] w-full sm:h-[340px]">
-        <Canvas
-          frameloop="demand"
-          camera={{ position: [2.2, 1.2, 2.2], fov: 42 }}
-          dpr={[1, 1.5]}
-          gl={{
-            antialias: true,
-            alpha: false,
-            powerPreference: "high-performance",
-          }}
-          onCreated={({ gl }) => {
-            gl.setClearColor(new THREE.Color("#070d18"), 1);
-          }}
-        >
-          <ambientLight intensity={0.6} />
-          <directionalLight position={[4, 5, 2]} intensity={1.05} />
-          <SphereFigure scene={scene} />
-          <OrbitControls
-            makeDefault
-            enablePan={false}
-            minDistance={1.55}
-            maxDistance={4.5}
-            rotateSpeed={0.7}
-            zoomSpeed={0.65}
-          />
-        </Canvas>
-      </div>
-      <div className="space-y-1 border-t border-[var(--border)] px-3 py-2.5">
-        <p className="text-center text-[12px] leading-6 text-[var(--muted)]">
-          {scene.caption}
-        </p>
-        {scene.metric && (
-          <p className="text-center font-[family-name:var(--font-display)] text-sm text-[var(--gold-soft)] dir-ltr">
-            {scene.metric}
-          </p>
-        )}
-        <p className="text-center text-[10px] text-[var(--muted)]">
-          بکشید تا بچرخد · اسکرول برای بزرگ‌نمایی
-        </p>
-      </div>
-    </div>
+    <LocalizedDigits>
+      {
+        <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--ink-deep)]">
+          <div className="h-[280px] w-full sm:h-[340px]">
+            <Canvas
+              frameloop="demand"
+              camera={{ position: [2.2, 1.2, 2.2], fov: 42 }}
+              dpr={[1, 1.5]}
+              gl={{
+                antialias: true,
+                alpha: false,
+                powerPreference: "high-performance",
+              }}
+              onCreated={({ gl }) => {
+                gl.setClearColor(new THREE.Color("#070d18"), 1);
+              }}
+            >
+              <ambientLight intensity={0.6} />
+              <directionalLight position={[4, 5, 2]} intensity={1.05} />
+              <SphereFigure scene={scene} />
+              <OrbitControls
+                makeDefault
+                enablePan={false}
+                minDistance={1.55}
+                maxDistance={4.5}
+                rotateSpeed={0.7}
+                zoomSpeed={0.65}
+              />
+            </Canvas>
+          </div>
+          <div className="space-y-1 border-t border-[var(--border)] px-3 py-2.5">
+            <p className="text-center text-[12px] leading-6 text-[var(--muted)]">
+              {scene.caption}
+            </p>
+            {scene.metric && (
+              <p className="text-center font-[family-name:var(--font-display)] text-sm text-[var(--gold-soft)] dir-ltr">
+                {scene.metric}
+              </p>
+            )}
+            <p className="text-center text-[10px] text-[var(--muted)]">
+              بکشید تا بچرخد · اسکرول برای بزرگ‌نمایی
+            </p>
+          </div>
+        </div>
+      }
+    </LocalizedDigits>
   );
 }
-
 function SphereFigure({ scene }: { scene: Built }) {
   const equator = useMemo(() => equatorCircle(160), []);
   const meridians = useMemo(
@@ -465,75 +471,82 @@ function SphereFigure({ scene }: { scene: Built }) {
       })),
     [scene.small],
   );
-
   return (
-    <group>
-      <mesh>
-        <sphereGeometry args={[0.992, 64, 64]} />
-        <meshStandardMaterial
-          color="#121c30"
-          transparent
-          opacity={0.52}
-          metalness={0.12}
-          roughness={0.88}
-        />
-      </mesh>
-      <mesh>
-        <sphereGeometry args={[1.001, 48, 48]} />
-        <meshBasicMaterial
-          color="#c9a227"
-          wireframe
-          transparent
-          opacity={0.07}
-        />
-      </mesh>
+    <LocalizedDigits>
+      {
+        <group>
+          <mesh>
+            <sphereGeometry args={[0.992, 64, 64]} />
+            <meshStandardMaterial
+              color="#121c30"
+              transparent
+              opacity={0.52}
+              metalness={0.12}
+              roughness={0.88}
+            />
+          </mesh>
+          <mesh>
+            <sphereGeometry args={[1.001, 48, 48]} />
+            <meshBasicMaterial
+              color="#c9a227"
+              wireframe
+              transparent
+              opacity={0.07}
+            />
+          </mesh>
 
-      {scene.axis && (
-        <Line
-          points={[
-            [0, -1.12, 0],
-            [0, 1.12, 0],
-          ]}
-          color="#e6d39a"
-          lineWidth={1.4}
-        />
-      )}
+          {scene.axis && (
+            <Line
+              points={[
+                [0, -1.12, 0],
+                [0, 1.12, 0],
+              ]}
+              color="#e6d39a"
+              lineWidth={1.4}
+            />
+          )}
 
-      {scene.equator && <Poly pts={equator} color="#c9a227" width={1.8} />}
-      {meridians.map((m, i) => (
-        <Poly key={`m${i}`} pts={m} color="#5b7c99" width={1} />
-      ))}
-      {parallels.map((p, i) => (
-        <Poly key={`p${i}`} pts={p} color="#3d7a7a" width={1} dashed />
-      ))}
-      {smalls.map((s, i) => (
-        <Poly
-          key={`s${i}`}
-          pts={s.pts}
-          color={s.color ?? "#3d7a7a"}
-          width={2}
-          dashed={s.dashed}
-        />
-      ))}
+          {scene.equator && <Poly pts={equator} color="#c9a227" width={1.8} />}
+          {meridians.map((m, i) => (
+            <Poly key={`m${i}`} pts={m} color="#5b7c99" width={1} />
+          ))}
+          {parallels.map((p, i) => (
+            <Poly key={`p${i}`} pts={p} color="#3d7a7a" width={1} dashed />
+          ))}
+          {smalls.map((s, i) => (
+            <Poly
+              key={`s${i}`}
+              pts={s.pts}
+              color={s.color ?? "#3d7a7a"}
+              width={2}
+              dashed={s.dashed}
+            />
+          ))}
 
-      {scene.fill && <TriangleCap vertices={scene.fill} />}
+          {scene.fill && <TriangleCap vertices={scene.fill} />}
 
-      {(scene.arcs ?? []).map((a, i) => (
-        <Poly
-          key={`a${i}`}
-          pts={a.pts}
-          color={a.color}
-          width={a.width ?? 2.5}
-        />
-      ))}
+          {(scene.arcs ?? []).map((a, i) => (
+            <Poly
+              key={`a${i}`}
+              pts={a.pts}
+              color={a.color}
+              width={a.width ?? 2.5}
+            />
+          ))}
 
-      {(scene.points ?? []).map((p, i) => (
-        <Marker key={`pt${i}`} pos={p.pos} label={p.label} color={p.color} />
-      ))}
-    </group>
+          {(scene.points ?? []).map((p, i) => (
+            <Marker
+              key={`pt${i}`}
+              pos={p.pos}
+              label={p.label}
+              color={p.color}
+            />
+          ))}
+        </group>
+      }
+    </LocalizedDigits>
   );
 }
-
 function TriangleCap({ vertices }: { vertices: [Vec3, Vec3, Vec3] }) {
   const geom = useMemo(() => {
     const [A, B, C] = vertices;
@@ -577,20 +590,22 @@ function TriangleCap({ vertices }: { vertices: [Vec3, Vec3, Vec3] }) {
     g.computeVertexNormals();
     return g;
   }, [vertices]);
-
   return (
-    <mesh geometry={geom}>
-      <meshStandardMaterial
-        color="#c9a227"
-        transparent
-        opacity={0.22}
-        side={THREE.DoubleSide}
-        depthWrite={false}
-      />
-    </mesh>
+    <LocalizedDigits>
+      {
+        <mesh geometry={geom}>
+          <meshStandardMaterial
+            color="#c9a227"
+            transparent
+            opacity={0.22}
+            side={THREE.DoubleSide}
+            depthWrite={false}
+          />
+        </mesh>
+      }
+    </LocalizedDigits>
   );
 }
-
 function slerpV(a: Vec3 | THREE.Vector3, b: Vec3 | THREE.Vector3, t: number) {
   const A = Array.isArray(a)
     ? new THREE.Vector3(...a).normalize()
@@ -609,7 +624,6 @@ function slerpV(a: Vec3 | THREE.Vector3, b: Vec3 | THREE.Vector3, t: number) {
     s0 * A.z + s1 * B.z,
   ).normalize();
 }
-
 function Poly({
   pts,
   color,
@@ -626,15 +640,19 @@ function Poly({
     [pts],
   );
   return (
-    <Line
-      points={points}
-      color={color}
-      lineWidth={width}
-      dashed={dashed}
-      dashSize={0.045}
-      gapSize={0.035}
-      transparent
-      opacity={0.95}
-    />
+    <LocalizedDigits>
+      {
+        <Line
+          points={points}
+          color={color}
+          lineWidth={width}
+          dashed={dashed}
+          dashSize={0.045}
+          gapSize={0.035}
+          transparent
+          opacity={0.95}
+        />
+      }
+    </LocalizedDigits>
   );
 }

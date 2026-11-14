@@ -1,4 +1,8 @@
 "use client";
+import {
+  useDigitScript,
+  LocalizedDigits,
+} from "@/components/digits/DigitScript";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   bvToColor,
@@ -10,6 +14,7 @@ import {
   type Look,
   type SkyStar,
 } from "@/lib/sky/project";
+import { formatDigits } from "@/lib/digits";
 import { lstHours } from "@/lib/astronomy/time";
 import { greatArc, sphToCart, cartToLonLat } from "@/lib/astronomy/sphereGeom";
 import { Button } from "@/components/ui/button";
@@ -30,7 +35,6 @@ type Cons = {
   rank: number;
   lines: Array<Array<[number, number]>>;
 };
-
 type StarCatalogV1 = {
   count: number;
   source?: string;
@@ -52,15 +56,17 @@ type StarCatalogV2 = {
   bv: string;
   n: Record<string, string>;
 };
-type ConsCatalog = { count: number; constellations: Cons[]; source: string };
-
+type ConsCatalog = {
+  count: number;
+  constellations: Cons[];
+  source: string;
+};
 function b64ToBytes(b64: string): Uint8Array {
   const bin = atob(b64);
   const out = new Uint8Array(bin.length);
   for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
   return out;
 }
-
 function expandStars(raw: StarCatalogV1 | StarCatalogV2): {
   stars: SkyStar[];
   count: number;
@@ -112,8 +118,8 @@ function expandStars(raw: StarCatalogV1 | StarCatalogV2): {
   }
   return { stars, count: c.count, source: c.source ?? "star catalog" };
 }
-
 export function LiveSky() {
+  const script = useDigitScript();
   const [lat, setLat] = useState(35.6892),
     [lon, setLon] = useState(51.389);
   const [locationLabel, setLocationLabel] = useState(
@@ -135,8 +141,22 @@ export function LiveSky() {
   const [look, setLook] = useState<Look>({ az: 180, alt: 35, fov: 75 });
   const canvasRef = useRef<HTMLCanvasElement>(null),
     stageRef = useRef<HTMLDivElement>(null);
-  const pickRef = useRef<Array<{ star: SkyStar; x: number; y: number }>>([]);
-  const pointers = useRef(new Map<number, { x: number; y: number }>());
+  const pickRef = useRef<
+    Array<{
+      star: SkyStar;
+      x: number;
+      y: number;
+    }>
+  >([]);
+  const pointers = useRef(
+    new Map<
+      number,
+      {
+        x: number;
+        y: number;
+      }
+    >(),
+  );
   const gesture = useRef({ x: 0, y: 0, moved: false, pinch: 0 });
   const [retry, setRetry] = useState(0);
   useEffect(() => {
@@ -246,7 +266,10 @@ export function LiveSky() {
       ctx.stroke();
     }
     const path = (
-      points: Array<{ az: number; alt: number }>,
+      points: Array<{
+        az: number;
+        alt: number;
+      }>,
       color: string,
       width: number,
       above = false,
@@ -254,7 +277,10 @@ export function LiveSky() {
       ctx.strokeStyle = color;
       ctx.lineWidth = width;
       ctx.beginPath();
-      let prev: { x: number; y: number } | null = null;
+      let prev: {
+        x: number;
+        y: number;
+      } | null = null;
       for (const q of points) {
         const p = screen(q.az, q.alt);
         if (
@@ -290,8 +316,15 @@ export function LiveSky() {
     if (showLines)
       for (const points of constellationPaths)
         path(points, "#709cc580", 1.1, true);
-    const hits: Array<{ star: SkyStar; x: number; y: number }> = [];
-    const occupied: Array<{ x: number; y: number }> = [];
+    const hits: Array<{
+      star: SkyStar;
+      x: number;
+      y: number;
+    }> = [];
+    const occupied: Array<{
+      x: number;
+      y: number;
+    }> = [];
     for (const q of horizontal) {
       if (q.alt < 0) continue;
       const p = screen(q.az, q.alt);
@@ -331,7 +364,7 @@ export function LiveSky() {
         ctx.font = "12px sans-serif";
         ctx.textAlign = "left";
         ctx.fillStyle = "#d7e4ef";
-        ctx.fillText(q.star.n, p.x + radius + 7, p.y + 4);
+        ctx.fillText(formatDigits(q.star.n, script), p.x + radius + 7, p.y + 4);
         occupied.push(p);
       }
     }
@@ -371,6 +404,7 @@ export function LiveSky() {
     showNames,
     showHorizon,
     selected,
+    script,
   ]);
   useEffect(() => {
     const id = requestAnimationFrame(draw);
@@ -483,7 +517,7 @@ export function LiveSky() {
         .filter((s) =>
           (s.n ?? String(s.id))
             .toLowerCase()
-            .includes(query.trim().toLowerCase()),
+            .includes(formatDigits(query.trim(), "en").toLowerCase()),
         )
         .slice(0, 7)
     : [];
@@ -491,369 +525,387 @@ export function LiveSky() {
     ? equatorialToAzAlt(selected.ra, selected.dec, lat, lon, now)
     : null;
   return (
-    <div className="space-y-5">
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px] items-start">
-        <div className="workspace" ref={stageRef}>
-          <div className="workspace-toolbar">
-            <span className="study-kicker">SKY / OBSERVATORY</span>
-            <div className="relative min-w-0 flex-1">
-              <label className="sr-only" htmlFor="star-search">
-                جست‌وجوی ستاره / Search stars
-              </label>
-              <Search
-                size={15}
-                className="absolute start-3 top-3 text-[var(--muted)]"
-              />
-              <input
-                id="star-search"
-                className="control-input !ps-9"
-                placeholder="نام ستاره یا شناسه · Sirius"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />
-              {query && (
-                <div className="absolute inset-x-0 top-full z-30 mt-2 rounded-xl border border-[var(--border)] bg-[#0d1d31] p-2 shadow-xl">
-                  {results.map((s) => (
-                    <button
-                      type="button"
-                      key={s.id}
-                      className="block w-full rounded-lg p-3 text-start text-sm hover:bg-white/5"
-                      onClick={() => focus(s)}
-                    >
-                      {s.n ?? `Star ${s.id}`}{" "}
-                      <span className="text-xs text-[var(--muted)]">
-                        mag {s.mag.toFixed(1)}
-                      </span>
-                    </button>
-                  ))}
-                  {results.length === 0 && (
-                    <p className="p-3 text-xs">ستاره‌ای یافت نشد.</p>
+    <LocalizedDigits>
+      {
+        <div className="space-y-5">
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px] items-start">
+            <div className="workspace" ref={stageRef}>
+              <div className="workspace-toolbar">
+                <span className="study-kicker">SKY / OBSERVATORY</span>
+                <div className="relative min-w-0 flex-1">
+                  <label className="sr-only" htmlFor="star-search">
+                    جست‌وجوی ستاره / Search stars
+                  </label>
+                  <Search
+                    size={15}
+                    className="absolute start-3 top-3 text-[var(--muted)]"
+                  />
+                  <input
+                    id="star-search"
+                    className="control-input !ps-9"
+                    placeholder="نام ستاره یا شناسه · Sirius"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                  />
+                  {query && (
+                    <div className="absolute inset-x-0 top-full z-30 mt-2 rounded-xl border border-[var(--border)] bg-[#0d1d31] p-2 shadow-xl">
+                      {results.map((s) => (
+                        <button
+                          type="button"
+                          key={s.id}
+                          className="block w-full rounded-lg p-3 text-start text-sm hover:bg-white/5"
+                          onClick={() => focus(s)}
+                        >
+                          {s.n ?? `Star ${s.id}`}{" "}
+                          <span className="text-xs text-[var(--muted)]">
+                            mag {s.mag.toFixed(1)}
+                          </span>
+                        </button>
+                      ))}
+                      {results.length === 0 && (
+                        <p className="p-3 text-xs">ستاره‌ای یافت نشد.</p>
+                      )}
+                    </div>
                   )}
                 </div>
-              )}
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="Fullscreen sky / تمام‌صفحه"
-              onClick={() => {
-                if (document.fullscreenElement) void document.exitFullscreen();
-                else void stageRef.current?.requestFullscreen();
-              }}
-            >
-              <Maximize2 size={17} />
-            </Button>
-          </div>
-          <div className="workspace-stage touch-none select-none">
-            <canvas
-              ref={canvasRef}
-              role="img"
-              aria-label="Interactive sky chart. Arrow keys pan, plus and minus zoom. Drag or pinch to explore; click a star to select."
-              tabIndex={0}
-              className="h-[min(72vh,690px)] min-h-[360px] w-full cursor-grab active:cursor-grabbing"
-              onPointerDown={onDown}
-              onPointerMove={onMove}
-              onPointerUp={onUp}
-              onPointerCancel={onUp}
-              onKeyDown={(e) => {
-                if (
-                  [
-                    "ArrowLeft",
-                    "ArrowRight",
-                    "ArrowUp",
-                    "ArrowDown",
-                    "+",
-                    "=",
-                    "-",
-                    "Escape",
-                  ].includes(e.key)
-                ) {
-                  e.preventDefault();
-                  if (e.key === "Escape") {
-                    setSelected(null);
-                    setQuery("");
-                  } else if (["+", "=", "-"].includes(e.key))
-                    setLook((l) => zoomLook(l, e.key === "-" ? 1.15 : 0.85));
-                  else
-                    setLook((l) => ({
-                      ...l,
-                      az:
-                        (l.az +
-                          (e.key === "ArrowRight"
-                            ? 5
-                            : e.key === "ArrowLeft"
-                              ? -5
-                              : 0) +
-                          360) %
-                        360,
-                      alt: Math.max(
-                        -85,
-                        Math.min(
-                          89,
-                          l.alt +
-                            (e.key === "ArrowUp"
-                              ? 5
-                              : e.key === "ArrowDown"
-                                ? -5
-                                : 0),
-                        ),
-                      ),
-                    }));
-                }
-              }}
-            />
-            {(!loaded || error) && (
-              <div
-                className="absolute inset-0 flex flex-col gap-4 items-center justify-center bg-[#07121fe6] p-6 text-sm text-center"
-                role="status"
-              >
-                {error ?? "در حال دریافت کاتالوگ ستارگان…"}
-                {error && (
-                  <Button size="sm" onClick={() => setRetry((v) => v + 1)}>
-                    تلاش دوباره
-                  </Button>
-                )}
-              </div>
-            )}
-            <div
-              className="pointer-events-none absolute start-4 top-4 rounded-xl border border-white/10 bg-[#07121fdb] px-4 py-3 text-xs space-y-1"
-              dir="ltr"
-            >
-              <p className="text-[#e9d59e]">
-                AZ {look.az.toFixed(1)}° · ALT {look.alt.toFixed(1)}°
-              </p>
-              <p className="text-[#9fb5cc]">
-                VERTICAL FOV {look.fov.toFixed(0)}° ·{" "}
-                {playing ? "LIVE" : "PAUSED"}
-              </p>
-            </div>
-            <div className="absolute end-3 bottom-3 flex flex-col gap-2">
-              <Button
-                size="icon"
-                variant="secondary"
-                aria-label="Zoom in / بزرگ‌نمایی"
-                onClick={() => setLook((l) => zoomLook(l, 0.8))}
-              >
-                <Plus size={17} />
-              </Button>
-              <Button
-                size="icon"
-                variant="secondary"
-                aria-label="Zoom out / کوچک‌نمایی"
-                onClick={() => setLook((l) => zoomLook(l, 1.25))}
-              >
-                <Minus size={17} />
-              </Button>
-            </div>
-          </div>
-          <div className="workspace-legend">
-            <span>شمال ۰° · شرق ۹۰° · جنوب ۱۸۰° · غرب ۲۷۰°</span>
-            <span>کشیدن / کلیدهای جهت · زوم دو انگشتی · انتخاب با کلیک</span>
-          </div>
-        </div>
-        <aside className="space-y-4 rounded-2xl border border-[var(--border)] bg-[#101d30] p-5">
-          <p className="study-kicker">OBSERVER / TIME</p>
-          <h2 className="text-lg text-[var(--gold-soft)]">مکان و زمان رصد</h2>
-          <p role="status" className="text-xs leading-6 text-[var(--muted)]">
-            {locationLabel}
-          </p>
-          <div className="grid grid-cols-2 gap-3">
-            <CoordinateInput
-              label="عرض شمالی φ"
-              value={lat}
-              limit={90}
-              onCommit={(v) => {
-                setLat(v);
-                setLocationLabel("مختصات دستی · Manual coordinates");
-              }}
-            />
-            <CoordinateInput
-              label="طول شرقی λ"
-              value={lon}
-              limit={180}
-              onCommit={(v) => {
-                setLon(v);
-                setLocationLabel("مختصات دستی · Manual coordinates");
-              }}
-            />
-          </div>
-          <Button
-            size="sm"
-            variant="outline"
-            className="w-full"
-            onClick={locate}
-          >
-            <LocateFixed size={15} />
-            موقعیت دستگاه
-          </Button>
-          <label className="block text-xs space-y-2">
-            زمان UTC
-            <input
-              aria-label="Observation time UTC"
-              type="datetime-local"
-              className="control-input"
-              dir="ltr"
-              value={now.toISOString().slice(0, 16)}
-              onChange={(e) => {
-                const d = new Date(e.target.value + "Z");
-                if (Number.isFinite(d.getTime())) {
-                  setNow(d);
-                  setPlaying(false);
-                }
-              }}
-            />
-          </label>
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              variant={playing ? "default" : "secondary"}
-              onClick={() => setPlaying((p) => !p)}
-            >
-              {playing ? <Pause size={14} /> : <Play size={14} />}{" "}
-              {playing ? "توقف" : "زنده"}
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                setNow(new Date());
-                setPlaying(true);
-              }}
-            >
-              <RotateCcw size={14} />
-              اکنون
-            </Button>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => {
-                setNow((d) => new Date(d.getTime() - 3600000));
-                setPlaying(false);
-              }}
-            >
-              −۱ ساعت
-            </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => {
-                setNow((d) => new Date(d.getTime() + 3600000));
-                setPlaying(false);
-              }}
-            >
-              +۱ ساعت
-            </Button>
-          </div>
-          <div className="border-t border-[var(--border)] pt-4 space-y-3">
-            <h3 className="text-sm text-[var(--gold-soft)]">
-              لایه‌ها و جهت نگاه
-            </h3>
-            {[
-              [showLines, setShowLines, "خطوط صورت‌های فلکی"],
-              [showNames, setShowNames, "نام ستاره‌ها"],
-              [showGrid, setShowGrid, "شبکهٔ سمت و ارتفاع"],
-              [showHorizon, setShowHorizon, "افق هندسی"],
-            ].map(([value, setter, label], i) => (
-              <label
-                className="flex items-center justify-between gap-2 text-xs"
-                key={i}
-              >
-                <span>{label as string}</span>
-                <input
-                  type="checkbox"
-                  checked={value as boolean}
-                  onChange={(e) =>
-                    (setter as (v: boolean) => void)(e.target.checked)
-                  }
-                  className="accent-[var(--gold)] h-4 w-4"
-                />
-              </label>
-            ))}
-            <label className="block text-xs">
-              حد قدر · {magLimit.toFixed(1)}
-              <input
-                aria-label="Limiting magnitude / حد قدر"
-                type="range"
-                min={2}
-                max={7}
-                step={0.1}
-                value={magLimit}
-                onChange={(e) => setMagLimit(+e.target.value)}
-                className="w-full accent-[var(--gold)]"
-              />
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {[
-                [0, "N"],
-                [90, "E"],
-                [180, "S"],
-                [270, "W"],
-              ].map(([az, label]) => (
                 <Button
-                  key={label}
-                  size="sm"
-                  variant="outline"
-                  onClick={() =>
-                    setLook((l) => ({ ...l, az: Number(az), alt: 25 }))
-                  }
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Fullscreen sky / تمام‌صفحه"
+                  onClick={() => {
+                    if (document.fullscreenElement)
+                      void document.exitFullscreen();
+                    else void stageRef.current?.requestFullscreen();
+                  }}
                 >
-                  {label}
+                  <Maximize2 size={17} />
                 </Button>
-              ))}
+              </div>
+              <div className="workspace-stage touch-none select-none">
+                <canvas
+                  ref={canvasRef}
+                  role="img"
+                  aria-label="Interactive sky chart. Arrow keys pan, plus and minus zoom. Drag or pinch to explore; click a star to select."
+                  tabIndex={0}
+                  className="h-[min(72vh,690px)] min-h-[360px] w-full cursor-grab active:cursor-grabbing"
+                  onPointerDown={onDown}
+                  onPointerMove={onMove}
+                  onPointerUp={onUp}
+                  onPointerCancel={onUp}
+                  onKeyDown={(e) => {
+                    if (
+                      [
+                        "ArrowLeft",
+                        "ArrowRight",
+                        "ArrowUp",
+                        "ArrowDown",
+                        "+",
+                        "=",
+                        "-",
+                        "Escape",
+                      ].includes(e.key)
+                    ) {
+                      e.preventDefault();
+                      if (e.key === "Escape") {
+                        setSelected(null);
+                        setQuery("");
+                      } else if (["+", "=", "-"].includes(e.key))
+                        setLook((l) =>
+                          zoomLook(l, e.key === "-" ? 1.15 : 0.85),
+                        );
+                      else
+                        setLook((l) => ({
+                          ...l,
+                          az:
+                            (l.az +
+                              (e.key === "ArrowRight"
+                                ? 5
+                                : e.key === "ArrowLeft"
+                                  ? -5
+                                  : 0) +
+                              360) %
+                            360,
+                          alt: Math.max(
+                            -85,
+                            Math.min(
+                              89,
+                              l.alt +
+                                (e.key === "ArrowUp"
+                                  ? 5
+                                  : e.key === "ArrowDown"
+                                    ? -5
+                                    : 0),
+                            ),
+                          ),
+                        }));
+                    }
+                  }}
+                />
+                {(!loaded || error) && (
+                  <div
+                    className="absolute inset-0 flex flex-col gap-4 items-center justify-center bg-[#07121fe6] p-6 text-sm text-center"
+                    role="status"
+                  >
+                    {error ?? "در حال دریافت کاتالوگ ستارگان…"}
+                    {error && (
+                      <Button size="sm" onClick={() => setRetry((v) => v + 1)}>
+                        تلاش دوباره
+                      </Button>
+                    )}
+                  </div>
+                )}
+                <div
+                  className="pointer-events-none absolute start-4 top-4 rounded-xl border border-white/10 bg-[#07121fdb] px-4 py-3 text-xs space-y-1"
+                  dir="ltr"
+                >
+                  <p className="text-[#e9d59e]">
+                    AZ {look.az.toFixed(1)}° · ALT {look.alt.toFixed(1)}°
+                  </p>
+                  <p className="text-[#9fb5cc]">
+                    VERTICAL FOV {look.fov.toFixed(0)}° ·{" "}
+                    {playing ? "LIVE" : "PAUSED"}
+                  </p>
+                </div>
+                <div className="absolute end-3 bottom-3 flex flex-col gap-2">
+                  <Button
+                    size="icon"
+                    variant="secondary"
+                    aria-label="Zoom in / بزرگ‌نمایی"
+                    onClick={() => setLook((l) => zoomLook(l, 0.8))}
+                  >
+                    <Plus size={17} />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="secondary"
+                    aria-label="Zoom out / کوچک‌نمایی"
+                    onClick={() => setLook((l) => zoomLook(l, 1.25))}
+                  >
+                    <Minus size={17} />
+                  </Button>
+                </div>
+              </div>
+              <div className="workspace-legend">
+                <span>شمال ۰° · شرق ۹۰° · جنوب ۱۸۰° · غرب ۲۷۰°</span>
+                <span>
+                  کشیدن / کلیدهای جهت · زوم دو انگشتی · انتخاب با کلیک
+                </span>
+              </div>
+            </div>
+            <aside className="space-y-4 rounded-2xl border border-[var(--border)] bg-[#101d30] p-5">
+              <p className="study-kicker">OBSERVER / TIME</p>
+              <h2 className="text-lg text-[var(--gold-soft)]">
+                مکان و زمان رصد
+              </h2>
+              <p
+                role="status"
+                className="text-xs leading-6 text-[var(--muted)]"
+              >
+                {locationLabel}
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <CoordinateInput
+                  label="عرض شمالی φ"
+                  value={lat}
+                  limit={90}
+                  onCommit={(v) => {
+                    setLat(v);
+                    setLocationLabel("مختصات دستی · Manual coordinates");
+                  }}
+                />
+                <CoordinateInput
+                  label="طول شرقی λ"
+                  value={lon}
+                  limit={180}
+                  onCommit={(v) => {
+                    setLon(v);
+                    setLocationLabel("مختصات دستی · Manual coordinates");
+                  }}
+                />
+              </div>
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => setLook((l) => ({ ...l, alt: 90, fov: 90 }))}
+                className="w-full"
+                onClick={locate}
               >
-                سرسو
+                <LocateFixed size={15} />
+                موقعیت دستگاه
               </Button>
-            </div>
+              <label className="block text-xs space-y-2">
+                زمان UTC
+                <input
+                  aria-label="Observation time UTC"
+                  type="datetime-local"
+                  className="control-input"
+                  dir="ltr"
+                  value={now.toISOString().slice(0, 16)}
+                  onChange={(e) => {
+                    const d = new Date(e.target.value + "Z");
+                    if (Number.isFinite(d.getTime())) {
+                      setNow(d);
+                      setPlaying(false);
+                    }
+                  }}
+                />
+              </label>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant={playing ? "default" : "secondary"}
+                  onClick={() => setPlaying((p) => !p)}
+                >
+                  {playing ? <Pause size={14} /> : <Play size={14} />}{" "}
+                  {playing ? "توقف" : "زنده"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setNow(new Date());
+                    setPlaying(true);
+                  }}
+                >
+                  <RotateCcw size={14} />
+                  اکنون
+                </Button>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => {
+                    setNow((d) => new Date(d.getTime() - 3600000));
+                    setPlaying(false);
+                  }}
+                >
+                  −۱ ساعت
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => {
+                    setNow((d) => new Date(d.getTime() + 3600000));
+                    setPlaying(false);
+                  }}
+                >
+                  +۱ ساعت
+                </Button>
+              </div>
+              <div className="border-t border-[var(--border)] pt-4 space-y-3">
+                <h3 className="text-sm text-[var(--gold-soft)]">
+                  لایه‌ها و جهت نگاه
+                </h3>
+                {[
+                  [showLines, setShowLines, "خطوط صورت‌های فلکی"],
+                  [showNames, setShowNames, "نام ستاره‌ها"],
+                  [showGrid, setShowGrid, "شبکهٔ سمت و ارتفاع"],
+                  [showHorizon, setShowHorizon, "افق هندسی"],
+                ].map(([value, setter, label], i) => (
+                  <label
+                    className="flex items-center justify-between gap-2 text-xs"
+                    key={i}
+                  >
+                    <span>{label as string}</span>
+                    <input
+                      type="checkbox"
+                      checked={value as boolean}
+                      onChange={(e) =>
+                        (setter as (v: boolean) => void)(e.target.checked)
+                      }
+                      className="accent-[var(--gold)] h-4 w-4"
+                    />
+                  </label>
+                ))}
+                <label className="block text-xs">
+                  حد قدر · {magLimit.toFixed(1)}
+                  <input
+                    aria-label="Limiting magnitude / حد قدر"
+                    type="range"
+                    min={2}
+                    max={7}
+                    step={0.1}
+                    value={magLimit}
+                    onChange={(e) => setMagLimit(+e.target.value)}
+                    className="w-full accent-[var(--gold)]"
+                  />
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    [0, "N"],
+                    [90, "E"],
+                    [180, "S"],
+                    [270, "W"],
+                  ].map(([az, label]) => (
+                    <Button
+                      key={label}
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        setLook((l) => ({ ...l, az: Number(az), alt: 25 }))
+                      }
+                    >
+                      {label}
+                    </Button>
+                  ))}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setLook((l) => ({ ...l, alt: 90, fov: 90 }))}
+                  >
+                    سرسو
+                  </Button>
+                </div>
+              </div>
+              <p className="text-xs text-[var(--teal)]" dir="ltr">
+                LST {lstHours(now, lon).toFixed(4)} h ·{" "}
+                {starsAll.length.toLocaleString("en")} catalogue stars
+              </p>
+            </aside>
           </div>
-          <p className="text-xs text-[var(--teal)]" dir="ltr">
-            LST {lstHours(now, lon).toFixed(4)} h ·{" "}
-            {starsAll.length.toLocaleString("en")} catalogue stars
-          </p>
-        </aside>
-      </div>
-      {selected && selectedH && (
-        <section
-          className="rounded-2xl border border-[var(--gold)]/35 bg-[#14243a] p-5 space-y-3"
-          aria-live="polite"
-        >
-          <div className="flex flex-wrap justify-between gap-3">
-            <h2 className="text-lg text-[var(--gold-soft)]">
-              {selected.n ?? `Star ${selected.id}`}
-            </h2>
-            <Button size="sm" variant="ghost" onClick={() => setSelected(null)}>
-              بستن انتخاب
-            </Button>
-          </div>
-          <p className="text-sm" dir="ltr">
-            RA {selected.ra.toFixed(4)} h · Dec {selected.dec.toFixed(3)}° · Mag{" "}
-            {selected.mag.toFixed(2)} · Az {selectedH.az.toFixed(2)}° · Alt{" "}
-            {selectedH.alt.toFixed(2)}°
-          </p>
-          {selectedH.alt < 0 && (
-            <p className="text-sm text-[var(--rose-ink)]">
-              این ستاره در زمان و مکان انتخابی زیر افق است. برای دیدن آن، زمان
-              را تغییر دهید.
-            </p>
+          {selected && selectedH && (
+            <section
+              className="rounded-2xl border border-[var(--gold)]/35 bg-[#14243a] p-5 space-y-3"
+              aria-live="polite"
+            >
+              <div className="flex flex-wrap justify-between gap-3">
+                <h2 className="text-lg text-[var(--gold-soft)]">
+                  {selected.n ?? `Star ${selected.id}`}
+                </h2>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setSelected(null)}
+                >
+                  بستن انتخاب
+                </Button>
+              </div>
+              <p className="text-sm" dir="ltr">
+                RA {selected.ra.toFixed(4)} h · Dec {selected.dec.toFixed(3)}° ·
+                Mag {selected.mag.toFixed(2)} · Az {selectedH.az.toFixed(2)}° ·
+                Alt {selectedH.alt.toFixed(2)}°
+              </p>
+              {selectedH.alt < 0 && (
+                <p className="text-sm text-[var(--rose-ink)]">
+                  این ستاره در زمان و مکان انتخابی زیر افق است. برای دیدن آن،
+                  زمان را تغییر دهید.
+                </p>
+              )}
+            </section>
           )}
-        </section>
-      )}
-      <p className="max-w-4xl text-xs leading-7 text-[var(--muted)]">
-        نمای گنومونیک با میدان دید عمودی؛ موقعیت‌ها هندسی‌اند و شکست جو اعمال
-        نشده است. مختصات کاتالوگ HYG/Hipparcos با زمان نجومی متوسط تقریبی تبدیل
-        می‌شوند؛ تقدیم، ترقّص و حرکت خاص برای تاریخ رصد اعمال نشده‌اند. این ابزار
-        آموزشی جای محاسبهٔ اخترسنجی دقیق را نمی‌گیرد. شمار ستاره‌های کاتالوگ یا
-        فیلتر قدر، شمار ستاره‌های قابل‌دیدن در قاب نیست.
-      </p>
-    </div>
+          <p className="max-w-4xl text-xs leading-7 text-[var(--muted)]">
+            نمای گنومونیک با میدان دید عمودی؛ موقعیت‌ها هندسی‌اند و شکست جو
+            اعمال نشده است. مختصات کاتالوگ HYG/Hipparcos با زمان نجومی متوسط
+            تقریبی تبدیل می‌شوند؛ تقدیم، ترقّص و حرکت خاص برای تاریخ رصد اعمال
+            نشده‌اند. این ابزار آموزشی جای محاسبهٔ اخترسنجی دقیق را نمی‌گیرد.
+            شمار ستاره‌های کاتالوگ یا فیلتر قدر، شمار ستاره‌های قابل‌دیدن در قاب
+            نیست.
+          </p>
+        </div>
+      }
+    </LocalizedDigits>
   );
 }
-
 function CoordinateInput({
   label,
   value,
@@ -883,26 +935,30 @@ function CoordinateInput({
     } else setError(true);
   };
   return (
-    <label className="text-xs space-y-2">
-      {label}
-      <input
-        className="control-input"
-        type="text"
-        inputMode="decimal"
-        dir="ltr"
-        value={draft}
-        aria-invalid={error}
-        onChange={(e) => setDraft(e.target.value)}
-        onBlur={commit}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") e.currentTarget.blur();
-        }}
-      />
-      {error && (
-        <span role="alert" className="block text-[var(--rose-ink)]">
-          عددی بین {-limit} و {limit} وارد کنید.
-        </span>
-      )}
-    </label>
+    <LocalizedDigits>
+      {
+        <label className="text-xs space-y-2">
+          {label}
+          <input
+            className="control-input"
+            type="text"
+            inputMode="decimal"
+            dir="ltr"
+            value={draft}
+            aria-invalid={error}
+            onChange={(e) => setDraft(e.target.value)}
+            onBlur={commit}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") e.currentTarget.blur();
+            }}
+          />
+          {error && (
+            <span role="alert" className="block text-[var(--rose-ink)]">
+              عددی بین {-limit} و {limit} وارد کنید.
+            </span>
+          )}
+        </label>
+      }
+    </LocalizedDigits>
   );
 }

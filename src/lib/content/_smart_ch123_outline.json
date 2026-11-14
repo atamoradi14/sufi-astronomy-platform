@@ -1,0 +1,1074 @@
+{
+  "chapters": [
+    {
+      "id": "ch1",
+      "roman": "I",
+      "pages": "1–24",
+      "titleEn": "Spherical Trigonometry",
+      "titleFa": "مثلثات کروی",
+      "topics": [
+        {
+          "id": "great-small-circles",
+          "section": "§§1–3",
+          "pages": "1–4",
+          "titleEn": "Celestial sphere; great and small circles; spherical triangle and small-circle arc",
+          "titleFa": "کرهٔ سماوی؛ دایرهٔ عظیمه و صغیره؛ مثلث کروی و کمان صغیره",
+          "formulae": [
+            "(1)"
+          ],
+          "figures": [
+            "1"
+          ],
+          "keyPointsEn": [
+            "Spherical astronomy concerns directions: a star’s place is where the line of sight meets a sphere of arbitrary radius centred on the observer.",
+            "A plane through the centre O cuts a great circle; any other intersecting plane cuts a small circle. The poles of a circle are the ends of the diameter perpendicular to its plane.",
+            "A spherical angle at P between two great circles equals the angle of their tangents at P (or of their planes at O).",
+            "Three points of one hemisphere joined by great-circle arcs form a spherical triangle; with R=1 a side equals the central angle (≤180°).",
+            "Small-circle arc CD: CD = AB · sin PC  (Smart 1), where AB is the parallel great-circle arc at polar distance 90° from P."
+          ],
+          "keyPointsFa": [
+            "نجوم کروی با راستاها سروکار دارد: جایگاه ستاره محل تقاطع خط دید با کره‌ای به مرکز ناظر و شعاع اختیاری است.",
+            "صفحهٔ گذرنده از مرکز O عظیمه می‌سازد؛ هر صفحهٔ ناگذر از مرکز صغیره می‌سازد. قطب‌ها انتهای قطر عمود بر صفحهٔ دایره‌اند.",
+            "زاویهٔ کروی در P میان دو عظیمه برابر زاویهٔ مماس‌ها در P (یا زاویهٔ صفحات در O) است.",
+            "سه نقطه در یک نیم‌کره با کمان‌های عظیمه مثلث کروی می‌سازند؛ با R=1 ضلع همان زاویهٔ مرکزی است (≤۱۸۰°).",
+            "کمان صغیره: CD = AB · sin PC  (فرمول ۱)، که AB کمان عظیمهٔ موازی در فاصلهٔ قطبی ۹۰° از P است."
+          ],
+          "workedExample": null,
+          "sphereDiagram": "Sphere centre O; great circle EAB; poles P,Q of diameter QOP ⊥ plane EAB; parallel small circle FCD; great circle PCAQ through poles; arcs AY (side), AB and CD labelled for formula (1).",
+          "exercises": [
+            {
+              "promptEn": "On the parallel of latitude 50° N, what is the length of a 1° arc of longitude in nautical miles (Earth radius so that 1′ of great circle = 1 nmi)?",
+              "promptFa": "روی مدار عرض ۵۰° شمالی، طول کمان ۱° طول جغرافیایی چند مایل دریایی است (با قرارداد ۱′ عظیمه = ۱ مایل دریایی)؟",
+              "answer": "60 · cos 50° ≈ 38.6 nmi (from CD = AB sin PC with PC = 40°)."
+            }
+          ]
+        },
+        {
+          "id": "terrestrial-latlong",
+          "section": "§4",
+          "pages": "4–6",
+          "titleEn": "Terrestrial latitude and longitude",
+          "titleFa": "عرض و طول جغرافیایی زمینی",
+          "formulae": [
+            "(2)"
+          ],
+          "figures": [
+            "2"
+          ],
+          "keyPointsEn": [
+            "Earth treated as a sphere; PQ is the polar axis; equator is the great circle whose plane is ⊥ PQ.",
+            "Latitude φ of A is the arc of the meridian from the equator to A (N or S); colatitude = 90° − φ = polar distance PA.",
+            "Longitude is the equatorial arc (or dihedral angle of meridians) from a chosen prime meridian, east or west 0°–180°.",
+            "Difference of longitude of two places is the shorter equatorial arc between their meridians (≤180°).",
+            "Arc of a parallel: XY = LY · cos φ  (2), with LY the corresponding equatorial arc."
+          ],
+          "keyPointsFa": [
+            "زمین کره فرض می‌شود؛ PQ محور قطبی؛ استوا عظیمهٔ عمود بر PQ است.",
+            "عرض φ کمان نصف‌النهار از استوا تا مکان است؛ متمم عرض = ۹۰° − φ = فاصلهٔ قطبی.",
+            "طول جغرافیایی کمان استوایی (یا زاویهٔ دووجهی نصف‌النهارها) از نصف‌النهار مبدأ است، شرق یا غرب ۰°–۱۸۰°.",
+            "اختلاف طول دو مکان، کمان کوتاه‌تر استوایی میان نصف‌النهارهایشان است (≤۱۸۰°).",
+            "کمان مدار: XY = LY · cos φ  (۲)."
+          ],
+          "workedExample": null,
+          "sphereDiagram": "Terrestrial sphere: poles P,Q; equator; Greenwich meridian PGKQ; place A with meridian PAH, latitude HA=φ, colatitude PA; second place B; parallel arc XY vs equatorial LY.",
+          "exercises": [
+            {
+              "promptEn": "Two ships on latitude 48° N differ by 10° of longitude. Find their distance along the parallel in nautical miles.",
+              "promptFa": "دو کشتی در عرض ۴۸°N با اختلاف طول ۱۰°. فاصلهٔ آن‌ها روی مدار چند مایل دریایی است؟",
+              "answer": "XY = 600 · cos 48° ≈ 401 nmi (formula 2)."
+            }
+          ]
+        },
+        {
+          "id": "cosine-formula-a",
+          "section": "§5",
+          "pages": "6–9",
+          "titleEn": "The cosine-formula (A)",
+          "titleFa": "فرمول کسینوس — صورت (A)",
+          "formulae": [
+            "(A)",
+            "(7)",
+            "(8)",
+            "(9)",
+            "(10)",
+            "(11)",
+            "(12)",
+            "(13)"
+          ],
+          "figures": [
+            "3"
+          ],
+          "keyPointsEn": [
+            "Fundamental formula: cos a = cos b cos c + sin b sin c cos A  (A); companions (7),(8) by cyclic permutation.",
+            "Derived by Smart from tangents at A meeting OB, OC produced (Fig. 3), equating two plane expressions for DE².",
+            "Given two sides and included angle → third side by (A). Given three sides → angles by (9) or half-angle formulae (11)–(13) with 2s = a+b+c.",
+            "sin(A/2) = √[sin(s−b)sin(s−c)/(sin b sin c)]  (11); cos(A/2) and tan(A/2) are (12),(13)."
+          ],
+          "keyPointsFa": [
+            "صورت بنیادی: cos a = cos b cos c + sin b sin c cos A  (A)؛ همراهان (۷) و (۸) با جایگشت دوری.",
+            "اسمارت با مماس‌های رأس A و برابرنهادن دو بسط مسطح DE² آن را به‌دست می‌آورد (شکل ۳).",
+            "دو ضلع و زاویهٔ مشمول ← ضلع سوم با (A). سه ضلع ← زوایا با (۹) یا نیم‌زاویه‌های (۱۱)–(۱۳) با ۲s = a+b+c.",
+            "sin(A/۲) = √[sin(s−b)sin(s−c)/(sin b sin c)]  (۱۱)."
+          ],
+          "workedExample": null,
+          "sphereDiagram": "Spherical triangle ABC, centre O; tangents AD, AE at A; points D on OB produced, E on OC produced; plane angles at A and at O labelled a,b,c,A.",
+          "exercises": [
+            {
+              "promptEn": "Two stars have δ₁=+20°, δ₂=+40°, Δα=30°. Find their angular separation with (A) on the polar triangle.",
+              "promptFa": "دو ستاره با δ₁=+۲۰°، δ₂=+۴۰° و Δα=۳۰°. فاصلهٔ زاویه‌ای را با (A) بیابید.",
+              "answer": "cos d = sin δ₁ sin δ₂ + cos δ₁ cos δ₂ cos Δα ⇒ d ≈ 27°.4."
+            }
+          ]
+        },
+        {
+          "id": "sine-formula-b",
+          "section": "§6",
+          "pages": "9–10",
+          "titleEn": "The sine-formula (B)",
+          "titleFa": "فرمول سینوس — صورت (B)",
+          "formulae": [
+            "(B)"
+          ],
+          "figures": [
+            "5"
+          ],
+          "keyPointsEn": [
+            "sin a / sin A = sin b / sin B = sin c / sin C  (B).",
+            "Derived by eliminating cosines among (A),(7),(8); each ratio equals the same diameter of the circumscribed small circle of the polar triangle in later geometric proofs.",
+            "Ambiguous case: given two sides and a non-included angle, (B) may yield two solutions; use cosine or half-angle formulae to resolve when possible."
+          ],
+          "keyPointsFa": [
+            "sin a / sin A = sin b / sin B = sin c / sin C  (B).",
+            "با حذف کسینوس‌ها از (A) و همراهان به‌دست می‌آید.",
+            "حالت مبهم: دو ضلع و زاویهٔ غیرمشمول ممکن است دو جواب بدهد؛ با کسینوس یا نیم‌زاویه رفع ابهام کنید."
+          ],
+          "workedExample": null,
+          "sphereDiagram": "Triangle ABC with sides a,b,c opposite A,B,C; optionally show circum-diameter of polar triangle linking to geometric proof of (B).",
+          "exercises": [
+            {
+              "promptEn": "In triangle ABC, a=57°22′11″, b=72°12′19″, C=94°1′49″. Outline how (B) and (A) together determine the remaining elements.",
+              "promptFa": "در مثلث ABC با a=۵۷°۲۲′۱۱″، b=۷۲°۱۲′۱۹″، C=۹۴°۱′۴۹″، مسیر یافتن بقیهٔ عناصر با (B) و (A) را بنویسید.",
+              "answer": "Find c from (A) with included C; then A,B from (B) or half-angle formulae (Smart Ex. 2, p. 23)."
+            }
+          ]
+        },
+        {
+          "id": "analogue-formula-c",
+          "section": "§7",
+          "pages": "10–12",
+          "titleEn": "The analogue formula (C)",
+          "titleFa": "فرمول مشابه کسینوس — صورت (C)",
+          "formulae": [
+            "(C)",
+            "(14)",
+            "(15)",
+            "(16)"
+          ],
+          "figures": [
+            "4"
+          ],
+          "keyPointsEn": [
+            "sin a cos B = cos b sin c − sin b cos c cos A  (C); companion (14) for sin a cos C.",
+            "Together with (A) and (B), (C) gives a side and an adjacent angle when two sides and the included angle are known.",
+            "Geometric proof (Fig. 4): extend BA to D with BD=90°, apply (A) in triangle ADC / related right constructions to recover (15)–(16) and thence (C)."
+          ],
+          "keyPointsFa": [
+            "sin a cos B = cos b sin c − sin b cos c cos A  (C)؛ همراه (۱۴) برای sin a cos C.",
+            "با (A) و (B)، وقتی دو ضلع و زاویهٔ مشمول معلوم‌اند، ضلع سوم و زاویهٔ مجاور را می‌دهد.",
+            "اثبات هندسی (شکل ۴): امتداد BA تا BD=۹۰° و به‌کارگیری (A)."
+          ],
+          "workedExample": null,
+          "sphereDiagram": "Triangle ABC; great-circle BA produced to D with BD=90°; arcs AD, CD and right angle at B labelled (Fig. 4).",
+          "exercises": [
+            {
+              "promptEn": "State when you would prefer (C) over solving for the third side by (A) alone.",
+              "promptFa": "چه زمانی (C) را بر حل صرف ضلع سوم با (A) ترجیح می‌دهید؟",
+              "answer": "When an adjacent angle is required simultaneously with the third side (two sides + included angle)."
+            }
+          ]
+        },
+        {
+          "id": "four-parts-d",
+          "section": "§8",
+          "pages": "12–14",
+          "titleEn": "The four-parts formula (D)",
+          "titleFa": "فرمول چهار جزء — صورت (D)",
+          "formulae": [
+            "(D)",
+            "(17)",
+            "(18)"
+          ],
+          "figures": [
+            "5"
+          ],
+          "keyPointsEn": [
+            "cos a cos C = sin a cot b − sin C cot B  (D).",
+            "Mnemonic: cosine(inner side)·cosine(inner angle) = sin(inner side)·cot(other side) − sin(inner angle)·cot(other angle), for four consecutive parts around the triangle.",
+            "Obtained by substituting (17),(18) and using (B); useful when two angles and the included side, or related four-part sets, are given."
+          ],
+          "keyPointsFa": [
+            "cos a cos C = sin a cot b − sin C cot B  (D).",
+            "قاعده: کسینوس(ضلع درونی)·کسینوس(زاویهٔ درونی) = sin(ضلع درونی)·cot(ضلع دیگر) − sin(زاویهٔ درونی)·cot(زاویهٔ دیگر).",
+            "از جایگذاری (۱۷)–(۱۸) و (B)؛ برای دو زاویه و ضلع مشمول یا چهار جزء متوالی مفید است."
+          ],
+          "workedExample": null,
+          "sphereDiagram": "Triangle ABC with four consecutive elements a, C, b, B highlighted around the figure (Fig. 5).",
+          "exercises": [
+            {
+              "promptEn": "Write the four-parts formula with inner parts b and A.",
+              "promptFa": "صورت چهار جزء با اجزای درونی b و A را بنویسید.",
+              "answer": "cos b cos A = sin b cot c − sin A cot C (cyclic form of D)."
+            }
+          ]
+        },
+        {
+          "id": "napier-right-angled",
+          "section": "§§9–10",
+          "pages": "14–15",
+          "titleEn": "Alternative proofs of (A)(B)(C); right-angled and quadrantal triangles; Napier’s rules",
+          "titleFa": "اثبات‌های جایگزین (A)(B)(C)؛ مثلث قائم و ربعی؛ قواعد نپر",
+          "formulae": [
+            "(19)",
+            "(20)"
+          ],
+          "figures": [
+            "6",
+            "7"
+          ],
+          "keyPointsEn": [
+            "§9: geometric construction (Fig. 6) with perpendiculars from vertices yields (A),(B),(C) without tangent lengths.",
+            "Right-angled triangle (C=90°): five circular parts a, b, 90°−A, 90°−c, 90°−B arranged on Napier’s circle (Fig. 7).",
+            "Napier: sine of any middle part = product of tangents of adjacent parts = product of cosines of opposite parts.",
+            "Quadrantal triangle (c=90°): dual circular parts outside the circle; same Napier rules apply."
+          ],
+          "keyPointsFa": [
+            "بند ۹: ساخت هندسی شکل ۶ فرمول‌های (A)(B)(C) را بدون طول مماس می‌دهد.",
+            "مثلث قائم (C=۹۰°): پنج جزء دایره‌ای a، b، ۹۰°−A، ۹۰°−c، ۹۰°−B روی دایرهٔ نپر (شکل ۷).",
+            "نپر: سینوس جزء میانی = حاصل‌ضرب تانژانت‌های مجاور = حاصل‌ضرب کسینوس‌های مقابل.",
+            "مثلث ربعی (c=۹۰°): اجزای دوگان بیرون دایره؛ همان قواعد."
+          ],
+          "workedExample": null,
+          "sphereDiagram": "Fig. 6 construction with feet of perpendiculars; Fig. 7 Napier circle with five circular parts for C=90°, and outer parts for c=90°.",
+          "exercises": [
+            {
+              "promptEn": "In right-angled ABC with C=90°, a=119°46′36″, b given in Ex. 1 p. 23: which Napier rule finds A?",
+              "promptFa": "در مثلث قائم با C=۹۰°، برای یافتن A کدام قاعدهٔ نپر به‌کار می‌رود؟",
+              "answer": "cos A = tan b cot c (or from circular parts: sine middle = product of cosines of opposites), using the five-part arrangement of Fig. 7."
+            }
+          ]
+        },
+        {
+          "id": "polar-triangle",
+          "section": "§11",
+          "pages": "15–16",
+          "titleEn": "The polar triangle and polar formulae",
+          "titleFa": "مثلث قطبی و فرمول‌های قطبی",
+          "formulae": [
+            "polar of (A)"
+          ],
+          "figures": [
+            "8"
+          ],
+          "keyPointsEn": [
+            "Poles A′,B′,C′ of sides BC,CA,AB form the polar triangle (Fig. 8); A′ lies so that BA′=CA′=90°, etc.",
+            "Sides and angles: a′ = 180° − A, A′ = 180° − a (and cyclic).",
+            "Applying (A) to A′B′C′ yields −cos A = cos B cos C − sin B sin C cos a; likewise for all polar transforms of (A)–(D).",
+            "Three angles determine the sides uniquely (up to congruence) via the polar cosine formula."
+          ],
+          "keyPointsFa": [
+            "قطب‌های اضلاع BC، CA، AB مثلث قطبی A′B′C′ را می‌سازند (شکل ۸).",
+            "a′ = ۱۸۰° − A و A′ = ۱۸۰° − a (و دوری).",
+            "اعمال (A) روی مثلث قطبی: −cos A = cos B cos C − sin B sin C cos a.",
+            "سه زاویه اضلاع را (تا هم‌نهشتی) یکتا تعیین می‌کنند."
+          ],
+          "workedExample": null,
+          "sphereDiagram": "Triangle ABC with poles A′,B′,C′ of opposite sides; arcs showing BA′=CA′=90°; polar triangle A′B′C′ drawn (Fig. 8).",
+          "exercises": [
+            {
+              "promptEn": "From the polar of (A), show that three given angles determine the sides.",
+              "promptFa": "از صورت قطبی (A) نشان دهید سه زاویهٔ معلوم اضلاع را تعیین می‌کنند.",
+              "answer": "−cos A = cos B cos C − sin B sin C cos a ⇒ cos a is determined; cyclic for b,c."
+            }
+          ]
+        },
+        {
+          "id": "smart-12-numerical",
+          "section": "§12",
+          "pages": "16–18",
+          "titleEn": "Numerical example (great-circle sailing)",
+          "titleFa": "مثال عددی اسمارت (کشتیرانی روی عظیمه)",
+          "formulae": [
+            "(A)",
+            "(11)",
+            "(B)"
+          ],
+          "figures": [
+            "9"
+          ],
+          "keyPointsEn": [
+            "Places A: 24°18′N, 133°39′E and B: 36°47′N, 125°24′W.",
+            "Colatitudes PA=65°42′, PB=53°13′; shorter longitude difference APB=100°57′ (not the long way 259°3′).",
+            "By (A): cos AB = 0.10776 ⇒ AB = 83°48′.8 ≈ 83°49′ = 5028.8 nautical miles.",
+            "Angle at A (PAB) from half-angle (11): A = 52°16′.",
+            "Highest latitude on AB: at C where PC ⊥ AB; sin PC = sin PA sin PAC ⇒ lat C = 43°53′N; longitude of C left as exercise."
+          ],
+          "keyPointsFa": [
+            "A: ۲۴°۱۸′N، ۱۳۳°۳۹′E و B: ۳۶°۴۷′N، ۱۲۵°۲۴′W.",
+            "PA=۶۵°۴۲′، PB=۵۳°۱۳′؛ اختلاف طول کوتاه‌تر APB=۱۰۰°۵۷′.",
+            "با (A): cos AB = ۰٫۱۰۷۷۶ ⇒ AB = ۸۳°۴۸′٫۸ ≈ ۸۳°۴۹′ = ۵۰۲۸٫۸ مایل دریایی.",
+            "زاویه در A از (۱۱): ۵۲°۱۶′.",
+            "شمالی‌ترین نقطه C با PC ⊥ AB؛ sin PC = sin PA sin PAC ⇒ عرض C = ۴۳°۵۳′N."
+          ],
+          "workedExample": {
+            "source": "Smart §12",
+            "given": "A 24°18′N 133°39′E; B 36°47′N 125°24′W; find AB, ∠PAB, and highest latitude on AB",
+            "result": "AB = 83°49′ = 5028.8 nmi; angle at A = 52°16′; lat C = 43°53′N",
+            "steps": [
+              "PA = 90°−24°18′ = 65°42′; PB = 90°−36°47′ = 53°13′.",
+              "Longitudes: 133°39′E + 125°24′W = 259°3′ the long way; shorter APB = 360°−259°3′ = 100°57′.",
+              "cos AB = cos PA cos PB + sin PA sin PB cos APB = M − N = 0.10776 (five-figure logs) ⇒ AB = 83°48′.8 ≈ 83°49′ = 5028.8 nmi.",
+              "With 2s = AB+PB+PA, formula (11) gives ∠PAB = 52°16′.",
+              "At northernmost C, ∠PCA=90°; sin PC = sin PA sin PAC ⇒ PC = 46°7′ ⇒ latitude 43°53′N."
+            ]
+          },
+          "sphereDiagram": "Fig. 9: north pole P; meridians through A and B; equator arcs GH, GK; triangle PAB with APB=100°57′; point C on AB with PC ⊥ AB; Greenwich G.",
+          "exercises": [
+            {
+              "promptEn": "Find the longitude of the most northerly point C on AB (Smart’s exercise on p. 18).",
+              "promptFa": "طول جغرافیایی شمالی‌ترین نقطهٔ C روی AB را بیابید (تمرین اسمارت ص. ۱۸).",
+              "answer": "In right triangle PAC: cos PAC = tan PC cot PA (Napier) or sin APC = cos PAC / cos PC; APC from sin APC = sin PAC · cos PC / sin PA wait — use cos PAC = tan PC / tan PA; then long(C) = long(A) ± APC."
+            }
+          ]
+        },
+        {
+          "id": "haversine-auxiliary",
+          "section": "§§13–14",
+          "pages": "18–21",
+          "titleEn": "Haversine formula and auxiliary-angle method",
+          "titleFa": "فرمول هاورساین و روش زاویهٔ کمکی",
+          "formulae": [
+            "(21)",
+            "(22)",
+            "(23)",
+            "(24)",
+            "(25)",
+            "(26)",
+            "(27)",
+            "(28)",
+            "(29)",
+            "(30)",
+            "(31)",
+            "(32)",
+            "(33)",
+            "(34)"
+          ],
+          "figures": [
+            "9"
+          ],
+          "keyPointsEn": [
+            "hav θ = ½(1 − cos θ) = sin²(θ/2)  (21); cos θ = 1 − 2 hav θ  (22).",
+            "Haversine form of (A): hav a = hav(b−c) + sin b sin c hav A  (23); hav θ ≥ 0 on 0°–180°.",
+            "Repeating §12 with Inman’s tables: hav AB = 0.44612 ⇒ AB = 83°49′ (agrees).",
+            "§14 auxiliary D: cos a = d cos D, sin a cos P = d sin D; then tan D = tan a cos P (32), tan A = tan P sin D csc(b−D) (33), tan p = tan(b−D) sec A (34).",
+            "Same data give A = 52°16′.9 and p = 83°49′."
+          ],
+          "keyPointsFa": [
+            "hav θ = ½(1 − cos θ) = sin²(θ/۲)  (۲۱).",
+            "صورت هاورساین (A): hav a = hav(b−c) + sin b sin c hav A  (۲۳).",
+            "با جداول اینمن: AB = ۸۳°۴۹′ همان نتیجهٔ بند ۱۲.",
+            "روش D کمکی: روابط (۲۷)–(۳۴)؛ A ≈ ۵۲°۱۶′٫۹ و p = ۸۳°۴۹′."
+          ],
+          "workedExample": {
+            "source": "Smart §13–14 (same data as §12)",
+            "given": "PA=65°42′, PB=53°13′, APB=100°57′",
+            "result": "AB = 83°49′; PAB = 52°16′.9",
+            "steps": [
+              "hav AB = hav(PA−PB) + sin PA sin PB hav APB = 0.01182 + 0.43430 = 0.44612 ⇒ AB=83°49′.",
+              "tan D = tan a cos P with a=PB, P=APB ⇒ D = 345°44′.4 (fourth quadrant).",
+              "tan A = tan P sin D csc(b−D) ⇒ A = 52°16′.9; tan p = tan(b−D) sec A ⇒ p = 83°49′."
+            ]
+          },
+          "sphereDiagram": "Same Fig. 9 triangle PAB; optionally mark auxiliary angle D on the polar construction for §14.",
+          "exercises": [
+            {
+              "promptEn": "Why is the haversine form preferred for logarithmic work near a ≈ 90°?",
+              "promptFa": "چرا صورت هاورساین برای کار لگاریتمی نزدیک a ≈ ۹۰° ترجیح دارد؟",
+              "answer": "hav a stays well-conditioned and non-negative; cos a ≈ 0 is awkward in (A) with five-figure logs."
+            }
+          ]
+        },
+        {
+          "id": "delambre-napier-analogies",
+          "section": "§§15–16",
+          "pages": "21–24",
+          "titleEn": "Small angles; Delambre’s and Napier’s analogies",
+          "titleFa": "زاویه‌های کوچک؛ قیاسی‌های دلامبر و نپر",
+          "formulae": [
+            "(35)",
+            "(36)",
+            "(37)",
+            "(38)",
+            "(39)",
+            "(40)",
+            "(41)",
+            "(42)",
+            "(43)",
+            "(44)",
+            "(45)",
+            "(46)",
+            "(47)",
+            "(48)",
+            "(49)",
+            "(50)",
+            "(51)",
+            "(52)"
+          ],
+          "figures": [],
+          "keyPointsEn": [
+            "For small θ in radians: sin θ ≈ θ, cos θ ≈ 1, tan θ ≈ θ  (35); sin 1″ = 1/206265  (36).",
+            "Time–arc: 24ʰ=360°, 1ʰ=15°, 1ᵐ=15′, 1ˢ=15″; sin H ≈ H · sin 1ʰ etc. (40)–(44).",
+            "Delambre (45)–(48): half-angle/half-side product identities (e.g. sin(c/2) sin½(A−B) = cos(C/2) sin½(a−b)).",
+            "Napier’s analogies (49)–(52): tan½(a±b) and tan½(A±B) in terms of half-angles/sides and tan(c/2) or cot(C/2).",
+            "Chapter exercises 1–9 apply Napier, great-circle sailing, and differentials of spherical elements."
+          ],
+          "keyPointsFa": [
+            "برای θ کوچک برحسب رادیان: sin θ ≈ θ و sin 1″ = ۱/۲۰۶۲۶۵  (۳۶).",
+            "تبدیل زمان–قوس: ۲۴ʰ=۳۶۰°، ۱ʰ=۱۵° و روابط (۴۰)–(۴۴).",
+            "دلامبر (۴۵)–(۴۸): اتحادهای نیم‌زاویه/نیم‌ضلع.",
+            "قیاسی‌های نپر (۴۹)–(۵۲): tan½(a±b) و tan½(A±B).",
+            "تمرین‌های ۱–۹ پایان فصل: نپر، کشتیرانی عظیمه، دیفرانسیل عناصر."
+          ],
+          "workedExample": null,
+          "sphereDiagram": "Optional Napier circle reminder; no new sphere figure in §§15–16.",
+          "exercises": [
+            {
+              "promptEn": "Smart Ex. 4: ships on 48°N and … steam along parallels — set up the spherical triangle for closest approach.",
+              "promptFa": "تمرین ۴ اسمارت: دو کشتی روی مدارهای موازی — مثلث کروی نزدیک‌ترین فاصله را بنویسید.",
+              "answer": "Meridian difference + colatitudes form triangle with P; closest distance is the great-circle arc when relative bearing uses (A)/(B)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch2",
+      "roman": "II",
+      "pages": "25–57",
+      "titleEn": "The Celestial Sphere",
+      "titleFa": "کرهٔ سماوی",
+      "topics": [
+        {
+          "id": "horizontal-coords",
+          "section": "§§17–18",
+          "pages": "25–28",
+          "titleEn": "Altitude and azimuth (horizontal coordinates)",
+          "titleFa": "ارتفاع و سمت (مختصات افقی)",
+          "formulae": [
+            "(1)",
+            "(2)"
+          ],
+          "figures": [
+            "10",
+            "11"
+          ],
+          "keyPointsEn": [
+            "Observer O; zenith Z along the plumb-line; celestial horizon = great circle ⊥ OZ.",
+            "Altitude a = arc from horizon to star on the vertical circle; zenith distance z = 90° − a  (1).",
+            "North celestial pole P: OP ∥ Earth’s axis; meridian through P meets horizon at north point N.",
+            "Azimuth = spherical angle PZX (or horizon arc from N); prime vertical when azimuth 90° E or W.",
+            "Colatitude PZ = 90° − φ  (2); altitude of the pole equals latitude φ."
+          ],
+          "keyPointsFa": [
+            "ناظر O؛ سمت‌الرأس Z در راستای شاقول؛ افق سماوی عظیمهٔ عمود بر OZ.",
+            "ارتفاع a کمان از افق تا ستاره روی دایرهٔ قائم؛ سمت‌القدم z = ۹۰° − a  (۱).",
+            "قطب شمال سماوی P؛ نصف‌النهار از P افق را در نقطهٔ شمال N قطع می‌کند.",
+            "سمت = زاویهٔ کروی PZX (یا کمان افق از N)؛ دایرهٔ اول وقتی سمت ۹۰°E یا ۹۰°W.",
+            "متمم عرض PZ = ۹۰° − φ  (۲)؛ ارتفاع قطب = عرض ناظر."
+          ],
+          "workedExample": null,
+          "sphereDiagram": "Fig. 10–11: O, Z, P, horizon NESW, star X on vertical ZX meeting horizon at A; arcs a, z; angle PZX = azimuth; PZ = co-lat.",
+          "exercises": [
+            {
+              "promptEn": "Facing north, which way is east? Relate to Smart’s azimuth convention (p. 27 n.).",
+              "promptFa": "رو به شمال، شرق کدام سمت است؟ با قرارداد سمت اسمارت ربط دهید.",
+              "answer": "East is to the observer’s right; azimuth east/west measured from N accordingly."
+            }
+          ]
+        },
+        {
+          "id": "equatorial-coords",
+          "section": "§§19–20",
+          "pages": "28–32",
+          "titleEn": "Declination and hour angle; southern-hemisphere diagram",
+          "titleFa": "میل و زاویهٔ ساعتی؛ نمودار نیم‌کرهٔ جنوبی",
+          "formulae": [],
+          "figures": [
+            "12",
+            "13",
+            "14"
+          ],
+          "keyPointsEn": [
+            "Celestial equator ⊥ OP meets horizon at E,W. Declination δ = arc from equator to star on the hour circle (N +, S −).",
+            "North polar distance PX = 90° − δ (algebraic δ).",
+            "Hour angle H = angle at P from the observer’s meridian westwards, 0ʰ–24ʰ.",
+            "Rule: azimuth west ⇔ 0ʰ ≤ H ≤ 12ʰ; azimuth east ⇔ 12ʰ ≤ H ≤ 24ʰ.",
+            "§20 Fig. 14 redraws the sphere for south latitude; the same azimuth–H rule holds."
+          ],
+          "keyPointsFa": [
+            "استوای سماوی عمود بر OP؛ میل δ از استوا تا ستاره روی دایرهٔ ساعتی (شمال +).",
+            "فاصلهٔ قطبی شمال PX = ۹۰° − δ.",
+            "زاویهٔ ساعتی H از نصف‌النهار ناظر به‌سوی غرب، ۰ʰ–۲۴ʰ.",
+            "سمت غرب ⇔ ۰ʰ≤H≤۱۲ʰ؛ سمت شرق ⇔ ۱۲ʰ≤H≤۲۴ʰ.",
+            "بند ۲۰ شکل ۱۴ برای عرض جنوبی؛ همان قاعده برقرار است."
+          ],
+          "workedExample": null,
+          "sphereDiagram": "Fig. 12–13: P, Z, equator, parallel of δ through X, meridian PZRSQ, rising G / setting F / upper L / lower M; H = ∠ZPX. Fig. 14 southern mirror.",
+          "exercises": [
+            {
+              "promptEn": "A star has west azimuth. In which half of the day (in hour angle) is it?",
+              "promptFa": "ستاره‌ای سمت غرب دارد. در کدام نیم‌روز زاویهٔ ساعتی است؟",
+              "answer": "0ʰ ≤ H ≤ 12ʰ."
+            }
+          ]
+        },
+        {
+          "id": "circumpolar-stars",
+          "section": "§21",
+          "pages": "32–33",
+          "titleEn": "Circumpolar stars; upper and lower culmination",
+          "titleFa": "ستارگان قطبی‌گرد؛ گذار بالا و پایین",
+          "formulae": [],
+          "figures": [
+            "15"
+          ],
+          "keyPointsEn": [
+            "Northern circumpolar if N.P.D. < φ, i.e. δ > 90° − φ (parallel never meets horizon).",
+            "Upper culmination at L: z = |φ − δ|; lower at M: z = 180° − (φ + δ) when circumpolar.",
+            "If δ = φ, upper transit in the zenith; if δ > φ, upper culmination between P and Z and |azimuth| ≤ 90°."
+          ],
+          "keyPointsFa": [
+            "قطبی‌گرد شمالی اگر δ > ۹۰° − φ (مدار میل افق را قطع نکند).",
+            "گذار بالا: z = |φ − δ|؛ گذار پایین: z = ۱۸۰° − (φ + δ).",
+            "اگر δ = φ گذار در سمت‌الرأس؛ اگر δ > φ گذار میان P و Z و |سمت| ≤ ۹۰°."
+          ],
+          "workedExample": {
+            "source": "Smart II §21 + a=0 in PZX",
+            "given": "φ = 40°N, δ = +15°",
+            "result": "H₀ ≈ 103° ≈ 6ʰ52ᵐ; time above horizon ≈ 13ʰ44ᵐ",
+            "steps": [
+              "At rising/setting z=90° ⇒ cos H₀ = −tan φ tan δ.",
+              "Compute H₀ and duration 2H₀."
+            ]
+          },
+          "sphereDiagram": "Fig. 15: parallels of δ relative to horizon; L upper, M lower culmination; PN = φ, PM = N.P.D.",
+          "exercises": [
+            {
+              "promptEn": "Write the condition that a star never rises at north latitude φ.",
+              "promptFa": "شرط ابدی‌الغروب بودن ستاره در عرض شمالی φ را بنویسید.",
+              "answer": "δ < φ − 90°."
+            }
+          ]
+        },
+        {
+          "id": "pzx-triangle",
+          "section": "§§22–23",
+          "pages": "33–36",
+          "titleEn": "Geocentric celestial sphere and solution of triangle PZX",
+          "titleFa": "کرهٔ زمین‌مرکز و حل مثلث PZX",
+          "formulae": [
+            "(3)",
+            "(4)",
+            "(5)",
+            "(6)",
+            "(7)"
+          ],
+          "figures": [
+            "16",
+            "17"
+          ],
+          "keyPointsEn": [
+            "For stars, polar distance from O equals that from Earth’s centre C; for Moon/Sun it does not (Fig. 16). Standard sphere centred at C.",
+            "(i) Given φ, δ, H → z, A: cos z = sin φ sin δ + cos φ cos δ cos H  (3); hav z = hav(φ−δ) + cos φ cos δ hav H  (4).",
+            "sin δ = sin φ cos z + cos φ sin z cos A  (5); haversine azimuth (6).",
+            "(ii) Given φ, z, A → δ, H: use (5) then cos H = cos z sec φ sec δ − tan φ tan δ  (7).",
+            "East of meridian: angle at P is 24ʰ − H; same formulae."
+          ],
+          "keyPointsFa": [
+            "برای ستارگان فاصلهٔ قطبی از O و از مرکز زمین C یکی است؛ برای ماه نه. کرهٔ استاندارد به مرکز C.",
+            "از (φ,δ,H) به (z,A): cos z = sin φ sin δ + cos φ cos δ cos H  (۳)؛ صورت هاورساین (۴).",
+            "sin δ = sin φ cos z + cos φ sin z cos A  (۵).",
+            "از (φ,z,A) به (δ,H): (۵) سپس cos H = cos z sec φ sec δ − tan φ tan δ  (۷).",
+            "شرق نصف‌النهار: زاویه در P برابر ۲۴ʰ − H."
+          ],
+          "workedExample": {
+            "source": "Smart II §23 (3)",
+            "given": "φ = 35°.7 N, δ = +16°.5, H = +2ʰ = 30°",
+            "result": "z ≈ 41°; a ≈ 49°",
+            "steps": [
+              "Insert into (3): cos z = sin φ sin δ + cos φ cos δ cos 30°.",
+              "a = 90° − z."
+            ]
+          },
+          "sphereDiagram": "Fig. 16 Moon parallax vs star; Fig. 17 PZX with PZ=90°−φ, PX=90°−δ, ZX=z, ∠P=H, ∠Z=A, ∠X=parallactic angle.",
+          "exercises": [
+            {
+              "promptEn": "Smart II Ex. 1: relate meridian and prime-vertical zenith distances z₁, z₂ to δ and φ.",
+              "promptFa": "تمرین ۱ فصل II: رابطهٔ سمت‌القدم نصف‌النهاری و دایرهٔ اول با δ و φ.",
+              "answer": "cot δ = csc z₁ sec z₂ − cot 2φ (Smart’s form)."
+            }
+          ]
+        },
+        {
+          "id": "ra-sidereal-time",
+          "section": "§§24, 27",
+          "pages": "36–37, 41–42",
+          "titleEn": "Right ascension, the equinox, and sidereal time",
+          "titleFa": "بعد، نقطهٔ حمل و زمان نجومی",
+          "formulae": [
+            "(8)",
+            "(9)",
+            "(13)",
+            "(14)"
+          ],
+          "figures": [
+            "18",
+            "22"
+          ],
+          "keyPointsEn": [
+            "Right ascension α = equatorial arc from the vernal equinox ♈ eastwards to the star’s hour circle, 0ʰ–24ʰ (opposite sense to H).",
+            "Sidereal time = hour angle of ♈; S.T. = H + α  (8)(9). When ♈ is on the meridian, S.T. = 0ʰ; 24ʰ sidereal = one sidereal day.",
+            "§27 / Fig. 22: H at Greenwich = H at longitude l ± long(l) in time (15°=1ʰ); GST = LST ± longitude (14)."
+          ],
+          "keyPointsFa": [
+            "بعد α کمان استوایی از نقطهٔ حمل ♈ به‌سوی شرق تا دایرهٔ ساعتی ستاره، ۰ʰ–۲۴ʰ.",
+            "زمان نجومی = زاویهٔ ساعتی ♈؛ S.T. = H + α  (۸)(۹).",
+            "H گرینویچ = H مکان ± طول (به زمان)؛ GST = LST ± طول  (۱۴)."
+          ],
+          "workedExample": null,
+          "sphereDiagram": "Fig. 18: equinox ♈, equator, star X with TD=α, RD=H, RT=S.T. Fig. 22: Greenwich vs local meridians and hour circles.",
+          "exercises": [
+            {
+              "promptEn": "A star of RA 5ʰ is on the observer’s meridian. What is LST?",
+              "promptFa": "ستاره‌ای با بعد ۵ʰ روی نصف‌النهار ناظر است. LST چیست؟",
+              "answer": "LST = 5ʰ (H=0 ⇒ S.T.=α)."
+            }
+          ]
+        },
+        {
+          "id": "ecliptic-coords",
+          "section": "§§25–26",
+          "pages": "37–40",
+          "titleEn": "Earth’s orbit, ecliptic, and celestial longitude/latitude",
+          "titleFa": "مدار زمین، دایرة‌البروج و طول/عرض سماوی",
+          "formulae": [
+            "(10)",
+            "(11)",
+            "(12)"
+          ],
+          "figures": [
+            "19",
+            "20",
+            "21"
+          ],
+          "keyPointsEn": [
+            "Earth’s orbit is an ellipse with the Sun at a focus (Kepler I); relative to Earth the Sun appears to move on the ecliptic great circle.",
+            "Obliquity ε ≈ 23½° = angle between ecliptic and equator. Cardinal solar positions: ♈ (α=0, δ=0), summer solstice (6ʰ, +ε), ♎ (12ʰ, 0), winter solstice (18ʰ, −ε).",
+            "Celestial longitude λ from ♈ along ecliptic; latitude β from ecliptic toward ecliptic pole K.",
+            "Transformations (α,δ)↔(λ,β) via the equatorial–ecliptic triangle of angle ε: e.g. sin β = sin δ cos ε − cos δ sin ε sin α  (10)."
+          ],
+          "keyPointsFa": [
+            "مدار زمین بیضی با کانون خورشید؛ حرکت ظاهری خورشید روی عظیمهٔ دایرة‌البروج.",
+            "میل دایرة‌البروج ε ≈ ۲۳½°. مواضع خورشید: ♈، انقلاب تابستانی، ♎، انقلاب زمستانی.",
+            "طول λ از ♈ روی دایرة‌البروج؛ عرض β از دایرة‌البروج به‌سوی قطب K.",
+            "تبدیل (α,δ)↔(λ,β) با مثلث استوا–دایرة‌البروج به زاویهٔ ε؛ مثلاً (۱۰)."
+          ],
+          "workedExample": null,
+          "sphereDiagram": "Figs. 19–20 Earth/Sun ellipses; Fig. 21 equator, ecliptic ♈MUY, poles P and K, star X with λ=♈A, β=AX, obliquity ε.",
+          "exercises": [
+            {
+              "promptEn": "For the Sun (β=0) prove cos δ cos α = cos λ and cos δ sin α = cos ε sin λ.",
+              "promptFa": "برای خورشید (β=۰) ثابت کنید cos δ cos α = cos λ و cos δ sin α = cos ε sin λ.",
+              "answer": "Set β=0 in the inverse transformation formulae of §26."
+            }
+          ]
+        },
+        {
+          "id": "mean-solar-time",
+          "section": "§§28–29",
+          "pages": "42–46",
+          "titleEn": "Mean solar time and zone-time example",
+          "titleFa": "زمان خورشیدی میانگین و مثال زمان منطقه",
+          "formulae": [
+            "(15)",
+            "(16)",
+            "(17)",
+            "(18)",
+            "(19)",
+            "(20)",
+            "(21)",
+            "(22)"
+          ],
+          "figures": [
+            "22"
+          ],
+          "keyPointsEn": [
+            "Apparent solar day is uneven (eccentricity + obliquity); mean Sun on the equator defines uniform mean solar time.",
+            "Equation of time links apparent and mean; Smart uses E with H.A.☉ = H.A.M.S. + E  (17).",
+            "U.T./G.M.T. related to local mean time by longitude (21); zone time is mean time of a standard meridian (22).",
+            "§29 worked example: convert zone time at a given longitude to the Sun’s hour angle via local mean → apparent time."
+          ],
+          "keyPointsFa": [
+            "روز شمسی ظاهری یکنواخت نیست؛ خورشید میانگین روی استوا زمان میانگین یکنواخت می‌سازد.",
+            "معادلهٔ زمان: H.A.☉ = H.A.M.S. + E  (۱۷).",
+            "U.T. با طول به زمان محلی مربوط است (۲۱)؛ زمان منطقه زمان میانگین نصف‌النهار استاندارد است (۲۲).",
+            "مثال بند ۲۹: از زمان منطقه به زاویهٔ ساعتی خورشید."
+          ],
+          "workedExample": {
+            "source": "Smart II §29",
+            "given": "Zone time at a place with known longitude and standard meridian (Smart’s numerical date/time on p. 45)",
+            "result": "Solar hour angle after zone → LMT → apparent time chain",
+            "steps": [
+              "Convert zone time to U.T. with standard-meridian longitude (22).",
+              "Form local mean time with place longitude (21).",
+              "Apply equation of time to get apparent solar time / H.A.☉ via (17),(20)."
+            ]
+          },
+          "sphereDiagram": "Fig. 22 with mean Sun and true Sun hour circles on the equator; standard vs local meridian.",
+          "exercises": [
+            {
+              "promptEn": "Convert longitude difference 165°E − 163°14′E into time.",
+              "promptFa": "اختلاف طول ۱۶۵°E − ۱۶۳°۱۴′E را به زمان تبدیل کنید.",
+              "answer": "1°46′ = 1ʰ46ᵐ/15 wait: 1°46′ × 4ᵐ/° = 7ᵐ4ˢ (arc to time: 1°=4ᵐ, 1′=4ˢ)."
+            }
+          ]
+        },
+        {
+          "id": "rising-setting-rates",
+          "section": "§§30–32",
+          "pages": "45–52",
+          "titleEn": "Hour angle of a body; rising and setting; rates of change of z and A",
+          "titleFa": "زاویهٔ ساعتی جرم سماوی؛ طلوع و غروب؛ آهنگ تغییر z و A",
+          "formulae": [
+            "(23)",
+            "(24)",
+            "(25)",
+            "(26)",
+            "(27)",
+            "(28)",
+            "(29)"
+          ],
+          "figures": [],
+          "keyPointsEn": [
+            "§30: H.A. of a star from GST and RA via (23): H + α = GST ± longitude (time).",
+            "§31 rising/setting (z=90°): cos H = −tan φ tan δ  (24); cos A = sin δ sec φ  (25).",
+            "If |tan φ tan δ| > 1 there is no real H (never rises or never sets).",
+            "§32 differentials: Δz = ΔH sin A cos φ  (26); azimuth rate (27); twilight ends when Sun’s z = 108°."
+          ],
+          "keyPointsFa": [
+            "بند ۳۰: زاویهٔ ساعتی ستاره از GST و بعد با (۲۳).",
+            "بند ۳۱: در طلوع/غروب cos H = −tan φ tan δ  (۲۴)؛ cos A = sin δ sec φ  (۲۵).",
+            "بند ۳۲: Δz = ΔH sin A cos φ  (۲۶)؛ شفق وقتی z خورشید = ۱۰۸°."
+          ],
+          "workedExample": null,
+          "sphereDiagram": "PZX on the horizon (z=90°) with H and A at rising; differential displacements along the parallel of δ for §32.",
+          "exercises": [
+            {
+              "promptEn": "Show that if |tan φ tan δ| > 1 the star never rises or never sets.",
+              "promptFa": "نشان دهید اگر |tan φ tan δ| > ۱ ستاره یا هرگز طلوع نمی‌کند یا هرگز غروب نمی‌کند.",
+              "answer": "Then |cos H| > 1 in (24), so no real rising/setting hour angle."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ch3",
+      "roman": "III",
+      "pages": "58–73",
+      "titleEn": "Refraction",
+      "titleFa": "شکست جوّی",
+      "topics": [
+        {
+          "id": "refraction-laws",
+          "section": "§34",
+          "pages": "58–60",
+          "titleEn": "The laws of refraction",
+          "titleFa": "قوانین شکست",
+          "formulae": [
+            "(1)",
+            "(2)",
+            "(3)",
+            "(4)"
+          ],
+          "figures": [],
+          "keyPointsEn": [
+            "Incident ray, refracted ray, and normal are coplanar; μ₁ sin i = μ₂ sin r.",
+            "Relative index μ = μ₂/μ₁; for vacuum→air, μ = μ_air.",
+            "Sets the optical foundation for astronomical refraction through layered air."
+          ],
+          "keyPointsFa": [
+            "پرتو تابش، شکست و عمود همصفحه‌اند؛ μ₁ sin i = μ₂ sin r.",
+            "ضریب نسبی μ = μ₂/μ₁؛ از خلا به هوا μ = μ_هوا.",
+            "پایهٔ نوری شکست نجومی در لایه‌های هوا."
+          ],
+          "workedExample": null,
+          "sphereDiagram": "Plane interface between media M₁, M₂ with incidence φ and emergence ψ; normals and μ labels (Smart’s opening figure of Ch III).",
+          "exercises": [
+            {
+              "promptEn": "State Snell’s law for vacuum (μ=1) into surface air of index μ₀.",
+              "promptFa": "قانون اسنل از خلا (μ=۱) به هوای سطح با ضریب μ₀ را بنویسید.",
+              "answer": "sin z = μ₀ sin ζ for plane-parallel layers (§35 prep)."
+            }
+          ]
+        },
+        {
+          "id": "true-apparent-mean-refraction",
+          "section": "§35",
+          "pages": "60–62",
+          "titleEn": "True and apparent zenith distance; mean refraction for small z",
+          "titleFa": "سمت‌القدم حقیقی و ظاهری؛ شکست میانگین برای z کوچک",
+          "formulae": [
+            "(5)",
+            "(6)",
+            "(7)"
+          ],
+          "figures": [
+            "23"
+          ],
+          "keyPointsEn": [
+            "Plane-parallel layers for small zenith distance (Fig. 23). True z = incidence at top of atmosphere; observed (apparent) ζ; refraction R = z − ζ.",
+            "From chained Snell: sin z = μ₀ sin ζ  (5) ⇒ R ≈ (μ₀ − 1) tan ζ  (6).",
+            "Mean refraction: P=760 mm, T=10°C; constant k ≈ 58″.2 so R = k tan ζ  (7) [Smart also writes R = 58″.2 tan ζ].",
+            "At other P,T: R′/R = 0.372 P / (273+T) form (Smart’s reduction).",
+            "Formula (7) adequate for ζ ≲ 45°."
+          ],
+          "keyPointsFa": [
+            "برای z کوچک لایه‌های تخت (شکل ۲۳). z حقیقی در مرز بالا؛ ζ ظاهری؛ R = z − ζ.",
+            "sin z = μ₀ sin ζ  (۵) ⇒ R ≈ (μ₀ − ۱) tan ζ  (۶).",
+            "شکست میانگین در ۷۶۰ mm و ۱۰°C؛ k ≈ ۵۸″٫۲ و R = k tan ζ  (۷).",
+            "برای فشار و دمای دیگر ضریب تصحیح Smart.",
+            "فرمول (۷) تا حدود ζ ≲ ۴۵° کافی است."
+          ],
+          "workedExample": null,
+          "sphereDiagram": "Fig. 23: concentric? plane layers M…M₀, zenith OZ, true direction OT′ ∥ PS, observed OT along final element; angles z and ζ; Earth’s surface.",
+          "exercises": [
+            {
+              "promptEn": "Estimate mean refraction at ζ = 45° with k = 58″.2.",
+              "promptFa": "با k = ۵۸″٫۲ شکست میانگین در ζ = ۴۵° را برآورد کنید.",
+              "answer": "R = 58″.2 tan 45° = 58″.2."
+            }
+          ]
+        },
+        {
+          "id": "refraction-integral-cassini",
+          "section": "§§36–37",
+          "pages": "62–68",
+          "titleEn": "General refraction integral; Cassini-type expansion R = A tan ζ + B tan³ ζ",
+          "titleFa": "انتگرال عمومی شکست؛ بسط کسینی R = A tan ζ + B tan³ ζ",
+          "formulae": [
+            "(9)",
+            "(10)",
+            "(11)",
+            "(12)",
+            "(18)",
+            "(20)",
+            "(22)",
+            "(23)",
+            "(28)",
+            "(29)",
+            "(30)"
+          ],
+          "figures": [
+            "29"
+          ],
+          "keyPointsEn": [
+            "Spherical layers: μ′ sin φ′ = μ sin φ and r sin φ = r′ sin φ′ ⇒ r μ sin φ = a μ₀ sin ζ  (12).",
+            "Differential refraction AR = −(dμ/μ) tan φ leads to the general integral (20) for total R between μ=μ₀ at the surface and μ=1 at the top.",
+            "Integral depends on both r and μ; μ(r) is imperfectly known → approximate development.",
+            "With s = (r−a)/a small: R = R₁ − R₂  (22); leading term R₁ = (μ₀−1) tan ζ  (23); second term ∝ tan ζ sec² ζ gives (28).",
+            "Cassini form: R = A tan ζ + B tan³ ζ  (29). Mean numerical: R = 58″.16 tan ζ − 0″.067 tan³ ζ  (30).",
+            "Invalid near horizon (ζ ≳ 75°); use Greenwich (1898) or Pulkova (1956) tables."
+          ],
+          "keyPointsFa": [
+            "لایه‌های کروی: r μ sin φ = a μ₀ sin ζ  (۱۲).",
+            "انتگرال عمومی شکست (۲۰) از سطح (μ₀) تا بالای جو (μ=۱).",
+            "انتگرال به r و μ وابسته است؛ μ(r) دقیقاً معلوم نیست ← بسط تقریبی.",
+            "با s کوچک: R = R₁ − R₂؛ جملهٔ اول (μ₀−۱) tan ζ؛ جملهٔ دوم به صورت کسینی می‌انجامد.",
+            "صورت کسینی: R = A tan ζ + B tan³ ζ  (۲۹)؛ مقدار میانگین (۳۰).",
+            "نزدیک افق ناکافی است؛ جداول گرینویچ/پولکووا."
+          ],
+          "workedExample": null,
+          "sphereDiagram": "Fig. 29: Earth centre C, observer O, zenith COZ, spherical layers M′,M with radii r′,r; ray path LP–PQ–TO; angles φ′,φ,ζ; observed direction OT.",
+          "exercises": [
+            {
+              "promptEn": "Smart Ex. 2: under Cassini’s homogeneous atmosphere of height h, relate sin ζ to a, μ, h.",
+              "promptFa": "تمرین ۲: با فرض کسینی (جو همگن ارتفاع h) رابطهٔ sin ζ با a، μ، h را بنویسید.",
+              "answer": "sin ζ = (a/(a+h)) μ sin z form as in Smart Ex. 2 (homogeneous shell)."
+            }
+          ]
+        },
+        {
+          "id": "cassini-constants-ab",
+          "section": "§38",
+          "pages": "68–69",
+          "titleEn": "Determination of Cassini constants A and B",
+          "titleFa": "تعیین ثابت‌های کسینی A و B",
+          "formulae": [
+            "(29)",
+            "(31)",
+            "(32)",
+            "(33)"
+          ],
+          "figures": [
+            "30"
+          ],
+          "keyPointsEn": [
+            "Upper culmination: φ − δ = ζ + A tan ζ + B tan³ ζ  (31).",
+            "Lower culmination: 180° − φ − δ = ζ′ + A tan ζ′ + B tan³ ζ′  (32).",
+            "Eliminating φ: 180° − 2δ = ζ + ζ′ + R + R′  (33); a second star gives another equation → A,B.",
+            "Many stars + least squares minimize observational error in A,B."
+          ],
+          "keyPointsFa": [
+            "گذار بالا: φ − δ = ζ + A tan ζ + B tan³ ζ  (۳۱).",
+            "گذار پایین: ۱۸۰° − φ − δ = ζ′ + A tan ζ′ + B tan³ ζ′  (۳۲).",
+            "حذف φ: ۱۸۰° − ۲δ = ζ + ζ′ + R + R′  (۳۳)؛ ستارهٔ دوم A و B را می‌دهد.",
+            "چندین ستاره و کمترین مربعات خطای رصدی را کم می‌کند."
+          ],
+          "workedExample": null,
+          "sphereDiagram": "Fig. 30: pole P, zenith Z, upper X→X₁ and lower Y→Y₁ displacements by refraction; true vs apparent zenith distances.",
+          "exercises": [
+            {
+              "promptEn": "If δ is known, how do (31) and (32) determine A and B without a second star?",
+              "promptFa": "اگر δ معلوم باشد، چگونه (۳۱) و (۳۲) بدون ستارهٔ دوم A و B را می‌دهند؟",
+              "answer": "Two linear equations in A,B from the two culminations of one circumpolar star (φ known or also solved)."
+            }
+          ]
+        },
+        {
+          "id": "refraction-effects",
+          "section": "§§39–40",
+          "pages": "69–73",
+          "titleEn": "Refraction effects on sunset and on α, δ",
+          "titleFa": "اثر شکست بر غروب خورشید و بر α، δ",
+          "formulae": [
+            "(34)",
+            "(35)",
+            "(36)",
+            "(37)",
+            "(38)",
+            "(39)",
+            "(40)"
+          ],
+          "figures": [
+            "31"
+          ],
+          "keyPointsEn": [
+            "Horizontal refraction ≈ 34′: when the Sun appears on the horizon, true z = 90°34′.",
+            "Delay of visible sunset: ΔH = 34′ sec φ sec δ csc H minutes of time  (35); at φ=60°, δ=0: ΔH ≈ 4ᵐ.5; with semi-diameter 16′ → ≈6ᵐ.7; day lengthened ≈13½ᵐ.",
+            "§40: refraction displaces star toward Z by k tan ζ; corrections ΔH and Δδ via parallactic angle η (38)(39); Δα = −(H−H′) (40).",
+            "Exercises include Simpson’s hypothesis → Bradley’s formula, solar disk ellipticity, and differential rates."
+          ],
+          "keyPointsFa": [
+            "شکست افقی ≈ ۳۴′: وقتی خورشید روی افق دیده می‌شود z حقیقی = ۹۰°۳۴′.",
+            "تأخیر غروب مرئی: ΔH = ۳۴′ sec φ sec δ csc H دقیقهٔ زمان  (۳۵)؛ در φ=۶۰°، δ=۰ حدود ۴ᵐ٫۵.",
+            "بند ۴۰: جابه‌جایی به‌سوی Z؛ تصحیح H و δ با زاویهٔ اختلاف‌منظر η؛ تصحیح بعد (۴۰).",
+            "تمرین‌ها: فرض سیمپسون ← فرمول برادلی، بیضی‌شدن قرص خورشید، آهنگ‌های دیفرانسیلی."
+          ],
+          "workedExample": {
+            "source": "Smart III §39",
+            "given": "φ = 60°, δ = 0° (equinox); horizontal refraction 34′",
+            "result": "ΔH ≈ 4ᵐ.5 for centre; ≈ 6ᵐ.7 including 16′ semi-diameter; day lengthened ≈ 13½ᵐ",
+            "steps": [
+              "Theoretical sunset: cos H = −tan φ tan δ ⇒ H = 6ʰ.",
+              "ΔH = 34 sec φ sec δ csc H minutes ⇒ 4ᵐ.5.",
+              "Replace 34′ by 50′ for upper limb ⇒ 6ᵐ.7; double for sunrise+sunset ≈ 13½ᵐ."
+            ]
+          },
+          "sphereDiagram": "Fig. 31: P, Z, true X and apparent X′ toward Z; small right triangle XX′Y; hour angles H,H′ and N.P.D.s; parallactic angle η = ∠PXZ.",
+          "exercises": [
+            {
+              "promptEn": "Smart Ex. 7: two neighbouring stars true distance D; show observed distance is D − k D (1 + cos²ψ tan² z).",
+              "promptFa": "تمرین ۷: دو ستارهٔ همسایه به فاصلهٔ حقیقی D؛ فاصلهٔ مشاهده‌شده را بیابید.",
+              "answer": "D_obs = D − k D (1 + cos² ψ tan² z) with k in radians (Smart III Ex. 7)."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "lessonIdMap": {
+    "great-small-circles": [
+      "great-circles",
+      "spherical-triangle"
+    ],
+    "terrestrial-latlong": [
+      "terrestrial-latlong"
+    ],
+    "cosine-formula-a": [
+      "cosine-sides"
+    ],
+    "sine-formula-b": [
+      "sine-law"
+    ],
+    "analogue-formula-c": [
+      "analogue-c"
+    ],
+    "four-parts-d": [
+      "four-parts"
+    ],
+    "napier-right-angled": [
+      "right-angled"
+    ],
+    "polar-triangle": [
+      "cosine-angles"
+    ],
+    "smart-12-numerical": [
+      "haversine-example"
+    ],
+    "haversine-auxiliary": [
+      "haversine-example"
+    ],
+    "delambre-napier-analogies": [
+      "delambre-napier"
+    ],
+    "horizontal-coords": [
+      "horizontal"
+    ],
+    "equatorial-coords": [
+      "equatorial"
+    ],
+    "circumpolar-stars": [
+      "rising-setting"
+    ],
+    "pzx-triangle": [
+      "coord-transform"
+    ],
+    "ra-sidereal-time": [
+      "celestial-sphere"
+    ],
+    "ecliptic-coords": [
+      "ecliptic"
+    ],
+    "mean-solar-time": [
+      "time"
+    ],
+    "rising-setting-rates": [
+      "rising-setting"
+    ],
+    "refraction-laws": [
+      "refraction-laws"
+    ],
+    "true-apparent-mean-refraction": [
+      "refraction-laws"
+    ],
+    "refraction-integral-cassini": [
+      "refraction-cassini"
+    ],
+    "cassini-constants-ab": [
+      "refraction-cassini"
+    ],
+    "refraction-effects": [
+      "refraction-parallax"
+    ]
+  }
+}
