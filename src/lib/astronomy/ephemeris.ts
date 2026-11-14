@@ -1,105 +1,120 @@
 /**
- * Teaching-grade live ephemeris (Meeus-style approximations).
- * Good for olympiad demos; not a JPL SPICE replacement.
+ * Live ephemeris via astronomy-engine (VSOP87 / ELP-class).
+ * Positions are of-date, apparent, for the given observer.
  */
 
-import { equatorialToHorizontal, normalizeDegrees, normalizeHours } from "@/lib/astronomy/sphere";
-import { gmstHours, julianDay, lstHours } from "@/lib/astronomy/time";
+import {
+  Body,
+  DeltaT_EspenakMeeus,
+  Ecliptic,
+  Equator,
+  HelioVector,
+  Horizon,
+  Illumination,
+  MakeTime,
+  MoonPhase,
+  Observer,
+  SiderealTime,
+  SunPosition,
+  GeoMoon,
+  EquatorFromVector,
+  type AstroTime,
+} from "astronomy-engine";
+import { julianDay } from "@/lib/astronomy/time";
 
-const DEG = Math.PI / 180;
-const RAD = 180 / Math.PI;
+const SYNODIC = 29.530588853;
 
-function sind(d: number) {
-  return Math.sin(d * DEG);
+function wrap24(h: number) {
+  return ((h % 24) + 24) % 24;
 }
-function cosd(d: number) {
-  return Math.cos(d * DEG);
-}
-function asind(x: number) {
-  return Math.asin(Math.min(1, Math.max(-1, x))) * RAD;
-}
-function atan2d(y: number, x: number) {
-  return Math.atan2(y, x) * RAD;
+function wrap360(d: number) {
+  return ((d % 360) + 360) % 360;
 }
 
-/** ΔT ≈ TT − UTC in seconds (Espenak/Meeus-ish for 2005–2050). */
+function observerOf(lat: number, lon: number, altM: number | null) {
+  return new Observer(lat, lon, altM ?? 0);
+}
+
 export function deltaTSeconds(date: Date): number {
-  const y = date.getUTCFullYear() + (date.getUTCMonth() + 0.5) / 12;
-  const t = y - 2000;
-  // Polynomial tuned for early 21st century; ~69–72 s in mid-2020s
-  return 62.92 + 0.32217 * t + 0.005589 * t * t;
+  const time = MakeTime(date);
+  return DeltaT_EspenakMeeus(time.ut);
 }
 
-/** Ephemeris / Terrestrial Time as Date-like JD and clock fields. */
 export function ephemerisTime(date: Date) {
   const dT = deltaTSeconds(date);
   const jdUtc = julianDay(date);
   const jdTt = jdUtc + dT / 86400;
-  const ttMs = date.getTime() + dT * 1000;
-  const tt = new Date(ttMs);
+  const tt = new Date(date.getTime() + dT * 1000);
   const minutesOfDay =
     tt.getUTCHours() * 60 +
     tt.getUTCMinutes() +
     tt.getUTCSeconds() / 60 +
-    tt.getUTCMilliseconds() / 60000;
+    tt.getUTCMilliseconds() / 60000 +
+    0; // TT clock
   return {
     deltaTSec: dT,
     jdUtc,
     jdTt,
     ttIso: tt.toISOString(),
-    /** Fractional minutes since 00:00 TT (high-resolution float). */
     minutesOfDay,
     hoursOfDay: minutesOfDay / 60,
   };
 }
 
+function solarCoords(time: AstroTime, obs: Observer) {
+  const eq = Equator(Body.Sun, time, obs, true, true);
+  const hor = Horizon(time, obs, eq.ra, eq.dec, "normal");
+  const ecl = SunPosition(time);
+  const gst = SiderealTime(time);
+  const lst = wrap24(gst + obs.longitude / 15);
+  const utcH =
+    time.date.getUTCHours() +
+    time.date.getUTCMinutes() / 60 +
+    time.date.getUTCSeconds() / 3600 +
+    time.date.getUTCMilliseconds() / 3_600_000;
+  const meanLocal = wrap24(utcH + obs.longitude / 15);
+  const ha = wrap24(lst - eq.ra);
+  const apparent = wrap24(ha + 12);
+  let eotHours = apparent - meanLocal;
+  if (eotHours > 12) eotHours -= 24;
+  if (eotHours < -12) eotHours += 24;
+  return {
+    lambda: ecl.elon,
+    beta: ecl.elat,
+    ra: eq.ra,
+    dec: eq.dec,
+    alt: hor.altitude,
+    az: hor.azimuth,
+    distanceAu: ecl.vec.Length(),
+    equationOfTimeMin: eotHours * 60,
+    lst,
+    gmst: gst,
+  };
+}
+
 export type SunState = {
-  lambda: number; // ecliptic longitude °
-  beta: number; // ecliptic latitude ° (~0)
-  ra: number; // hours
-  dec: number; // °
+  lambda: number;
+  beta: number;
+  ra: number;
+  dec: number;
   alt: number;
   az: number;
   distanceAu: number;
-  meanAnomaly: number;
-  trueAnomaly: number;
   equationOfTimeMin: number;
 };
 
-/** Sun apparent equatorial + ecliptic (low precision). */
-export function sunState(date: Date, lat: number, lon: number): SunState {
-  const JD = julianDay(date);
-  const n = JD - 2451545.0;
-  const L = normalizeDegrees(280.460 + 0.9856474 * n);
-  const g = normalizeDegrees(357.528 + 0.9856003 * n);
-  const λ = normalizeDegrees(
-    L + 1.915 * sind(g) + 0.02 * sind(2 * g),
-  );
-  const ε = 23.439 - 0.0000004 * n;
-  const R =
-    1.00014 - 0.01671 * cosd(g) - 0.00014 * cosd(2 * g);
-  const λr = λ * DEG;
-  const εr = ε * DEG;
-  const raRad = Math.atan2(Math.cos(εr) * Math.sin(λr), Math.cos(λr));
-  const dec = asind(Math.sin(εr) * Math.sin(λr));
-  const ra = normalizeHours((raRad * RAD) / 15);
-  const lst = lstHours(date, lon);
-  const horiz = equatorialToHorizontal(ra, dec, lat, lst);
-  let eot = 4 * (L - ra * 15);
-  if (eot > 720) eot -= 1440;
-  if (eot < -720) eot += 1440;
-  const ν = normalizeDegrees(g + 1.915 * sind(g) + 0.02 * sind(2 * g));
+export function sunState(date: Date, lat: number, lon: number, altM: number | null = 0): SunState {
+  const time = MakeTime(date);
+  const s = solarCoords(time, observerOf(lat, lon, altM));
   return {
-    lambda: λ,
-    beta: 0,
-    ra,
-    dec,
-    alt: horiz.alt,
-    az: horiz.az,
-    distanceAu: R,
-    meanAnomaly: g,
-    trueAnomaly: ν,
-    equationOfTimeMin: eot,
+    lambda: s.lambda,
+    beta: s.beta,
+    ra: s.ra,
+    dec: s.dec,
+    alt: s.alt,
+    az: s.az,
+    distanceAu: s.distanceAu,
+    equationOfTimeMin: s.equationOfTimeMin,
   };
 }
 
@@ -112,134 +127,88 @@ export type MoonState = {
   az: number;
   distanceKm: number;
   phaseAngle: number;
-  illumination: number; // 0..1
+  illumination: number;
   elongation: number;
   ageDays: number;
   phaseNameFa: string;
+  waxing: boolean;
 };
 
-/** Approximate lunar ecliptic / equatorial position (Meeus truncated). */
-export function moonState(date: Date, lat: number, lon: number): MoonState {
-  const JD = julianDay(date);
-  const T = (JD - 2451545.0) / 36525;
-  const Lp = normalizeDegrees(
-    218.3164477 +
-      481267.88123421 * T -
-      0.0015786 * T * T +
-      (T * T * T) / 538841,
-  );
-  const D = normalizeDegrees(
-    297.8501921 + 445267.1114034 * T - 0.0018819 * T * T,
-  );
-  const M = normalizeDegrees(357.5291092 + 35999.0502909 * T);
-  const Mp = normalizeDegrees(
-    134.9633964 + 477198.8675055 * T + 0.0087414 * T * T,
-  );
-  const F = normalizeDegrees(
-    93.272095 + 483202.0175233 * T - 0.0036539 * T * T,
-  );
-
-  const λ =
-    Lp +
-    6.289 * sind(Mp) +
-    1.274 * sind(2 * D - Mp) +
-    0.658 * sind(2 * D) +
-    0.214 * sind(2 * Mp) -
-    0.186 * sind(M) -
-    0.114 * sind(2 * F);
-  const β =
-    5.128 * sind(F) +
-    0.281 * sind(Mp + F) +
-    0.278 * sind(Mp - F) +
-    0.173 * sind(2 * D - F);
-  const Σr =
-    -20905 * cosd(Mp) -
-    3699 * cosd(2 * D - Mp) -
-    2956 * cosd(2 * D) -
-    570 * cosd(2 * Mp);
-  const Δ = 385000.56 + Σr; // km
-
-  const ε = 23.439291 - 0.0130042 * T;
-  const λr = λ * DEG;
-  const βr = β * DEG;
-  const εr = ε * DEG;
-  const raRad = Math.atan2(
-    Math.sin(λr) * Math.cos(εr) - Math.tan(βr) * Math.sin(εr),
-    Math.cos(λr),
-  );
-  const dec = asind(
-    Math.sin(βr) * Math.cos(εr) + Math.cos(βr) * Math.sin(εr) * Math.sin(λr),
-  );
-  const ra = normalizeHours((raRad * RAD) / 15);
-
-  const sun = sunState(date, lat, lon);
-  const elong = Math.abs(normalizeDegrees(λ - sun.lambda + 180) - 180);
-  // phase angle approx from elongation
-  const phaseAngle = elong; // deg, simplified
-  const illumination = (1 - Math.cos(phaseAngle * DEG)) / 2;
-  const ageDays = (normalizeDegrees(λ - sun.lambda) / 360) * 29.53058867;
-
-  const lst = lstHours(date, lon);
-  const horiz = equatorialToHorizontal(ra, dec, lat, lst);
-
+export function moonState(date: Date, lat: number, lon: number, altM: number | null = 0): MoonState {
+  const time = MakeTime(date);
+  const obs = observerOf(lat, lon, altM);
+  const vec = GeoMoon(time);
+  const eq = EquatorFromVector(vec);
+  const hor = Horizon(time, obs, eq.ra, eq.dec, "normal");
+  const ecl = Ecliptic(vec);
+  const ill = Illumination(Body.Moon, time);
+  const phase = MoonPhase(time); // 0 new … 180 full … 360
+  const ageDays = (phase / 360) * SYNODIC;
+  const waxing = phase < 180;
+  const sun = SunPosition(time);
+  const elong = Math.abs(wrap360(ecl.elon - sun.elon + 180) - 180);
   return {
-    lambda: normalizeDegrees(λ),
-    beta: β,
-    ra,
-    dec,
-    alt: horiz.alt,
-    az: horiz.az,
-    distanceKm: Δ,
-    phaseAngle,
-    illumination,
+    lambda: ecl.elon,
+    beta: ecl.elat,
+    ra: eq.ra,
+    dec: eq.dec,
+    alt: hor.altitude,
+    az: hor.azimuth,
+    distanceKm: vec.Length() * 149597870.7,
+    phaseAngle: ill.phase_angle,
+    illumination: ill.phase_fraction,
     elongation: elong,
     ageDays,
-    phaseNameFa: moonPhaseNameFa(illumination, ageDays),
+    waxing,
+    phaseNameFa: moonPhaseNameFa(phase),
   };
 }
 
-function moonPhaseNameFa(illum: number, age: number): string {
-  if (illum < 0.03) return "ماه نو";
-  if (illum > 0.97) return "بدر";
-  if (age < 7.4) return "هلال فزاینده";
-  if (age < 9) return "تربیع اول";
-  if (age < 14.8) return "کوژ فزاینده";
-  if (age < 18) return "کوژ کاهنده";
-  if (age < 22.1) return "تربیع آخر";
+function moonPhaseNameFa(phase: number): string {
+  const p = wrap360(phase);
+  if (p < 8 || p > 352) return "ماه نو";
+  if (p < 80) return "هلال فزاینده";
+  if (p < 100) return "تربیع اول";
+  if (p < 170) return "کوژ فزاینده";
+  if (p < 190) return "بدر";
+  if (p < 260) return "کوژ کاهنده";
+  if (p < 280) return "تربیع آخر";
   return "هلال کاهنده";
 }
 
 export type EarthOrbitState = {
-  /** Heliocentric ecliptic longitude of Earth (°) */
   heliocentricLon: number;
-  /** True anomaly (°) */
-  trueAnomaly: number;
-  /** Radius AU (Sun–Earth) */
   rAu: number;
-  eccentricity: number;
-  /** Perihelion argument / direction of γ from Sun–Earth frame */
-  equinoxLon: number;
   x: number;
   y: number;
+  z: number;
 };
 
-/** Earth on elliptical heliocentric orbit; γ along +x. */
 export function earthOrbitState(date: Date): EarthOrbitState {
-  const sun = sunState(date, 0, 0);
-  const e = 0.0167086;
-  const λEarth = normalizeDegrees(sun.lambda + 180);
-  // Place Sun at focus; γ (vernal equinox) at λ=0 on the ecliptic
-  const r = sun.distanceAu;
-  const lon = λEarth * DEG;
+  const time = MakeTime(date);
+  const v = HelioVector(Body.Earth, time);
+  const ecl = Ecliptic(v);
+  const r = v.Length();
+  const lon = ecl.elon * (Math.PI / 180);
   return {
-    heliocentricLon: λEarth,
-    trueAnomaly: sun.trueAnomaly,
+    heliocentricLon: ecl.elon,
     rAu: r,
-    eccentricity: e,
-    equinoxLon: 0,
     x: r * Math.cos(lon),
     y: r * Math.sin(lon),
+    z: v.z,
   };
+}
+
+/** Full-year heliocentric ecliptic track (of date), equinox = +x. */
+export function earthOrbitTrack(year: number) {
+  const pts: { x: number; y: number; lon: number; r: number; day: number }[] = [];
+  for (let day = 0; day < 366; day += 2) {
+    const date = new Date(Date.UTC(year, 0, 1 + day, 12, 0, 0));
+    if (date.getUTCFullYear() !== year) break;
+    const e = earthOrbitState(date);
+    pts.push({ x: e.x, y: e.y, lon: e.heliocentricLon, r: e.rAu, day: day + 1 });
+  }
+  return pts;
 }
 
 export type ObserverState = {
@@ -250,19 +219,10 @@ export type ObserverState = {
   gmst: number;
 };
 
-export function observerState(
-  date: Date,
-  lat: number,
-  lon: number,
-  altM: number | null,
-): ObserverState {
-  return {
-    lat,
-    lon,
-    altM,
-    lst: lstHours(date, lon),
-    gmst: gmstHours(date),
-  };
+export function observerState(date: Date, lat: number, lon: number, altM: number | null): ObserverState {
+  const time = MakeTime(date);
+  const gmst = SiderealTime(time);
+  return { lat, lon, altM, gmst, lst: wrap24(gmst + lon / 15) };
 }
 
 export type LiveSnapshot = {
@@ -284,67 +244,106 @@ export function liveSnapshot(
     utcIso: date.toISOString(),
     et: ephemerisTime(date),
     observer: observerState(date, lat, lon, altM),
-    sun: sunState(date, lat, lon),
-    moon: moonState(date, lat, lon),
+    sun: sunState(date, lat, lon, altM),
+    moon: moonState(date, lat, lon, altM),
     earth: earthOrbitState(date),
   };
 }
 
-/** Yearly sample of sun coords (one point per day, UTC noon). */
-export function sunYearSeries(year: number, lat: number, lon: number) {
-  const out: Array<{
-    day: number;
-    label: string;
-    dec: number;
-    ra: number;
-    lambda: number;
-    beta: number;
-    alt: number;
-    az: number;
-  }> = [];
-  for (let day = 1; day <= 365; day += 2) {
-    const d = new Date(Date.UTC(year, 0, day, 12, 0, 0));
-    const s = sunState(d, lat, lon);
+export type SunSample = {
+  t: string;
+  dec: number;
+  ra: number;
+  lambda: number;
+  beta: number;
+  alt: number;
+  az: number;
+  eot: number;
+};
+
+/** Local civil day, 15-minute steps. x = hours after local midnight. */
+export function sunDaySeries(date: Date, lat: number, lon: number, altM: number | null = 0) {
+  const local = new Date(date.getTime() + (lon / 15) * 3_600_000);
+  const midnightUtc =
+    Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate(), 0, 0, 0) -
+    (lon / 15) * 3_600_000;
+  const out: (SunSample & { hour: number; label: string })[] = [];
+  for (let i = 0; i <= 96; i++) {
+    const d = new Date(midnightUtc + i * 15 * 60 * 1000);
+    const s = sunState(d, lat, lon, altM);
+    const hour = i * 0.25;
     out.push({
-      day,
-      label: String(day),
-      dec: +s.dec.toFixed(3),
-      ra: +s.ra.toFixed(4),
-      lambda: +s.lambda.toFixed(3),
-      beta: +s.beta.toFixed(4),
+      hour,
+      label: hour % 1 === 0 ? String(hour).padStart(2, "0") : "",
+      t: d.toISOString(),
+      dec: +s.dec.toFixed(4),
+      ra: +s.ra.toFixed(5),
+      lambda: +s.lambda.toFixed(4),
+      beta: +s.beta.toFixed(5),
       alt: +s.alt.toFixed(3),
-      az: +s.az.toFixed(2),
+      az: +s.az.toFixed(3),
+      eot: +s.equationOfTimeMin.toFixed(3),
     });
   }
   return out;
 }
 
-/** Intraday sample (UTC hours). */
-export function sunDaySeries(date: Date, lat: number, lon: number, stepH = 0.25) {
-  const out: Array<{
-    hour: number;
-    label: string;
-    dec: number;
-    ra: number;
-    lambda: number;
-    beta: number;
-    alt: number;
-    az: number;
-  }> = [];
-  for (let h = 0; h < 24; h += stepH) {
-    const d = new Date(date);
-    d.setUTCHours(0, 0, 0, 0);
-    d.setUTCMinutes(Math.round(h * 60));
-    const s = sunState(d, lat, lon);
+const MONTHS_FA = [
+  "ژانویه",
+  "فوریه",
+  "مارس",
+  "آوریل",
+  "مه",
+  "ژوئن",
+  "ژوئیه",
+  "اوت",
+  "سپتامبر",
+  "اکتبر",
+  "نوامبر",
+  "دسامبر",
+];
+
+/** One sample per day at local noon — culmination altitude is meaningful. */
+export function sunYearSeries(year: number, lat: number, lon: number, altM: number | null = 0) {
+  const out: (SunSample & { day: number; month: string; label: string })[] = [];
+  let n = 0;
+  for (let month = 0; month < 12; month++) {
+    const dim = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+    for (let d = 1; d <= dim; d++) {
+      n += 1;
+      const noonUtc = Date.UTC(year, month, d, 12, 0, 0) - (lon / 15) * 3_600_000;
+      const when = new Date(noonUtc);
+      const s = sunState(when, lat, lon, altM);
+      out.push({
+        day: n,
+        month: MONTHS_FA[month],
+        label: d === 1 ? MONTHS_FA[month] : "",
+        t: when.toISOString(),
+        dec: +s.dec.toFixed(4),
+        ra: +s.ra.toFixed(5),
+        lambda: +s.lambda.toFixed(4),
+        beta: +s.beta.toFixed(5),
+        alt: +s.alt.toFixed(3),
+        az: +s.az.toFixed(3),
+        eot: +s.equationOfTimeMin.toFixed(3),
+      });
+    }
+  }
+  return out;
+}
+
+/** Lunar illumination over the next 30 days (local noon). */
+export function moonMonthSeries(date: Date, lat: number, lon: number) {
+  const out: { day: number; label: string; illum: number; alt: number; dec: number }[] = [];
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(date.getTime() + i * 86_400_000);
+    const m = moonState(d, lat, lon, 0);
     out.push({
-      hour: h,
-      label: h.toFixed(2),
-      dec: +s.dec.toFixed(3),
-      ra: +s.ra.toFixed(4),
-      lambda: +s.lambda.toFixed(3),
-      beta: +s.beta.toFixed(4),
-      alt: +s.alt.toFixed(3),
-      az: +s.az.toFixed(2),
+      day: i,
+      label: String(i),
+      illum: +(m.illumination * 100).toFixed(2),
+      alt: +m.alt.toFixed(2),
+      dec: +m.dec.toFixed(3),
     });
   }
   return out;

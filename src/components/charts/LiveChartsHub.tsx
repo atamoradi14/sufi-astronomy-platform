@@ -3,21 +3,14 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import {
+  earthOrbitTrack,
   liveSnapshot,
+  moonMonthSeries,
   sunDaySeries,
   sunYearSeries,
   type LiveSnapshot,
 } from "@/lib/astronomy/ephemeris";
+import { AreaSeries, PlotCard } from "@/components/charts/AstroPlot";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { downloadCsv } from "@/lib/charts/csv";
 import { formatDeg, formatHours, toPersianDigits } from "@/lib/utils";
@@ -104,13 +97,23 @@ export function LiveChartsHub() {
 
   const daySeries = useMemo(() => {
     if (!now) return [];
-    return sunDaySeries(now, lat, lon, 0.25);
-  }, [now, lat, lon]);
+    return sunDaySeries(now, lat, lon, altM);
+  }, [now, lat, lon, altM]);
 
   const yearSeries = useMemo(() => {
     if (!now) return [];
-    return sunYearSeries(now.getUTCFullYear(), lat, lon);
+    return sunYearSeries(now.getUTCFullYear(), lat, lon, altM);
+  }, [now, lat, lon, altM]);
+
+  const moonSeries = useMemo(() => {
+    if (!now) return [];
+    return moonMonthSeries(now, lat, lon);
   }, [now, lat, lon]);
+
+  const orbitTrack = useMemo(() => {
+    if (!now) return [];
+    return earthOrbitTrack(now.getUTCFullYear());
+  }, [now]);
 
   const exportAll = () => {
     if (!snap || !now) return;
@@ -240,7 +243,7 @@ export function LiveChartsHub() {
               </CardHeader>
               <CardContent className="grid gap-3 sm:grid-cols-2">
                 <div className="sm:col-span-2">
-                  <MoonPhaseDisc illumination={snap.moon.illumination} ageDays={snap.moon.ageDays} />
+                  <MoonPhaseDisc illumination={snap.moon.illumination} waxing={snap.moon.waxing} />
                 </div>
                 <CopyValue
                   label="درخشش (بخش روشن)"
@@ -276,54 +279,36 @@ export function LiveChartsHub() {
             </Button>
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
-            <ChartCard title="شبانه‌روز — میل، بعد، λ" desc="UTC hours">
-              <SunMultiChart data={daySeries} xKey="label" />
-            </ChartCard>
-            <ChartCard title="شبانه‌روز — ارتفاع و سمت" desc="برای ناظر فعلی">
-              <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={daySeries}>
-                  <CartesianGrid stroke="rgba(201,162,39,0.12)" />
-                  <XAxis dataKey="label" stroke="#9aa6b8" tick={{ fontSize: 10 }} />
-                  <YAxis stroke="#9aa6b8" tick={{ fontSize: 10 }} />
-                  <Tooltip contentStyle={tipStyle} />
-                  <Legend />
-                  <Line type="monotone" dataKey="alt" name="ارتفاع" stroke="#6f9e7a" dot={false} strokeWidth={2} />
-                  <Line type="monotone" dataKey="az" name="سمت" stroke="#5b7c99" dot={false} strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartCard>
-            <ChartCard title="سالانه — میل و λ" desc="هر دو روز، ظهر UTC">
-              <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={yearSeries}>
-                  <CartesianGrid stroke="rgba(201,162,39,0.12)" />
-                  <XAxis dataKey="day" stroke="#9aa6b8" tick={{ fontSize: 10 }} />
-                  <YAxis stroke="#9aa6b8" tick={{ fontSize: 10 }} />
-                  <Tooltip contentStyle={tipStyle} />
-                  <Legend />
-                  <Line type="monotone" dataKey="dec" name="میل δ" stroke="#c9a227" dot={false} strokeWidth={2} />
-                  <Line type="monotone" dataKey="lambda" name="λ" stroke="#3d7a7a" dot={false} strokeWidth={2} />
-                  <Line type="monotone" dataKey="ra" name="α (ʰ)" stroke="#8b4557" dot={false} strokeWidth={1.5} />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartCard>
-            <ChartCard title="سالانه — ارتفاع ظهر" desc="وابسته به عرض ناظر">
-              <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={yearSeries}>
-                  <CartesianGrid stroke="rgba(201,162,39,0.12)" />
-                  <XAxis dataKey="day" stroke="#9aa6b8" tick={{ fontSize: 10 }} />
-                  <YAxis stroke="#9aa6b8" tick={{ fontSize: 10 }} />
-                  <Tooltip contentStyle={tipStyle} />
-                  <Legend />
-                  <Line type="monotone" dataKey="alt" name="ارتفاع" stroke="#6f9e7a" dot={false} strokeWidth={2} />
-                  <Line type="monotone" dataKey="az" name="سمت" stroke="#5b7c99" dot={false} strokeWidth={1.5} />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartCard>
+            <PlotCard title="ارتفاع خورشید در شبانه‌روز محلی" desc="درجه از افق · خط صورتی = افق · محور افقی ساعت محلی">
+              <AreaSeries data={daySeries} xKey="hour" yKey="alt" color="#e6d39a" name="ارتفاع" unit="°" zeroLine yLabel="°" />
+            </PlotCard>
+            <PlotCard title="سمت خورشید در شبانه‌روز" desc="آزیموت از شمال، ساعت‌گرد">
+              <AreaSeries data={daySeries} xKey="hour" yKey="az" color="#7eb6e8" name="سمت" unit="°" domain={[0, 360]} yLabel="°" />
+            </PlotCard>
+            <PlotCard title="میل خورشید در سال" desc="ظهر محلی · محور = روز سال">
+              <AreaSeries data={yearSeries} xKey="day" yKey="dec" color="#e6d39a" name="δ" unit="°" domain={[-24, 24]} yLabel="°" />
+            </PlotCard>
+            <PlotCard title="طول دایرة‌البروجی در سال" desc="λ از اعتدال بهاری">
+              <AreaSeries data={yearSeries} xKey="day" yKey="lambda" color="#7ec8c8" name="λ" unit="°" domain={[0, 360]} yLabel="°" />
+            </PlotCard>
+            <PlotCard title="بعد خورشید در سال" desc="ساعت اعتدالی">
+              <AreaSeries data={yearSeries} xKey="day" yKey="ra" color="#e08aa0" name="α" unit="h" domain={[0, 24]} yLabel="h" />
+            </PlotCard>
+            <PlotCard title="ارتفاع ظهر محلی در سال" desc="گذر نصف‌النهار برای عرض شما">
+              <AreaSeries data={yearSeries} xKey="day" yKey="alt" color="#8fd4a4" name="ارتفاع ظهر" unit="°" yLabel="°" />
+            </PlotCard>
+            <PlotCard title="معادلهٔ زمان در سال" desc="دقیقه · ظاهری منهای میانگین">
+              <AreaSeries data={yearSeries} xKey="day" yKey="eot" color="#d4a574" name="EoT" unit="min" zeroLine yLabel="min" />
+            </PlotCard>
+            <PlotCard title="عرض دایرة‌البروجی خورشید" desc="β تقریباً صفر؛ مقیاس باز شده تا مقدار واقعی دیده شود">
+              <AreaSeries data={yearSeries} xKey="day" yKey="beta" color="#9ec4e6" name="β" unit="°" />
+            </PlotCard>
           </div>
         </div>
       )}
 
       {tab === "moon" && (
+        <div className="space-y-4">
         <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
           <Card>
             <CardHeader>
@@ -331,7 +316,7 @@ export function LiveChartsHub() {
               <CardDescription>{snap.moon.phaseNameFa}</CardDescription>
             </CardHeader>
             <CardContent>
-              <MoonPhaseDisc illumination={snap.moon.illumination} ageDays={snap.moon.ageDays} size={220} />
+              <MoonPhaseDisc illumination={snap.moon.illumination} waxing={snap.moon.waxing} size={220} />
             </CardContent>
           </Card>
           <div className="grid gap-2 sm:grid-cols-2">
@@ -371,6 +356,19 @@ export function LiveChartsHub() {
             </Button>
           </div>
         </div>
+        <PlotCard title="روشنایی ماه در ۳۰ روز آینده" desc="درصد سطح روشن · محور = روز از امروز">
+          <AreaSeries
+            data={moonSeries}
+            xKey="day"
+            yKey="illum"
+            color="#f3ebd4"
+            name="روشنایی"
+            unit="%"
+            domain={[0, 100]}
+            yLabel="%"
+          />
+        </PlotCard>
+        </div>
       )}
 
       {tab === "earth" && (
@@ -381,16 +379,14 @@ export function LiveChartsHub() {
               <CardDescription>خط‌چین: اعتدال بهاری ♈ · نقطهٔ درخشان: زمین</CardDescription>
             </CardHeader>
             <CardContent>
-              <EarthOrbitView earth={snap.earth} />
+              <EarthOrbitView earth={snap.earth} track={orbitTrack} />
             </CardContent>
           </Card>
           <div className="grid gap-2 content-start">
             <CopyValue label="طول خورشیدمرکزی زمین" value={snap.earth.heliocentricLon.toFixed(6)} display={formatDeg(snap.earth.heliocentricLon, 4)} />
-            <CopyValue label="آنومالی حقیقی" value={snap.earth.trueAnomaly.toFixed(6)} display={formatDeg(snap.earth.trueAnomaly, 4)} />
             <CopyValue label="R (AU)" value={snap.earth.rAu.toFixed(8)} display={toPersianDigits(snap.earth.rAu.toFixed(6))} />
-            <CopyValue label="خروج از مرکز e" value={snap.earth.eccentricity.toFixed(8)} display={toPersianDigits(snap.earth.eccentricity.toFixed(7))} />
-            <CopyValue label="x (AU)" value={snap.earth.x.toFixed(8)} />
-            <CopyValue label="y (AU)" value={snap.earth.y.toFixed(8)} />
+            <CopyValue label="x (AU) در صفحهٔ دایرة‌البروج" value={snap.earth.x.toFixed(8)} />
+            <CopyValue label="y (AU) در صفحهٔ دایرة‌البروج" value={snap.earth.y.toFixed(8)} />
             <CopyValue label="ET دقیقهٔ روز" value={snap.et.minutesOfDay.toFixed(6)} display={toPersianDigits(snap.et.minutesOfDay.toFixed(6))} />
             <Button
               variant="outline"
@@ -399,9 +395,7 @@ export function LiveChartsHub() {
                   {
                     utc: snap.utcIso,
                     helio_lon: snap.earth.heliocentricLon,
-                    true_anomaly: snap.earth.trueAnomaly,
                     r_au: snap.earth.rAu,
-                    e: snap.earth.eccentricity,
                     x: snap.earth.x,
                     y: snap.earth.y,
                     et_minutes: snap.et.minutesOfDay,
@@ -551,56 +545,5 @@ export function LiveChartsHub() {
         </div>
       )}
     </div>
-  );
-}
-
-const tipStyle = {
-  background: "#152238",
-  border: "1px solid rgba(201,162,39,0.3)",
-  borderRadius: 8,
-  direction: "rtl" as const,
-};
-
-function SunMultiChart({
-  data,
-  xKey,
-}: {
-  data: Array<Record<string, string | number>>;
-  xKey: string;
-}) {
-  return (
-    <ResponsiveContainer width="100%" height={280}>
-      <LineChart data={data}>
-        <CartesianGrid stroke="rgba(201,162,39,0.12)" />
-        <XAxis dataKey={xKey} stroke="#9aa6b8" tick={{ fontSize: 10 }} />
-        <YAxis stroke="#9aa6b8" tick={{ fontSize: 10 }} />
-        <Tooltip contentStyle={tipStyle} />
-        <Legend />
-        <Line type="monotone" dataKey="dec" name="δ" stroke="#c9a227" dot={false} strokeWidth={2} />
-        <Line type="monotone" dataKey="ra" name="α" stroke="#8b4557" dot={false} strokeWidth={2} />
-        <Line type="monotone" dataKey="lambda" name="λ" stroke="#3d7a7a" dot={false} strokeWidth={2} />
-        <Line type="monotone" dataKey="beta" name="β" stroke="#5b7c99" dot={false} strokeWidth={1.5} />
-      </LineChart>
-    </ResponsiveContainer>
-  );
-}
-
-function ChartCard({
-  title,
-  desc,
-  children,
-}: {
-  title: string;
-  desc: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">{title}</CardTitle>
-        <CardDescription>{desc}</CardDescription>
-      </CardHeader>
-      <CardContent className="pt-2">{children}</CardContent>
-    </Card>
   );
 }

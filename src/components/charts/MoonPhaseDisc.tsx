@@ -5,11 +5,11 @@ import { useEffect, useRef } from "react";
 /** Pixel lunar disc: illumination 0 = new, 1 = full. */
 export function MoonPhaseDisc({
   illumination,
-  ageDays,
+  waxing = true,
   size = 180,
 }: {
   illumination: number;
-  ageDays: number;
+  waxing?: boolean;
   size?: number;
 }) {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -29,7 +29,6 @@ export function MoonPhaseDisc({
     const cy = size / 2;
     const r = size * 0.4;
     const k = Math.min(1, Math.max(0, illumination));
-    const waxing = ageDays % 29.53058867 < 14.765294;
     const cosPhase = 2 * k - 1;
 
     const img = ctx.createImageData(size, size);
@@ -40,7 +39,7 @@ export function MoonPhaseDisc({
         const ny = (y - cy) / r;
         if (nx * nx + ny * ny > 1) continue;
         const limbX = waxing ? nx : -nx;
-        const edge = cosPhase * Math.sqrt(Math.max(0, 1 - ny * ny));
+        const edge = -cosPhase * Math.sqrt(Math.max(0, 1 - ny * ny));
         const lit = limbX >= edge;
         const i = (y * size + x) * 4;
         if (lit) {
@@ -73,7 +72,7 @@ export function MoonPhaseDisc({
     ctx.strokeStyle = "rgba(230,211,154,0.55)";
     ctx.lineWidth = 1.5;
     ctx.stroke();
-  }, [illumination, ageDays, size]);
+  }, [illumination, waxing, size]);
 
   return (
     <canvas
