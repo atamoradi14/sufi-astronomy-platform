@@ -87,6 +87,15 @@ export function BuilderStory() {
               {t("سازندهٔ ماندریا", "Builder of Manderia")}
             </small>
           </div>
+          <a
+            href="mailto:atamoradi8@gmail.com"
+            className="mt-6 inline-flex max-w-full flex-wrap items-center gap-x-3 gap-y-2 text-sm text-[var(--teal)] hover:text-[var(--parchment)]"
+          >
+            <span>{t("با من در تماس باشید", "Get in touch")}</span>
+            <span dir="ltr" data-digit-literal className="break-all">
+              atamoradi8@gmail.com
+            </span>
+          </a>
         </div>
       </section>
     </LocalizedDigits>
