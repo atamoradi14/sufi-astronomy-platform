@@ -59,8 +59,8 @@ const FEATURES = [
   },
   {
     href: "/sensor",
-    title: "حسگر ستاره",
-    titleEn: "Star sensor",
+    title: "حسگر ستاره (هوش مصنوعی ستاره‌یاب)",
+    titleEn: "Star sensor (AI star finder)",
     desc: "عکس آسمان را بخوانید: صورت‌ها، بعد و میل، و ارتفاع و سمت تا چند ثانیه قوسی.",
     descEn:
       "Read a sky photo: constellations, RA/Dec, and altitude/azimuth to a few arcseconds.",

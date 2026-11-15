@@ -535,12 +535,12 @@ export function StarSensor() {
             {t("مانند حسگر ماهواره، در مرورگر", "A star tracker, in the browser")}
           </p>
           <h1 className="font-[family-name:var(--font-display)] text-3xl text-[var(--gold-soft)] md:text-4xl">
-            {t("حسگر ستاره", "Star sensor")}
+            {t("حسگر ستاره (هوش مصنوعی ستاره‌یاب)", "Star sensor (AI star finder)")}
           </h1>
           <p className="max-w-3xl text-sm leading-7 text-[var(--muted)]">
             {t(
-              "عکس آسمان را بارگذاری کنید یا با دوربین بگیرید. ستاره‌ها با هندسهٔ مثلث‌ها و فهرست هیپارکوس شناسایی می‌شوند، نه با یک شبکهٔ عصبی: همین روش است که در حسگر ماهواره به دقت ثانیهٔ قوسی می‌رسد. مرکز تصویر و هر ستاره، بعد و میل هندسی و ارتفاع و سمت ظاهری می‌گیرند.",
-              "Upload a sky photo or take one with the camera. Stars are identified by triangle geometry against a Hipparcos catalog, not by a neural net: that is the method satellite star trackers use when the result has to be arcseconds. The center and every star get a geometric RA/Dec and an apparent altitude and azimuth.",
+              "عکس آسمان را بارگذاری کنید یا با دوربین بگیرید. ستاره‌ها با هندسهٔ مثلث‌ها و فهرست هیپارکوس شناسایی می‌شوند، همان روشی که حسگر ماهواره را به دقت ثانیهٔ قوسی می‌رساند. مرکز تصویر و هر ستاره، بعد و میل هندسی و ارتفاع و سمت ظاهری می‌گیرند.",
+              "Upload a sky photo or take one with the camera. Stars are identified by triangle geometry against a Hipparcos catalog, the same method a satellite star tracker uses when the result has to be arcseconds. The center and every star get a geometric RA/Dec and an apparent altitude and azimuth.",
             )}
           </p>
         </header>
