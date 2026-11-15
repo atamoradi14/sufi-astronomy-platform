@@ -146,7 +146,7 @@ export default function HomePage() {
   const Arrow = fa ? ArrowUpLeft : ArrowUpRight;
   return (
     <LocalizedDigits>
-      <div className="manderia-home">
+      <div className="fanous-home">
         <Hero />
         <section
           id="explore"
@@ -240,8 +240,8 @@ export default function HomePage() {
             </h2>
             <p>
               {t(
-                "در گوشی‌های اندرویدی و مرورگرهای سازگار، ماندریا می‌تواند با اجازهٔ شما از موقعیت و حسگرهای جهت‌یابیِ موجود استفاده کند. ابزارهای موقعیت، قطب‌نما و نقشهٔ آسمان کمک می‌کنند آسمان اطرافتان را بهتر بشناسید.",
-                "On supported Android phones and browsers, Manderia can use your location and available orientation sensors—with your permission. Location tools, the compass, and the sky map help you get to know the sky around you.",
+                "در گوشی‌های اندرویدی و مرورگرهای سازگار، فانوس خیال می‌تواند با اجازهٔ شما از موقعیت و حسگرهای جهت‌یابیِ موجود استفاده کند. ابزارهای موقعیت، قطب‌نما و نقشهٔ آسمان کمک می‌کنند آسمان اطرافتان را بهتر بشناسید.",
+                "On supported Android phones and browsers, Fanous-e Khial can use your location and available orientation sensors—with your permission. Location tools, the compass, and the sky map help you get to know the sky around you.",
               )}
             </p>
             <ul>
@@ -292,8 +292,8 @@ export default function HomePage() {
             </h2>
             <p>
               {t(
-                "ماندریا هنوز در حال ساخت است، اما بعضی سرویس‌ها همین حالا در دسترس‌اند. درس‌نامهٔ کروی به بازبینی و توسعهٔ بیشتری نیاز دارد؛ امیدوارم به‌زودی آن را به بخشی بسیار بهتر و دوست‌داشتنی‌تر تبدیل کنیم. تا آن روز، کشف و تجربه را از ابزارهای فعلی شروع کنید.",
-                "Manderia is a work in progress, with several services already available. The spherical course needs more review and development; I hope to make it much better in the days ahead. For now, start exploring with the tools that are here.",
+                "فانوس خیال هنوز در حال ساخت است، اما بعضی سرویس‌ها همین حالا در دسترس‌اند. درس‌نامهٔ کروی به بازبینی و توسعهٔ بیشتری نیاز دارد؛ امیدوارم به‌زودی آن را به بخشی بسیار بهتر و دوست‌داشتنی‌تر تبدیل کنیم. تا آن روز، کشف و تجربه را از ابزارهای فعلی شروع کنید.",
+                "Fanous-e Khial is a work in progress, with several services already available. The spherical course needs more review and development; I hope to make it much better in the days ahead. For now, start exploring with the tools that are here.",
               )}
             </p>
             <div className="home-closing-links">

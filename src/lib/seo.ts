@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 export const SITE_URL = "https://manderia.daryajan.com";
-export const SITE_NAME = "ماندریا | Manderia";
+export const SITE_NAME = "فانوس خیال | Fanous-e Khial";
 export function pageMetadata(
   title: string,
   description: string,
@@ -11,7 +11,7 @@ export function pageMetadata(
     description,
     alternates: { canonical: path },
     openGraph: {
-      title: `${title} | ماندریا`,
+      title: `${title} | فانوس خیال`,
       description,
       url: SITE_URL + path,
       siteName: SITE_NAME,
@@ -22,7 +22,7 @@ export function pageMetadata(
           url: "/social-card.png",
           width: 1200,
           height: 630,
-          alt: "ماندریا؛ پنجره‌ای برای شناختن زیبایی‌های آسمان",
+          alt: "فانوس خیال؛ پنجره‌ای برای شناختن زیبایی‌های آسمان",
         },
       ],
     },

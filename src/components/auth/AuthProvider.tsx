@@ -82,14 +82,14 @@ function AuthShell({ children }: { children: ReactNode }) {
             <X size={18} />
           </button>
           <ShieldCheck size={30} className="text-[var(--teal)]" />
-          <p className="study-kicker">MANDERIA</p>
+          <p className="study-kicker">FANOUS-E KHIAL</p>
           <h2
             id="signin-title"
             className="text-2xl font-[family-name:var(--font-display)] text-[var(--gold-soft)]"
           >
             {t(
-              "آسمان را با ماندریا کشف کنید",
-              "Discover the sky with Manderia",
+              "آسمان را با فانوس خیال کشف کنید",
+              "Discover the sky with Fanous-e Khial",
             )}
           </h2>
           <p className="text-sm leading-7 text-[var(--muted)]">
@@ -194,8 +194,8 @@ export function AccessRequired({ feature }: { feature: string }) {
       </h1>
       <p className="text-sm leading-7 text-[var(--muted)]">
         {t(
-          "برای دسترسی به این ابزار ماندریا، با حساب گوگل خود وارد شوید.",
-          "Use your Google account to access this Manderia tool.",
+          "برای دسترسی به این ابزار فانوس خیال، با حساب گوگل خود وارد شوید.",
+          "Use your Google account to access this Fanous-e Khial tool.",
         )}{" "}
         <span className="sr-only">{feature}</span>
       </p>

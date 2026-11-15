@@ -50,7 +50,7 @@ export default async function LessonPage({
                 timeRequired: `PT${lesson.minutes}M`,
                 provider: {
                   "@type": "Organization",
-                  name: "Manderia",
+                  name: "Fanous-e Khial",
                   url: SITE_URL,
                 },
               }),

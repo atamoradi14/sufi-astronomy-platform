@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Manderia release driver: committed source -> Docker Hub digest -> astronomy namespace."""
+"""Fanous-e Khial release driver: committed source -> Docker Hub digest -> astronomy namespace."""
 import argparse
 import base64
 import hashlib
@@ -81,7 +81,7 @@ def build_push(args):
     digest = digest_match[1]
     raw = json.loads(run(['docker', 'buildx', 'imagetools', 'inspect', '--raw', image]))
     platform_digest = next((m['digest'] for m in raw.get('manifests', []) if m.get('platform', {}).get('os') == 'linux' and m.get('platform', {}).get('architecture') == 'amd64'), digest)
-    value = {'application': 'Manderia', 'namespace': 'astronomy', 'context': 'ravand', 'tag': args.tag, 'sourceRevision': sha, 'image': image, 'digest': f'{REPOSITORY}@{digest}', 'platformDigest': platform_digest, 'authSchema': 1, 'builtAt': datetime.now(timezone.utc).isoformat()}
+    value = {'application': 'Fanous-e Khial', 'namespace': 'astronomy', 'context': 'ravand', 'tag': args.tag, 'sourceRevision': sha, 'image': image, 'digest': f'{REPOSITORY}@{digest}', 'platformDigest': platform_digest, 'authSchema': 1, 'builtAt': datetime.now(timezone.utc).isoformat()}
     save(path, value)
     print('Pushed:', value['digest'])
     print('Release record:', path)

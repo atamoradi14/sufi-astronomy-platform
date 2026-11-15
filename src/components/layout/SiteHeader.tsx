@@ -32,18 +32,27 @@ export function SiteHeader() {
       {
         <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--ink)]/85 backdrop-blur-md">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-3">
-            <Link href="/" className="flex items-center gap-2 group">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--gold)]/40 bg-[var(--panel)] text-[var(--gold)] group-hover:border-[var(--gold)] transition-colors">
-                <Image src="/logo.svg" alt="" width={36} height={36} priority />
+            <Link
+              href="/"
+              className="brand-lockup flex min-w-0 items-center gap-2 group"
+            >
+              <span className="shrink-0">
+                <Image src="/logo.svg" alt="" width={44} height={44} priority />
               </span>
               <span className="leading-tight">
                 <span className="block font-[family-name:var(--font-display)] text-lg text-[var(--gold-soft)]">
-                  {t("ماندریا", "Manderia")}
+                  {t("فانوس خیال", "Fanous-e Khial")}
                 </span>
-                <span className="block text-[10px] text-[var(--muted)] tracking-wide">
+                <span
+                  className="brand-header-verse block text-[var(--muted)]"
+                  title={t(
+                    "از رباعی منسوب به خیام",
+                    "Inspired by a quatrain attributed to Khayyam",
+                  )}
+                >
                   {t(
-                    "زیبایی‌های آسمان را کشف کنید",
-                    "Discover the beauty of the sky",
+                    "فانوس خیال از او مثالی دانیم",
+                    "A lantern of imagination, a likeness of the heavens",
                   )}
                 </span>
               </span>

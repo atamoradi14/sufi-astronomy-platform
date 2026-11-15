@@ -12,8 +12,8 @@ export function SiteFooter() {
             <div className="min-w-0 space-y-3 md:max-w-md">
               <p>
               {t(
-                "ماندریا — پنجره‌ای برای شناختن زیبایی‌های آسمان، با نگاهی به میراث صوفی.",
-                "Manderia — a window to the beauty of the sky, with a connection to al-Sufi’s legacy.",
+                "فانوس خیال — پنجره‌ای برای شناختن زیبایی‌های آسمان، با نگاهی به میراث صوفی.",
+                "Fanous-e Khial — a window to the beauty of the sky, with a connection to al-Sufi’s legacy.",
               )}
               </p>
               <a
@@ -27,7 +27,7 @@ export function SiteFooter() {
               </a>
             </div>
             <div className="flex flex-wrap gap-4">
-              <Link href="/about">{t("دربارهٔ ماندریا", "About")}</Link>
+              <Link href="/about">{t("دربارهٔ فانوس خیال", "About")}</Link>
               <Link href="/privacy">{t("حریم خصوصی", "Privacy")}</Link>
               <Link href="/tools">{t("راهنمای ابزارها", "Tool guide")}</Link>
               <Link href="/course" className="hover:text-[var(--parchment)]">

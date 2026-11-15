@@ -15,11 +15,11 @@ import "@fontsource/amiri/latin-400.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://manderia.daryajan.com"),
   title: {
-    default: "ماندریا | پنجره‌ای به زیبایی‌های آسمان",
-    template: "%s | ماندریا",
+    default: "فانوس خیال | نجوم، آسمان و میراث ایران",
+    template: "%s | فانوس خیال",
   },
   description:
-    "ماندریا، ساختهٔ عطا مرادی، وب‌سایتی برای شناختن زیبایی‌های آسمان؛ نقشهٔ شب، حسگر ستاره، کرهٔ تعاملی، اطلس صوفی و درس‌نامهٔ کروی در حال توسعه.",
+    "فانوس خیال، ساختهٔ عطا مرادی، وب‌سایتی برای شناختن زیبایی‌های آسمان؛ نقشهٔ شب، حسگر ستاره، کرهٔ تعاملی، اطلس صوفی و درس‌نامهٔ کروی در حال توسعه.",
   alternates: { canonical: "/" },
   keywords: [
     "درس‌نامه کروی",
@@ -30,11 +30,11 @@ export const metadata: Metadata = {
     "spherical astronomy",
   ],
   twitter: { card: "summary_large_image", images: ["/social-card.png"] },
-  applicationName: "ماندریا",
+  applicationName: "فانوس خیال",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
-    title: "ماندریا",
+    title: "فانوس خیال",
     statusBarStyle: "black-translucent",
   },
   formatDetection: { telephone: false },
@@ -46,8 +46,8 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
-    title: "ماندریا | Manderia",
-    siteName: "Manderia",
+    title: "فانوس خیال | Fanous-e Khial",
+    siteName: "Fanous-e Khial",
     url: "https://manderia.daryajan.com",
     type: "website",
     locale: "fa_IR",
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
         url: "/social-card.png",
         width: 1200,
         height: 630,
-        alt: "Manderia — spherical astronomy",
+        alt: "فانوس خیال | Fanous-e Khial — astronomy and Persian heritage",
       },
     ],
   },
@@ -90,8 +90,8 @@ export default function RootLayout({
                     __html: safeJsonLd({
                       "@context": "https://schema.org",
                       "@type": "WebSite",
-                      name: "ماندریا",
-                      alternateName: "Manderia",
+                      name: "فانوس خیال",
+                      alternateName: "Fanous-e Khial",
                       url: SITE_URL,
                       inLanguage: ["fa", "en"],
                       description: "پنجره‌ای برای شناختن زیبایی‌های آسمان",

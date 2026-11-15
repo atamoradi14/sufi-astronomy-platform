@@ -1,4 +1,4 @@
-# Manderia (ماندریا)
+# Fanous-e Khial (فانوس خیال)
 
 Persian-first web app for **spherical trigonometry**, olympiad astronomy, and observational practice — inspired by **Abd al-Rahman al-Sufi** and *Ṣuwar al-Kawākib*.
 

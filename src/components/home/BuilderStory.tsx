@@ -26,8 +26,8 @@ export function BuilderStory() {
           </h2>
           <p>
             {t(
-              "ماندریا را می‌سازم تا لذت شناختن آسمان را با شما شریک شوم. راهی که برای من با علاقه به نجوم آغاز شد، به المپیاد رسید و هنوز با همان کنجکاوی ادامه دارد.",
-              "I’m building Manderia to share the joy of getting to know the sky. A personal interest in astronomy led me to the olympiads, and the same curiosity is still with me today.",
+              "فانوس خیال را می‌سازم تا لذت شناختن آسمان را با شما شریک شوم. راهی که برای من با علاقه به نجوم آغاز شد، به المپیاد رسید و هنوز با همان کنجکاوی ادامه دارد.",
+              "I’m building Fanous-e Khial to share the joy of getting to know the sky. A personal interest in astronomy led me to the olympiads, and the same curiosity is still with me today.",
             )}
           </p>
           <div className="builder-medals">
@@ -76,15 +76,15 @@ export function BuilderStory() {
           </blockquote>
           <p>
             {t(
-              "امیدوارم بتوانم با کمک ماندریا، سهم کوچکی در کمک به جامعهٔ نجومی ایران و همهٔ علاقه‌مندان به نجوم داشته باشم. همچنین دوست دارم آثار دانشمندان بزرگ ایران عزیزمان را بیشتر معرفی کنم و پلی میان میراث آن‌ها و ابزارهای امروز بسازم.",
-              "I hope Manderia can make a small contribution to Iran’s astronomy community and to everyone who is curious about the sky. I also want to introduce more people to the work of great Iranian scientists, connecting their legacy with the tools we have today.",
+              "امیدوارم بتوانم با کمک فانوس خیال، سهم کوچکی در کمک به جامعهٔ نجومی ایران و همهٔ علاقه‌مندان به نجوم داشته باشم. همچنین دوست دارم آثار دانشمندان بزرگ ایران عزیزمان را بیشتر معرفی کنم و پلی میان میراث آن‌ها و ابزارهای امروز بسازم.",
+              "I hope Fanous-e Khial can make a small contribution to Iran’s astronomy community and to everyone who is curious about the sky. I also want to introduce more people to the work of great Iranian scientists, connecting their legacy with the tools we have today.",
             )}
           </p>
           <div className="builder-signature">
             <span>{t("عطا مرادی", "Ata Moradi")}</span>
             <small>
               <Heart size={13} />
-              {t("سازندهٔ ماندریا", "Builder of Manderia")}
+              {t("سازندهٔ فانوس خیال", "Builder of Fanous-e Khial")}
             </small>
           </div>
           <a

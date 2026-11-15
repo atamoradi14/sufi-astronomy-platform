@@ -13,7 +13,7 @@ RUN npm run build
 FROM node:22-alpine AS runner
 WORKDIR /app
 ARG SOURCE_REVISION=unknown
-LABEL org.opencontainers.image.title="Manderia" \
+LABEL org.opencontainers.image.title="Fanous-e Khial" \
       org.opencontainers.image.source="https://github.com/atamoradi14/sufi-astronomy-platform" \
       org.opencontainers.image.revision=$SOURCE_REVISION
 ENV NODE_ENV=production PORT=3847 HOSTNAME=0.0.0.0 NEXT_TELEMETRY_DISABLED=1

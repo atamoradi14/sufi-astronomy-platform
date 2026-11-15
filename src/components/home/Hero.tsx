@@ -3,7 +3,8 @@ import Link from "next/link";
 import { ArrowUpLeft, ArrowUpRight, ChevronDown } from "lucide-react";
 import { LocalizedDigits } from "@/components/digits/DigitScript";
 import { useLanguage } from "@/components/language/Language";
-import { FeaturePreview } from "./FeaturePreview";
+import { KhayyamVerse } from "@/components/brand/KhayyamVerse";
+import { LanternScene } from "@/components/brand/LanternScene";
 export function Hero() {
   const { fa, t } = useLanguage();
   const Arrow = fa ? ArrowUpLeft : ArrowUpRight;
@@ -17,16 +18,18 @@ export function Hero() {
               <span />
               {t("از زمین، برای تماشای آسمان", "From Earth, with wonder")}
             </p>
-            <h1 id="home-title">
-              {t("ماندریا", "Manderia")}
-              <span>
-                {t("آسمان، نزدیک‌تر از همیشه.", "A little closer to the sky.")}
-              </span>
-            </h1>
+            <h1 id="home-title">{t("فانوس خیال", "Fanous-e Khial")}</h1>
+            <KhayyamVerse />
+            <p className="hero-tagline">
+              {t(
+                "نجوم، آسمان و میراث ایران",
+                "Explore the sky. Discover Persian astronomy.",
+              )}
+            </p>
             <p className="hero-introduction">
               {t(
-                "ماندریا، وب‌سایتی نجومی برای شناختن زیبایی‌های آسمان.",
-                "Manderia is a place to discover the beauty of the sky.",
+                "فانوس خیال، وب‌سایتی نجومی برای شناختن زیبایی‌های آسمان.",
+                "Fanous-e Khial is a place to discover the beauty of the sky.",
               )}
             </p>
             <p className="hero-description">
@@ -41,15 +44,15 @@ export function Hero() {
                 <Arrow size={18} />
               </Link>
               <a className="home-button home-button-secondary" href="#explore">
-                {t("کشف ابزارهای ماندریا", "Discover the tools")}
+                {t("کشف ابزارهای فانوس خیال", "Discover the tools")}
                 <ChevronDown size={17} />
               </a>
             </div>
             <p className="hero-development">
               <span className="status-light" />
               {t(
-                "ماندریا هنوز در حال ساخت است؛ چند پنجره به آسمان، همین حالا باز است.",
-                "Manderia is still taking shape. A few windows to the sky are already open.",
+                "فانوس خیال هنوز در حال ساخت است؛ چند پنجره به آسمان، همین حالا باز است.",
+                "Fanous-e Khial is still taking shape. A few windows to the sky are already open.",
               )}
             </p>
           </div>
@@ -60,7 +63,7 @@ export function Hero() {
               </span>
               <span className="sky-mini-star">✦</span>
             </div>
-            <FeaturePreview kind="sky" hero />
+            <LanternScene />
             <figcaption>
               <span>
                 {t(
@@ -69,7 +72,7 @@ export function Hero() {
                 )}
               </span>
               <a href="#builder">
-                {t("داستان ماندریا", "The story behind Manderia")}
+                {t("داستان فانوس خیال", "The story behind Fanous-e Khial")}
                 <Arrow size={15} />
               </a>
             </figcaption>

@@ -48,9 +48,9 @@ export function AdminUsers() {
     <LocalizedDigits>
       <section className="mx-auto max-w-6xl space-y-6 px-4 py-10">
         <header className="space-y-2">
-          <p className="study-kicker">MANDERIA / ADMIN</p>
+          <p className="study-kicker">FANOUS-E KHIAL / ADMIN</p>
           <h1 className="text-3xl text-[var(--gold-soft)]">
-            {t("کاربران ماندریا", "Manderia users")}
+            {t("کاربران فانوس خیال", "Fanous-e Khial users")}
           </h1>
           <p className="text-sm text-[var(--muted)]">
             {t(

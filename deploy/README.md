@@ -1,4 +1,6 @@
-# Manderia deployment
+# Fanous-e Khial deployment
+
+The public brand is **فانوس خیال / Fanous-e Khial**. Existing `manderia` infrastructure identifiers and the current domain are retained; see [brand.md](brand.md) for the identity and asset workflow.
 
 Public URL: https://manderia.daryajan.com. This follows the existing Darvazeh/Hamafarin worker pattern: context `ravand`, node `ravand-worker-01`, namespace `astronomy`, Deployment and ClusterIP Service `manderia`. The shared Caddy stays in `hamafarin-apps`; no new Ingress, host port, separate database server or Caddy instance is required.
 

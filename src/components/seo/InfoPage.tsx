@@ -1,16 +1,24 @@
 "use client";
 import Link from "next/link";
 import { useLanguage } from "@/components/language/Language";
+import { KhayyamVerse } from "@/components/brand/KhayyamVerse";
 export function InfoPage({ kind }: { kind: "about" | "privacy" | "tools" }) {
   const { t } = useLanguage();
   const pages = {
     about: {
-      title: t("دربارهٔ ماندریا", "About Manderia"),
+      title: t("دربارهٔ فانوس خیال", "About Fanous-e Khial"),
       intro: t(
-        "ماندریا وب‌سایتی نجومی برای شناختن زیبایی‌های آسمان است؛ از پیدا کردن ستاره‌های یک عکس تا گردش در آسمان شب و آشنایی با میراث دانشمندان ایران.",
-        "Manderia is a place to discover the beauty of the sky, from finding the stars in a photo to exploring the night sky and the legacy of Iranian astronomers.",
+        "فانوس خیال وب‌سایتی نجومی برای شناختن زیبایی‌های آسمان است؛ از پیدا کردن ستاره‌های یک عکس تا گردش در آسمان شب و آشنایی با میراث دانشمندان ایران.",
+        "Fanous-e Khial is a place to discover the beauty of the sky, from finding the stars in a photo to exploring the night sky and the legacy of Iranian astronomers.",
       ),
       sections: [
+        [
+          t("نامی از روشنایی و حیرت", "A name of light and wonder"),
+          t(
+            "نام فانوس خیال از رباعی منسوب به خیام الهام گرفته است؛ تصویری شاعرانه از خورشید، جهان و گردش نقش‌ها در روشنایی یک فانوس. اینجا، همان حیرت در برابر آسمان را با رصد، هندسه و میراث نجوم ایران دنبال می‌کنیم.",
+            "Fanous-e Khial takes its name from a quatrain attributed to Khayyam: a poetic image of the sun, the world, and figures turning in a lantern’s light. Here, that wonder leads to observation, geometry, and the heritage of Persian astronomy.",
+          ),
+        ],
         [
           t(
             "درس‌نامهٔ کروی بر پایهٔ اسمارت",
@@ -38,7 +46,7 @@ export function InfoPage({ kind }: { kind: "about" | "privacy" | "tools" }) {
       ],
     },
     privacy: {
-      title: t("حریم خصوصی در ماندریا", "Privacy at Manderia"),
+      title: t("حریم خصوصی در فانوس خیال", "Privacy at Fanous-e Khial"),
       intro: t(
         "برای ورود، از گوگل فقط هویت پایهٔ حساب، نام، تصویر نمایه و ایمیل تأییدشده درخواست می‌شود. دسترسی به ایمیل‌ها یا صندوق Gmail درخواست نمی‌کنیم.",
         "Google sign-in requests only your basic identity, name, profile picture, and verified email. It does not request access to Gmail messages or your inbox.",
@@ -61,14 +69,14 @@ export function InfoPage({ kind }: { kind: "about" | "privacy" | "tools" }) {
         [
           t("کنترل شما", "Your control"),
           t(
-            "می‌توانید از حساب خارج شوید یا مجوز ماندریا را در تنظیمات حساب گوگل لغو کنید. برای درخواست حذف اطلاعات حساب، با مدیر سایت پیگیری کنید.",
+            "می‌توانید از حساب خارج شوید یا مجوز فانوس خیال را در تنظیمات حساب گوگل لغو کنید. برای درخواست حذف اطلاعات حساب، با مدیر سایت پیگیری کنید.",
             "You can sign out or revoke the app’s permission in your Google account settings. To request deletion of your account data, contact the site administrator.",
           ),
         ],
       ],
     },
     tools: {
-      title: t("ابزارهای نجومی ماندریا", "Manderia astronomy tools"),
+      title: t("ابزارهای نجومی فانوس خیال", "Fanous-e Khial astronomy tools"),
       intro: t(
         "متن درس‌ها بدون حساب در دسترس است. برای کار با کرهٔ سه‌بعدی، حسگر ستاره و اطلس صوفی با حساب گوگل وارد شوید.",
         "The lessons are public. Sign in with Google to use the 3D sphere, star sensor, and Sufi atlas.",
@@ -102,10 +110,11 @@ export function InfoPage({ kind }: { kind: "about" | "privacy" | "tools" }) {
   return (
     <article className="mx-auto max-w-3xl space-y-8 px-5 py-12">
       <header className="space-y-4">
-        <p className="study-kicker">MANDERIA</p>
+        <p className="study-kicker">FANOUS-E KHIAL</p>
         <h1 className="text-3xl text-[var(--gold-soft)]">{page.title}</h1>
         <p className="text-base leading-9 text-[var(--muted)]">{page.intro}</p>
       </header>
+      {kind === "about" && <KhayyamVerse full />}
       {page.sections.map(([title, body]) => (
         <section
           key={title}

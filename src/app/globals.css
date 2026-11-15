@@ -7,11 +7,11 @@
   --ink-deep: #070d18;
   --panel: #152238;
   --border: rgba(201, 162, 39, 0.22);
-  --gold: #c9a227;
-  --gold-soft: #e6d39a;
-  --parchment: #e8e2d4;
+  --gold: #d4ab67;
+  --gold-soft: #f1ddb1;
+  --parchment: #eee5d6;
   --muted: #9aa6b8;
-  --teal: #73c9c4;
+  --teal: #84c8bf;
   --rose-ink: #ed94aa;
   --sky-line: #5b7c99;
   --success: #6f9e7a;
@@ -405,8 +405,8 @@ summary {
   background: #020913bb;
   backdrop-filter: blur(8px);
 }
-/* Manderia's public observatory: lightweight illustrations, no sensor access on arrival. */
-.manderia-home {
+/* Fanous-e Khial's public observatory: lightweight illustrations, no sensor access on arrival. */
+.fanous-home {
   --home-line: #8eafbf29;
   --home-copy: #a7bbc8;
   overflow: clip;
@@ -459,7 +459,7 @@ summary {
   line-height: 1.5;
   margin-block: 12px 22px;
 }
-.hero-story h1 > span {
+.hero-tagline {
   display: block;
   color: #d6e1e6;
   font-family: var(--font-body), sans-serif;
@@ -467,6 +467,57 @@ summary {
   font-size: clamp(23px, 2.4vw, 33px);
   line-height: 1.7;
   letter-spacing: -0.035em;
+  margin-block: 22px 18px;
+}
+.hero-story h1 {
+  margin-block-end: 0;
+  font-size: clamp(54px, 5.2vw, 78px);
+}
+[dir="ltr"] .hero-story h1 {
+  font-size: clamp(42px, 4.5vw, 65px);
+  line-height: 1.3;
+}
+.brand-header-verse {
+  max-width: 205px;
+  font-family: var(--font-display), serif;
+  font-size: 12px;
+  line-height: 1.8;
+}
+[dir="ltr"] .brand-header-verse {
+  max-width: 185px;
+  font-family: var(--font-body), sans-serif;
+  font-size: 9px;
+  line-height: 1.5;
+}
+.brand-verse {
+  margin-block: 8px 20px;
+  padding-inline-start: 18px;
+  border-inline-start: 1px solid #d9b77566;
+  color: #c7b28f;
+}
+.brand-verse blockquote {
+  font-family: var(--font-display), serif;
+  font-size: 19px;
+  line-height: 1.8;
+}
+.brand-verse figcaption {
+  margin-block-start: 5px;
+  font-size: 9px;
+  color: #8caaa9;
+}
+.brand-verse a:hover {
+  color: var(--gold-soft);
+}
+[dir="ltr"] .brand-verse blockquote {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.8;
+}
+.brand-lantern-scene {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 .hero-introduction {
   color: #e1e9ec;
@@ -1272,11 +1323,17 @@ summary {
     padding-block: 44px 50px;
   }
   .hero-story h1 {
-    font-size: 61px;
-    margin-block: 12px 20px;
+    font-size: clamp(45px, 12vw, 61px);
+    margin-block: 12px 0;
   }
-  .hero-story h1 > span {
-    font-size: 24px;
+  .hero-tagline {
+    font-size: 22px;
+  }
+  [dir="ltr"] .hero-story h1 {
+    font-size: clamp(35px, 10vw, 48px);
+  }
+  .brand-verse blockquote {
+    font-size: 17px;
   }
   .hero-introduction {
     font-size: 15px;
@@ -1364,9 +1421,9 @@ summary {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .manderia-home *,
-  .manderia-home *::before,
-  .manderia-home *::after {
+  .fanous-home *,
+  .fanous-home *::before,
+  .fanous-home *::after {
     animation: none !important;
     transition: none !important;
   }
