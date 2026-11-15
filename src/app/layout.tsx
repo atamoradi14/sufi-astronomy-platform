@@ -15,11 +15,11 @@ import "@fontsource/amiri/latin-400.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://manderia.daryajan.com"),
   title: {
-    default: "ماندریا | درس‌نامهٔ کروی و ابزارهای نجوم",
+    default: "ماندریا | پنجره‌ای به زیبایی‌های آسمان",
     template: "%s | ماندریا",
   },
   description:
-    "درس‌نامهٔ کروی ماندریا بر پایهٔ اسمارت؛ آموزش فارسی و انگلیسی مثلثات کروی، اثبات‌ها و مثال‌ها، کرهٔ سه‌بعدی، حسگر ستاره، آسمان تعاملی و اطلس صوفی.",
+    "ماندریا، ساختهٔ عطا مرادی، وب‌سایتی برای شناختن زیبایی‌های آسمان؛ نقشهٔ شب، حسگر ستاره، کرهٔ تعاملی، اطلس صوفی و درس‌نامهٔ کروی در حال توسعه.",
   alternates: { canonical: "/" },
   keywords: [
     "درس‌نامه کروی",
@@ -94,7 +94,12 @@ export default function RootLayout({
                       alternateName: "Manderia",
                       url: SITE_URL,
                       inLanguage: ["fa", "en"],
-                      description: "درس‌نامهٔ کروی و ابزارهای آموزشی نجوم",
+                      description: "پنجره‌ای برای شناختن زیبایی‌های آسمان",
+                      creator: {
+                        "@type": "Person",
+                        name: "Ata Moradi",
+                        alternateName: "عطا مرادی",
+                      },
                     }),
                   }}
                 />

@@ -22,7 +22,7 @@ export function pageMetadata(
           url: "/social-card.png",
           width: 1200,
           height: 630,
-          alt: "ماندریا؛ درس‌نامهٔ کروی و ابزارهای تعاملی نجوم",
+          alt: "ماندریا؛ پنجره‌ای برای شناختن زیبایی‌های آسمان",
         },
       ],
     },

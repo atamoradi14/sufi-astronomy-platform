@@ -42,8 +42,8 @@ export function SiteHeader() {
                 </span>
                 <span className="block text-[10px] text-[var(--muted)] tracking-wide">
                   {t(
-                    "هندسهٔ آسمان را کشف کنید",
-                    "Explore the geometry of the sky",
+                    "زیبایی‌های آسمان را کشف کنید",
+                    "Discover the beauty of the sky",
                   )}
                 </span>
               </span>
@@ -67,7 +67,7 @@ export function SiteHeader() {
               ))}
             </nav>
 
-            <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-end">
+            <div className="flex w-full items-center justify-between gap-1 sm:w-auto sm:justify-end sm:gap-2">
               <AccountButton />
               <div
                 role="group"

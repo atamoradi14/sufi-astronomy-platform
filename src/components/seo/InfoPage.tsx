@@ -7,8 +7,8 @@ export function InfoPage({ kind }: { kind: "about" | "privacy" | "tools" }) {
     about: {
       title: t("دربارهٔ ماندریا", "About Manderia"),
       intro: t(
-        "ماندریا فضایی برای یادگیری دقیق هندسهٔ کروی و نجوم است؛ از اثبات فرمول‌ها تا دیدن همان رابطه روی کره و آسمان.",
-        "Manderia connects rigorous spherical geometry with the visible sky: follow a proof, then explore the same relationship on a sphere.",
+        "ماندریا وب‌سایتی نجومی برای شناختن زیبایی‌های آسمان است؛ از پیدا کردن ستاره‌های یک عکس تا گردش در آسمان شب و آشنایی با میراث دانشمندان ایران.",
+        "Manderia is a place to discover the beauty of the sky, from finding the stars in a photo to exploring the night sky and the legacy of Iranian astronomers.",
       ),
       sections: [
         [
@@ -17,8 +17,8 @@ export function InfoPage({ kind }: { kind: "about" | "privacy" | "tools" }) {
             "A spherical course based on Smart",
           ),
           t(
-            "فصل‌های اول تا سوم نجوم کروی اسمارت، با نمادگذاری روشن، واحدهای مشخص، اثبات‌های پیوسته و مثال‌های بازحساب‌شده آموزش داده می‌شوند. مطالب آموزشی بازنویسی شده‌اند و شکل‌ها مستقل محاسبه و رسم می‌شوند.",
-            "Chapters I–III of Smart’s Textbook on Spherical Astronomy are taught with explicit conventions, units, connected derivations, and recomputed examples. The teaching text is adapted and the diagrams are independently constructed.",
+            "درس‌نامهٔ کروی از فصل‌های اول تا سوم نجوم کروی اسمارت شروع شده است. هنوز به توسعه و بازبینی بیشتری نیاز دارد؛ فعلاً برای مرور خلاصه‌ها از آن استفاده کنید، نه به‌عنوان مرجع آموزش.",
+            "The spherical course begins with Chapters I–III of Smart’s Textbook on Spherical Astronomy. It needs more development and review: for now, use it for an overview, rather than as a teaching reference.",
           ),
         ],
         [

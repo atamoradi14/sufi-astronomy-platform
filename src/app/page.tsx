@@ -1,169 +1,316 @@
 "use client";
-import { useLanguage } from "@/components/language/Language";
-import { LocalizedDigits } from "@/components/digits/DigitScript";
 import Link from "next/link";
-import { Hero } from "@/components/home/Hero";
 import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { LESSONS, SMART_CHAPTERS } from "@/lib/content/lessons";
-import {
-  Box,
+  ArrowUpLeft,
+  ArrowUpRight,
   BookOpen,
-  Map,
-  Orbit,
-  PenLine,
-  ScrollText,
-  Crosshair,
-  Stars,
+  Compass,
+  Construction,
+  LockKeyhole,
+  MapPin,
+  ShieldCheck,
+  Smartphone,
+  Sparkles,
 } from "lucide-react";
-const FEATURES = [
+import { Hero } from "@/components/home/Hero";
+import { BuilderStory } from "@/components/home/BuilderStory";
+import {
+  FeaturePreview,
+  type PreviewKind,
+} from "@/components/home/FeaturePreview";
+import { LocalizedDigits } from "@/components/digits/DigitScript";
+import { useLanguage } from "@/components/language/Language";
+type Feature = {
+  id: PreviewKind;
+  href: string;
+  title: string;
+  titleEn: string;
+  eyebrow: string;
+  eyebrowEn: string;
+  description: string;
+  descriptionEn: string;
+  cta: string;
+  ctaEn: string;
+  requiresLogin?: boolean;
+  developing?: boolean;
+  wide?: boolean;
+};
+const FEATURES: Feature[] = [
   {
-    href: "/course",
-    title: "درس‌نامهٔ کروی",
-    titleEn: "Course hub",
-    desc: "فصل‌های ۱–۳ اسمارت در یک فهرست: مسیر، دروس، مثال‌ها، مسائل، اثبات‌ها و کره.",
-    descEn:
-      "Smart Chapters I–III: a learning path, lessons, examples, problems, proofs, and sphere.",
-    icon: BookOpen,
-  },
-  {
-    href: "/course?tab=lab",
-    title: "کرهٔ تعاملی",
-    titleEn: "Interactive sphere",
-    desc: "عظیمه، صغیره، مثلث، برچسب کامل، اندازه‌گیری زنده.",
-    descEn:
-      "Great circles, small circles, and triangles with clear labels and live measurements.",
-    icon: Box,
-  },
-  {
-    href: "/course?tab=proofs",
-    title: "اثبات‌ها",
-    titleEn: "Proofs",
-    desc: "صورت‌های (A)(B)(C)(D)، هاورساین، PZX و ژیرار گام‌به‌گام.",
-    descEn:
-      "Connected derivations of identities (A)–(D), haversine, PZX, and Girard.",
-    icon: PenLine,
-  },
-  {
+    id: "sky",
     href: "/sky",
-    title: "آسمان زنده",
-    titleEn: "Live sky",
-    desc: "۱۵k+ ستاره تا قدر ۷، خطوط IAU، به‌علاوه اطلس صوفی.",
-    descEn:
-      "Over 15,000 stars to magnitude 7, constellation lines, and al-Sufi’s atlas.",
-    icon: Stars,
+    title: "امشب، آسمان را جور دیگری ببینید.",
+    titleEn: "See the night sky in a new light.",
+    eyebrow: "آسمان زنده",
+    eyebrowEn: "The live sky",
+    description:
+      "در نقشهٔ به‌روز آسمان شب گردش کنید، صورت‌های فلکی را ببینید و ستاره‌ها را پیدا کنید. جای ناظر و زمان را تغییر دهید و از تماشای آسمان لذت ببرید.",
+    descriptionEn:
+      "Wander through an up-to-date night-sky map, explore constellations, and find stars. Change the observer’s location and time, and enjoy a different view of the sky.",
+    cta: "باز کردن آسمان",
+    ctaEn: "Open the sky",
+    wide: true,
   },
   {
+    id: "sensor",
     href: "/sensor",
-    title: "حسگر ستاره (هوش مصنوعی ستاره‌یاب)",
-    titleEn: "Star sensor (AI star finder)",
-    desc: "الگوی ستاره‌ها را در عکس آسمان تطبیق دهید و جهت تصویر را تخمین بزنید.",
-    descEn:
-      "Read a sky photo: constellations, RA/Dec, and altitude/azimuth to a few arcseconds.",
-    icon: Crosshair,
+    title: "یک عکس، کلی ستارهٔ آشنا.",
+    titleEn: "One photo. A sky full of names.",
+    eyebrow: "حسگر ستاره",
+    eyebrowEn: "Star sensor",
+    description:
+      "عکسی از آسمان به ستاره‌یاب هوشمند بدهید؛ الگوی ستاره‌ها را تطبیق می‌دهد، نام ستاره‌های شناسایی‌شده را نشان می‌دهد و مختصات مرکز تصویر را تخمین می‌زند.",
+    descriptionEn:
+      "Give the intelligent star finder a sky photograph. It matches star patterns, names the stars it identifies, and estimates the coordinates at the centre of your image.",
+    cta: "امتحان کردن یک عکس",
+    ctaEn: "Try a sky photo",
+    requiresLogin: true,
   },
   {
+    id: "sphere",
+    href: "/lab",
+    title: "با آسمان، هندسه بازی کنید.",
+    titleEn: "Get your hands on the geometry.",
+    eyebrow: "کرهٔ تعاملی",
+    eyebrowEn: "Interactive sphere",
+    description:
+      "کره را بچرخانید، رأس‌ها را جابه‌جا کنید و عظیمه‌ها، زاویه‌ها و مثلث‌های کروی را از نزدیک بشناسید. این بخش جالبِ داستان را حتماً امتحان کنید.",
+    descriptionEn:
+      "Rotate the sphere, move its vertices, and get to know great circles, angles, and spherical triangles. This is one part of the story you really should try.",
+    cta: "کار با کره",
+    ctaEn: "Explore the sphere",
+    requiresLogin: true,
+  },
+  {
+    id: "atlas",
     href: "/atlas",
-    title: "اطلس صور الکواکب",
-    titleEn: "Book of Fixed Stars atlas",
-    desc: "۴۸ صورت با نگاره‌های واقعی نسخهٔ خطی و شرح فارسی.",
-    descEn: "48 constellations with historical manuscript illustrations.",
-    icon: ScrollText,
+    title: "آسمان، از نگاه استاد صوفی.",
+    titleEn: "The sky, through al-Sufi’s eyes.",
+    eyebrow: "اطلس صوفی",
+    eyebrowEn: "Sufi atlas",
+    description:
+      "به یاد استاد عبدالرحمن صوفی، نگاره‌های نسخه‌های صورالکواکب را انتخاب و مطالعه کنید؛ میراثی از دانشمندان ایران عزیز، در کنار تجربه‌ای امروزی از آسمان.",
+    descriptionEn:
+      "Explore selected illustrations from manuscripts of the Book of Fixed Stars, in honour of Abd al-Rahman al-Sufi. Discover a chapter of Iran’s scientific heritage alongside a modern view of the sky.",
+    cta: "ورق زدن اطلس",
+    ctaEn: "Browse the atlas",
+    requiresLogin: true,
   },
   {
-    href: "/course?tab=problems",
-    title: "مسائل با شکل",
-    titleEn: "Illustrated problems",
-    desc: "راه‌حل‌های تشریحی با کرهٔ سه‌بعدی دقیق.",
-    descEn: "Worked solutions with geometric 3D diagrams.",
-    icon: Orbit,
+    id: "charts",
+    href: "/charts",
+    title: "ریتم خورشید، زمین و ماه.",
+    titleEn: "Follow the rhythm of our solar system.",
+    eyebrow: "داده های لایو",
+    eyebrowEn: "Live data",
+    description:
+      "حرکت خورشید، زمین و ماه و تغییر مختصات نجومی را در نمودارهای به‌روز دنبال کنید. هر نمودار، راه دیگری برای دیدن نظم و حرکت آسمان است.",
+    descriptionEn:
+      "Follow the Sun, Earth, Moon, and changing astronomical coordinates through updated charts. Each plot offers another way to see the order and motion of the sky.",
+    cta: "دیدن نمودارها",
+    ctaEn: "See the charts",
   },
   {
+    id: "course",
+    href: "/course",
+    title: "اسمارت، در قالب درس‌نامهٔ کروی.",
+    titleEn: "Smart, one chapter at a time.",
+    eyebrow: "درس‌نامهٔ کروی",
+    eyebrowEn: "Spherical course",
+    description:
+      "خلاصه‌ها، شکل‌ها و درس‌های فعلی نجوم کروی اسمارت را مرور کنید. این بخش هنوز خیلی کار دارد؛ فعلاً برای مرور و دیدن خلاصه‌ها مناسب‌تر است و هنوز آن را به‌عنوان مرجع آموزش توصیه نمی‌کنم.",
+    descriptionEn:
+      "Browse the current summaries, diagrams, and lessons based on Smart’s Spherical Astronomy. There is still a lot to do: it is useful for an overview, but I do not yet recommend it as a teaching reference.",
+    cta: "مرور درس‌های فعلی",
+    ctaEn: "Browse the current lessons",
+    developing: true,
+    wide: true,
+  },
+  {
+    id: "map",
     href: "/map",
-    title: "نقشه و قبله",
-    titleEn: "Map and qibla",
-    desc: "GPS، ماهواره، دایره‌های هم‌فاصله.",
-    descEn: "Location, satellite imagery, and distance circles.",
-    icon: Map,
+    title: "جای شما در این جهان کجاست؟",
+    titleEn: "Where are you in this world?",
+    eyebrow: "نقشه و موقعیت",
+    eyebrowEn: "Map and location",
+    description:
+      "موقعیت خود را روی نقشه پیدا کنید، فاصله‌ها و جهت‌ها را بشناسید و ارتباط جای ناظر روی زمین با هندسهٔ کره را ببینید.",
+    descriptionEn:
+      "Find your place on the map, explore distances and directions, and connect your position on Earth with the geometry of a sphere.",
+    cta: "رفتن به نقشه",
+    ctaEn: "Open the map",
   },
 ];
 export default function HomePage() {
   const { fa, t } = useLanguage();
+  const Arrow = fa ? ArrowUpLeft : ArrowUpRight;
   return (
     <LocalizedDigits>
-      {
-        <>
-          <Hero />
-          <section className="mx-auto max-w-6xl px-4 pb-16">
-            <div className="manuscript-rule mb-10" />
-            <h2 className="font-[family-name:var(--font-display)] text-2xl text-[var(--gold-soft)] md:text-3xl">
-              {t("ابزارها", "Explore")}
-            </h2>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {FEATURES.map((f) => (
-                <Link key={f.href} href={f.href}>
-                  <Card className="h-full transition-colors hover:border-[var(--gold)]/50">
-                    <CardHeader>
-                      <f.icon className="mb-2 h-5 w-5 text-[var(--gold)]" />
-                      <CardTitle className="text-lg">
-                        {fa ? f.title : f.titleEn}
-                      </CardTitle>
-                      <CardDescription>
-                        {fa ? f.desc : f.descEn}
-                      </CardDescription>
-                    </CardHeader>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-
-            <div className="mt-14 flex items-end justify-between gap-4">
-              <h2 className="font-[family-name:var(--font-display)] text-2xl text-[var(--gold-soft)]">
-                {t("مسیر فصل‌های ۱–۳", "Chapters I–III learning path")}
+      <div className="manderia-home">
+        <Hero />
+        <section
+          id="explore"
+          className="home-shell home-explore"
+          aria-labelledby="explore-title"
+        >
+          <header className="home-section-heading">
+            <div>
+              <p className="home-eyebrow">
+                {t("پنجره‌ای را انتخاب کنید", "Choose your window")}
+              </p>
+              <h2 id="explore-title">
+                {t(
+                  "هر کنجکاوی، یک راه به آسمان.",
+                  "Let your curiosity choose the way.",
+                )}
               </h2>
+            </div>
+            <p>
+              {t(
+                "از تماشای یک صورت فلکی تا شناختن ستاره‌های عکس خودتان؛ روی هر کارت بزنید و وارد همان بخش شوید.",
+                "From finding a constellation to recognising the stars in your own photo—choose a card and step inside.",
+              )}
+            </p>
+          </header>
+          <div className="home-feature-grid">
+            {FEATURES.map((f) => (
               <Link
-                href="/course"
-                className="text-sm text-[var(--muted)] hover:text-[var(--gold-soft)]"
+                key={f.id}
+                href={f.href}
+                className={`home-feature-card${f.wide ? " feature-wide" : ""}${f.developing ? " feature-developing" : ""}`}
+                aria-labelledby={`feature-${f.id}-title`}
               >
-                {t("ورود به درس‌نامهٔ کروی", "Open the course")}
+                <div className="feature-art">
+                  <FeaturePreview kind={f.id} />
+                  <span className="feature-preview-label">
+                    {t("پیش‌نمایش", "Preview")}
+                  </span>
+                  {f.requiresLogin && (
+                    <span className="feature-access">
+                      <LockKeyhole size={12} />
+                      {t("با حساب گوگل", "Google sign-in")}
+                    </span>
+                  )}
+                  {f.developing && (
+                    <span className="feature-access feature-status">
+                      <Construction size={13} />
+                      {t("در حال تکمیل", "Work in progress")}
+                    </span>
+                  )}
+                </div>
+                <div className="feature-copy">
+                  <p className="home-eyebrow">{fa ? f.eyebrow : f.eyebrowEn}</p>
+                  <h3 id={`feature-${f.id}-title`}>
+                    {fa ? f.title : f.titleEn}
+                  </h3>
+                  <p className="feature-description">
+                    {fa ? f.description : f.descriptionEn}
+                  </p>
+                  <span className="feature-cta">
+                    {fa ? f.cta : f.ctaEn}
+                    <Arrow size={18} />
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+        <section
+          className="home-shell phone-section"
+          aria-labelledby="phone-title"
+        >
+          <div className="phone-art">
+            <FeaturePreview kind="compass" />
+            <span className="phone-icon">
+              <Smartphone size={24} />
+            </span>
+          </div>
+          <div className="phone-copy">
+            <p className="home-eyebrow">
+              {t(
+                "یک همراه کوچک برای شب‌های رصد",
+                "A little companion for a night under the stars",
+              )}
+            </p>
+            <h2 id="phone-title">
+              {t(
+                "گوشی‌تان هم می‌تواند هم‌سفر آسمان باشد.",
+                "Your phone can join the adventure.",
+              )}
+            </h2>
+            <p>
+              {t(
+                "در گوشی‌های اندرویدی و مرورگرهای سازگار، ماندریا می‌تواند با اجازهٔ شما از موقعیت و حسگرهای جهت‌یابیِ موجود استفاده کند. ابزارهای موقعیت، قطب‌نما و نقشهٔ آسمان کمک می‌کنند آسمان اطرافتان را بهتر بشناسید.",
+                "On supported Android phones and browsers, Manderia can use your location and available orientation sensors—with your permission. Location tools, the compass, and the sky map help you get to know the sky around you.",
+              )}
+            </p>
+            <ul>
+              <li>
+                <ShieldCheck size={16} />
+                {t(
+                  "دسترسی فقط با اجازهٔ شما",
+                  "Access only with your permission",
+                )}
+              </li>
+              <li>
+                <MapPin size={16} />
+                {t(
+                  "امکان ورود دستی موقعیت در ابزارهای پشتیبان",
+                  "Manual location entry in supported tools",
+                )}
+              </li>
+            </ul>
+            <Link className="home-text-link" href="/compass">
+              {t("رفتن به قطب‌نما و حسگرها", "Open the compass and sensors")}
+              <Arrow size={17} />
+            </Link>
+            <small>
+              {t(
+                "در دسترس بودن حسگرها به گوشی، مرورگر و مجوزهای شما بستگی دارد؛ این ابزارها جایگزین ابزار دقیق رصدی نیستند.",
+                "Sensor availability depends on your phone, browser, and permissions. These tools do not replace precision observing instruments.",
+              )}
+            </small>
+          </div>
+        </section>
+        <BuilderStory />
+        <section
+          className="home-shell home-in-progress"
+          aria-labelledby="progress-title"
+        >
+          <div className="progress-mark">
+            <Sparkles size={23} />
+          </div>
+          <div>
+            <p className="home-eyebrow">
+              {t("هنوز در آغاز راه", "Still growing")}
+            </p>
+            <h2 id="progress-title">
+              {t(
+                "این آسمان، کم‌کم کامل‌تر می‌شود.",
+                "This little universe is still taking shape.",
+              )}
+            </h2>
+            <p>
+              {t(
+                "ماندریا هنوز در حال ساخت است، اما بعضی سرویس‌ها همین حالا در دسترس‌اند. درس‌نامهٔ کروی به بازبینی و توسعهٔ بیشتری نیاز دارد؛ امیدوارم به‌زودی آن را به بخشی بسیار بهتر و دوست‌داشتنی‌تر تبدیل کنیم. تا آن روز، کشف و تجربه را از ابزارهای فعلی شروع کنید.",
+                "Manderia is a work in progress, with several services already available. The spherical course needs more review and development; I hope to make it much better in the days ahead. For now, start exploring with the tools that are here.",
+              )}
+            </p>
+            <div className="home-closing-links">
+              <Link href="/course?tab=proofs">
+                <BookOpen size={15} />
+                {t("اثبات‌ها و خلاصه‌ها", "Proofs and overviews")}
+                <Arrow size={15} />
+              </Link>
+              <Link href="/sky">
+                <Compass size={15} />
+                {t("یک نگاه به آسمان", "Take a look at the sky")}
+                <Arrow size={15} />
               </Link>
             </div>
-            <div className="mt-5 grid gap-3 md:grid-cols-3">
-              {SMART_CHAPTERS.filter((c) =>
-                ["ch1", "ch2", "ch3"].includes(c.id),
-              ).map((c) => {
-                const n = LESSONS.filter((l) => l.chapterId === c.id).length;
-                return (
-                  <LocalizedDigits key={c.id}>
-                    {
-                      <Link
-                        key={c.id}
-                        href="/course?tab=path"
-                        className="rounded-xl border border-[var(--border)] bg-[var(--panel)]/55 px-4 py-3 hover:border-[var(--gold)]/45"
-                      >
-                        <span className="block text-[11px] text-[var(--teal)] dir-ltr text-left">
-                          {t("فصل", "Chapter")} {c.roman} · {t("ص.", "pp.")}{" "}
-                          {c.pages}
-                        </span>
-                        <span className="mt-1 block font-[family-name:var(--font-display)] text-lg text-[var(--gold-soft)]">
-                          {fa ? c.titleFa : c.titleEn}
-                        </span>
-                        <span className="mt-0.5 block text-xs text-[var(--muted)] dir-ltr text-left">
-                          {n} {t("درس", "lessons")}
-                        </span>
-                      </Link>
-                    }
-                  </LocalizedDigits>
-                );
-              })}
-            </div>
-          </section>
-        </>
-      }
+          </div>
+        </section>
+      </div>
     </LocalizedDigits>
   );
 }

@@ -11,8 +11,8 @@ export function SiteFooter() {
           <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 text-sm text-[var(--muted)] md:flex-row md:items-center md:justify-between">
             <p>
               {t(
-                "ماندریا — آموزش ریاضیات کروی و رصد، با الهام از صور الکواکب.",
-                "Manderia — spherical mathematics and observational astronomy, inspired by al-Sufi’s Book of Fixed Stars.",
+                "ماندریا — پنجره‌ای برای شناختن زیبایی‌های آسمان، با نگاهی به میراث صوفی.",
+                "Manderia — a window to the beauty of the sky, with a connection to al-Sufi’s legacy.",
               )}
             </p>
             <div className="flex flex-wrap gap-4">

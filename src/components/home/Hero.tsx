@@ -1,97 +1,81 @@
 "use client";
+import Link from "next/link";
+import { ArrowUpLeft, ArrowUpRight, ChevronDown } from "lucide-react";
 import { LocalizedDigits } from "@/components/digits/DigitScript";
 import { useLanguage } from "@/components/language/Language";
-import { LESSONS } from "@/lib/content/lessons";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Box, PenLine, Stars, BookOpen } from "lucide-react";
+import { FeaturePreview } from "./FeaturePreview";
 export function Hero() {
-  const { t } = useLanguage();
-  const count = LESSONS.filter((l) =>
-    ["ch1", "ch2", "ch3"].includes(l.chapterId),
-  ).length;
+  const { fa, t } = useLanguage();
+  const Arrow = fa ? ArrowUpLeft : ArrowUpRight;
   return (
     <LocalizedDigits>
-      {
-        <section className="relative overflow-hidden border-b border-[var(--border)]">
-          <div className="hero-grid absolute inset-0 opacity-50" />
-          <div className="relative mx-auto max-w-6xl px-4 pb-14 pt-12 md:pt-16">
-            <div className="animate-in-fade max-w-3xl">
-              <p className="mb-3 text-sm text-[var(--teal)]">
-                {t(
-                  "المپیاد نجوم · اسمارت · آسمان تعاملی",
-                  "Astronomy olympiad · Smart · Interactive sky",
-                )}
-              </p>
-              <h1 className="font-[family-name:var(--font-display)] text-4xl leading-[1.15] text-[var(--gold-soft)] md:text-6xl">
-                {t("ماندریا", "Manderia")}
-              </h1>
-              <p className="mt-5 text-base leading-8 text-[var(--parchment)]/90 md:text-lg">
-                {t(
-                  "آموزش فصل‌های اول تا سوم نجوم کروی اسمارت، اثبات‌های پیوسته، آسمان تعاملی تا قدر ۷، اطلس صور الکواکب و مسئله‌های همراه با شکل کروی.",
-                  "Explore Smart’s Spherical Astronomy Chapters I–III through connected proofs, an interactive sky to magnitude 7, the Book of Fixed Stars atlas, and problems with spherical diagrams.",
-                )}
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Button asChild size="lg">
-                  <Link href="/lab">
-                    <Box className="h-4 w-4" />
-                    {t("کرهٔ تعاملی", "Interactive sphere")}
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="lg">
-                  <Link href="/sky">
-                    <Stars className="h-4 w-4" />
-                    {t("آسمان زنده", "Live sky")}
-                  </Link>
-                </Button>
-                <Button asChild variant="secondary" size="lg">
-                  <Link href="/proofs?kind=girard">
-                    <PenLine className="h-4 w-4" />
-                    {t("اثبات مساحت", "Area proof")}
-                  </Link>
-                </Button>
-                <Button asChild variant="secondary" size="lg">
-                  <Link href="/learn">
-                    <BookOpen className="h-4 w-4" />
-                    {t("درس‌نامهٔ کروی", "Spherical course")}
-                  </Link>
-                </Button>
-              </div>
+      <section className="home-hero" aria-labelledby="home-title">
+        <div className="home-hero-aura" />
+        <div className="home-shell hero-composition">
+          <div className="hero-story">
+            <p className="home-eyebrow">
+              <span />
+              {t("از زمین، برای تماشای آسمان", "From Earth, with wonder")}
+            </p>
+            <h1 id="home-title">
+              {t("ماندریا", "Manderia")}
+              <span>
+                {t("آسمان، نزدیک‌تر از همیشه.", "A little closer to the sky.")}
+              </span>
+            </h1>
+            <p className="hero-introduction">
+              {t(
+                "ماندریا، وب‌سایتی نجومی برای شناختن زیبایی‌های آسمان.",
+                "Manderia is a place to discover the beauty of the sky.",
+              )}
+            </p>
+            <p className="hero-description">
+              {t(
+                "ستاره‌های یک عکس را پیدا کنید، در آسمان شب گردش کنید و هندسهٔ جهان بالای سرتان را روی یک کره ببینید. اینجا قرار است کنجکاوی، آغاز یک کشف باشد.",
+                "Find the stars in a photograph, wander through the night sky, and explore the geometry above you on an interactive sphere. Let curiosity be the beginning of a discovery.",
+              )}
+            </p>
+            <div className="hero-actions">
+              <Link className="home-button home-button-primary" href="/sky">
+                {t("تماشای آسمان", "Explore the night sky")}
+                <Arrow size={18} />
+              </Link>
+              <a className="home-button home-button-secondary" href="#explore">
+                {t("کشف ابزارهای ماندریا", "Discover the tools")}
+                <ChevronDown size={17} />
+              </a>
             </div>
-
-            <div className="mt-10 grid gap-3 sm:grid-cols-3 animate-in-fade animate-delay-1">
-              {[
-                {
-                  t: `${count} ${t("درس", "lessons")}`,
-                  d: t("فصل‌های ۱–۳ اسمارت", "Smart Chapters I–III"),
-                },
-                {
-                  t: t("۱۵٬۵۴۴ ستاره", "15,544 stars"),
-                  d: t("قدر ≤ ۷ · J2000", "Magnitude ≤ 7 · J2000"),
-                },
-                {
-                  t: t("شکل‌محور", "Visual learning"),
-                  d: t(
-                    "هندسهٔ دقیق و اندازه‌گیری زنده",
-                    "Computed geometry and live measurements",
-                  ),
-                },
-              ].map((x) => (
-                <div
-                  key={x.t}
-                  className="rounded-xl border border-[var(--border)] bg-[var(--panel)]/70 px-4 py-3"
-                >
-                  <div className="font-[family-name:var(--font-display)] text-lg text-[var(--gold-soft)]">
-                    {x.t}
-                  </div>
-                  <div className="text-xs text-[var(--muted)]">{x.d}</div>
-                </div>
-              ))}
-            </div>
+            <p className="hero-development">
+              <span className="status-light" />
+              {t(
+                "ماندریا هنوز در حال ساخت است؛ چند پنجره به آسمان، همین حالا باز است.",
+                "Manderia is still taking shape. A few windows to the sky are already open.",
+              )}
+            </p>
           </div>
-        </section>
-      }
+          <figure className="hero-sky-figure">
+            <div className="hero-figure-top">
+              <span className="home-eyebrow">
+                {t("برای لحظه‌ای، رو به آسمان", "Take a moment. Look up.")}
+              </span>
+              <span className="sky-mini-star">✦</span>
+            </div>
+            <FeaturePreview kind="sky" hero />
+            <figcaption>
+              <span>
+                {t(
+                  "یک آسمان، هزار مسیرِ کشف",
+                  "One sky. A thousand ways to discover it.",
+                )}
+              </span>
+              <a href="#builder">
+                {t("داستان ماندریا", "The story behind Manderia")}
+                <Arrow size={15} />
+              </a>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
     </LocalizedDigits>
   );
 }
