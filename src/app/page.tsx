@@ -59,7 +59,7 @@ const FEATURES = [
   },
   {
     href: "/sensor",
-    title: "ستاره‌سنج",
+    title: "حسگر ستاره",
     titleEn: "Star sensor",
     desc: "عکس آسمان را بخوانید: صورت‌ها، بعد و میل، و ارتفاع و سمت تا چند ثانیه قوسی.",
     descEn:

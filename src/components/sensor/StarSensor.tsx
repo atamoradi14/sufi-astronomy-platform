@@ -285,15 +285,16 @@ export function StarSensor() {
       const solved = solvePlate(cat, dets, snapshot.width, snapshot.height, ctx);
       if (!solved.ok) {
         setHold(null);
+        const found = String(dets.length);
         setError(
           solved.reason === "too-few-stars"
             ? t(
-                "ستارهٔ کافی در تصویر پیدا نشد. آسمان تاریک‌تر، ستاره‌های نقطه‌ای و افق بیرون از قاب نتیجهٔ بهتری می‌دهد.",
-                "Not enough star-like points. A darker sky, sharper stars, and the horizon outside the frame work better.",
+                `${found} نقطهٔ ستاره‌مانند پیدا شد، که برای حل کافی نیست. آسمان تاریک‌تر، ستاره‌های نقطه‌ای و افق بیرون از قاب نتیجهٔ بهتری می‌دهد.`,
+                `Found ${found} star-like points, which is not enough to solve. A darker sky, sharper stars, and the horizon outside the frame work better.`,
               )
             : t(
-                "الگوی ستاره‌ها با فهرست جور نشد. ابر، مهتاب شدید، یا ساختمانی در قاب را کم کنید و دوباره حل کنید.",
-                "The star pattern did not match the catalog. Keep clouds, a bright moon, and buildings out of the frame and solve again.",
+                `${found} ستاره پیدا شد، ولی الگوی آن‌ها با فهرست جور نشد. ابر، مهتاب شدید، یا ساختمانی در قاب را کم کنید و دوباره حل کنید.`,
+                `Found ${found} stars, but their pattern did not match the catalog. Keep clouds, a bright moon, and buildings out of the frame and solve again.`,
               ),
         );
         return;
@@ -531,10 +532,10 @@ export function StarSensor() {
       <div className="mx-auto max-w-7xl space-y-6 px-4 py-8">
         <header className="space-y-3">
           <p className="text-sm text-[var(--teal)]">
-            {t("حسگر ستاره، مانند حسگر ماهواره", "A star tracker, in the browser")}
+            {t("مانند حسگر ماهواره، در مرورگر", "A star tracker, in the browser")}
           </p>
           <h1 className="font-[family-name:var(--font-display)] text-3xl text-[var(--gold-soft)] md:text-4xl">
-            {t("ستاره‌سنج", "Star sensor")}
+            {t("حسگر ستاره", "Star sensor")}
           </h1>
           <p className="max-w-3xl text-sm leading-7 text-[var(--muted)]">
             {t(

@@ -16,7 +16,7 @@ const NAV = [
   { href: "/course", label: "درس‌نامه", en: "Course" },
   { href: "/lab", label: "کره", en: "Sphere" },
   { href: "/sky", label: "آسمان", en: "Sky" },
-  { href: "/sensor", label: "ستاره‌سنج", en: "Star sensor" },
+  { href: "/sensor", label: "حسگر ستاره", en: "Star sensor" },
   { href: "/atlas", label: "اطلس صوفی", en: "Sufi atlas" },
   { href: "/charts", label: "داده های لایو", en: "Live data" },
   { href: "/map", label: "نقشه", en: "Map" },

@@ -579,28 +579,18 @@ function solveParity(
     ]);
     const R = wahba(camVecs, catVecs, [1, 1, 1]);
     const cam: Camera = { R, f, k1: 0, k2: 0, cx, cy, mirror };
-    const pairs = collectInliers(cat.n, vecs, cam, dets, width, height, 16);
-    if (pairs.length < 6) continue;
+    const loose = collectInliers(cat.n, vecs, cam, dets, width, height, 16);
+    // A 16 px gate on a wide, dense plate counts chance alignments. A real
+    // match also puts a core of stars within a few pixels.
+    const tight = collectInliers(cat.n, vecs, cam, dets, width, height, 4);
+    const pairs = tight.length >= 6 ? tight : loose;
+    if (pairs.length < 6 || tight.length < 4) continue;
     const mean = pairs.reduce((s, p) => s + p.d2, 0) / pairs.length;
-    const score = pairs.length * 1000 - mean;
+    const score = tight.length * 1000 - mean;
     if (!best || score > best.score) best = { cam, pairs, score };
   }
   if (!best) return null;
-
-  let cam = best.cam;
-  let pairs = best.pairs;
-  for (let pass = 0; pass < 3; pass++) {
-    if (pairs.length < 6) break;
-    const fit = fitCamera(cam, pairs, dets, vecs);
-    cam = fit.cam;
-    const med = median(pairs.map((p) => Math.sqrt(p.d2)));
-    const tight = clamp(Math.max(2.4, med * 3.2), 2.4, 18);
-    const next = collectInliers(cat.n, vecs, cam, dets, width, height, tight);
-    if (next.length >= 6) pairs = next;
-    else break;
-  }
-  if (pairs.length < 6) return null;
-  return { cam, pairs };
+  return best;
 }
 
 function polishF(
@@ -724,6 +714,47 @@ function patternIsMirrored(stars: SolvedStar[], bore: Vec3): boolean {
   return image * sky < 0;
 }
 
+function tightCount(
+  catN: number,
+  vecs: Float64Array,
+  cam: Camera,
+  dets: Centroid[],
+  width: number,
+  height: number,
+  px = 3.5,
+) {
+  return collectInliers(catN, vecs, cam, dets, width, height, px).length;
+}
+
+/**
+ * Radial distortion is weakly constrained by the inner stars alone, and a
+ * free Levenberg–Marquardt step will invent k1/k2 to absorb false matches.
+ * Search a small grid and keep the distortion that lands the most stars
+ * within a few pixels.
+ */
+function tuneDistortion(
+  catN: number,
+  vecs: Float64Array,
+  cam: Camera,
+  dets: Centroid[],
+  width: number,
+  height: number,
+): Camera {
+  let best = cam;
+  let bestN = tightCount(catN, vecs, cam, dets, width, height);
+  for (const k1 of [-0.24, -0.16, -0.1, -0.06, -0.03, 0, 0.04, 0.08]) {
+    for (const k2 of [-0.04, 0, 0.03]) {
+      const trial = { ...cam, k1, k2 };
+      const n = tightCount(catN, vecs, trial, dets, width, height);
+      if (n > bestN) {
+        bestN = n;
+        best = trial;
+      }
+    }
+  }
+  return best;
+}
+
 function rollOf(cam: Camera, beta: Vec3 | null) {
   const north = beta ? addAberration([0, 0, 1], beta) : ([0, 0, 1] as Vec3);
   const n = matVec(transpose(cam.R), north);
@@ -768,27 +799,41 @@ export function solvePlate(
     u[8] *= -1;
     R = matMul(u, transpose(v));
   }
-  const cam: Camera = { ...won.cam, R };
-  const fit = fitCamera(cam, won.pairs, dets, vecs);
-  const finalCam = fit.cam;
-  const med = median(won.pairs.map((p) => Math.sqrt(p.d2)));
-  const pairs = collectInliers(
-    cat.n,
-    vecs,
-    finalCam,
-    dets,
-    width,
-    height,
-    clamp(Math.max(2.6, med * 2.8), 2.6, 14),
-  );
+  let cam: Camera = tuneDistortion(cat.n, vecs, { ...won.cam, R }, dets, width, height);
+  let pairs = collectInliers(cat.n, vecs, cam, dets, width, height, 4.5);
+  if (pairs.length < 6) pairs = won.pairs;
+  let names = paramNames(pairs.length);
+  for (let pass = 0; pass < 3; pass++) {
+    if (pairs.length < 6) break;
+    const before = tightCount(cat.n, vecs, cam, dets, width, height);
+    const fit = fitCamera(cam, pairs, dets, vecs);
+    const after = tightCount(cat.n, vecs, fit.cam, dets, width, height);
+    if (after + 1 < before) break;
+    cam = fit.cam;
+    names = fit.names;
+    const med = median(pairs.map((p) => Math.sqrt(p.d2)));
+    const gate = clamp(Math.max(3, med * 2.2), 3, 5.5);
+    const next = collectInliers(cat.n, vecs, cam, dets, width, height, gate);
+    if (next.length >= 6) pairs = next;
+  }
   if (pairs.length < 6) return { ok: false, reason: "no-match" };
-  const refit = fitCamera(finalCam, pairs, dets, vecs);
-  const camF = refit.cam;
+  const wide = collectInliers(cat.n, vecs, cam, dets, width, height, 12);
+  const medWide = median(wide.map((p) => Math.sqrt(p.d2)));
+  const clip = clamp(Math.max(3, medWide * 2.2), 3, 6);
+  const clipped = wide.filter((p) => p.d2 <= clip * clip);
+  if (clipped.length >= pairs.length) pairs = clipped;
+  const refit = fitCamera(cam, pairs, dets, vecs);
+  if (tightCount(cat.n, vecs, refit.cam, dets, width, height) + 1 >= tightCount(cat.n, vecs, cam, dets, width, height)) {
+    cam = refit.cam;
+    names = refit.names;
+  }
+  const camF = cam;
   const resid = residuals(camF, pairs, dets, vecs);
   const rmsPx = Math.sqrt(chi2(resid) / pairs.length);
-  if (rmsPx > 4.5 || pairs.length < 6) return { ok: false, reason: "no-match" };
+  const medPx = median(pairs.map((p) => Math.sqrt(p.d2)));
+  if (pairs.length < 6 || (rmsPx > 4.5 && medPx > 3.2)) return { ok: false, reason: "no-match" };
   const plate = ARCSEC_PER_RAD / camF.f;
-  const cov = covariance(camF, refit.names, pairs, dets, vecs, resid);
+  const cov = covariance(camF, names, pairs, dets, vecs, resid);
   let sigmaCenter = rmsPx * plate / Math.sqrt(pairs.length);
   let sigmaRoll = sigmaCenter;
   if (cov.inv) {

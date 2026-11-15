@@ -426,7 +426,11 @@ export function LiveSky() {
     return () => canvas.removeEventListener("wheel", wheel);
   }, []);
   const onDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    e.currentTarget.setPointerCapture(e.pointerId);
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // A pointer that is already gone should not take down the sky page.
+    }
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pointers.current.size === 1)
       gesture.current = { x: e.clientX, y: e.clientY, moved: false, pinch: 0 };
@@ -453,14 +457,12 @@ export function LiveSky() {
       4
     )
       gesture.current.moved = true;
-    setLook((l) =>
-      panLook(
-        l,
-        e.clientX - old.x,
-        e.clientY - old.y,
-        e.currentTarget.clientHeight,
-      ),
-    );
+    // Read the event before setState. React may replay the updater during
+    // render, after the pointer event has been released and currentTarget is null.
+    const dx = e.clientX - old.x;
+    const dy = e.clientY - old.y;
+    const viewH = e.currentTarget?.clientHeight || 690;
+    setLook((l) => panLook(l, dx, dy, viewH));
   };
   const onUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!pointers.current.has(e.pointerId)) return;
@@ -606,21 +608,20 @@ export function LiveSky() {
                       ].includes(e.key)
                     ) {
                       e.preventDefault();
-                      if (e.key === "Escape") {
+                      const key = e.key;
+                      if (key === "Escape") {
                         setSelected(null);
                         setQuery("");
-                      } else if (["+", "=", "-"].includes(e.key))
-                        setLook((l) =>
-                          zoomLook(l, e.key === "-" ? 1.15 : 0.85),
-                        );
+                      } else if (["+", "=", "-"].includes(key))
+                        setLook((l) => zoomLook(l, key === "-" ? 1.15 : 0.85));
                       else
                         setLook((l) => ({
                           ...l,
                           az:
                             (l.az +
-                              (e.key === "ArrowRight"
+                              (key === "ArrowRight"
                                 ? 5
-                                : e.key === "ArrowLeft"
+                                : key === "ArrowLeft"
                                   ? -5
                                   : 0) +
                               360) %
@@ -630,9 +631,9 @@ export function LiveSky() {
                             Math.min(
                               89,
                               l.alt +
-                                (e.key === "ArrowUp"
+                                (key === "ArrowUp"
                                   ? 5
-                                  : e.key === "ArrowDown"
+                                  : key === "ArrowDown"
                                     ? -5
                                     : 0),
                             ),
