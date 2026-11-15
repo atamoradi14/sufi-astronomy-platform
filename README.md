@@ -465,3 +465,10 @@ The unrelated Dependabot branch proposing Next.js 16 was inspected and remains s
 ## Learning-content language
 
 Use **فارسی / English** in the header to choose one content language. Persian is the initial default; there is no bilingual lesson mode. The choice applies to lesson titles and paragraphs, course tabs, examples, problem statements and solutions, proof steps, diagram captions, and the sphere lab. It is saved in `sufi-language` and synchronised across browser tabs. Direction changes between RTL and LTR without remounting the workspace. The separate **123 / ۱۲۳** control continues to choose numeral glyphs independently. Mathematical symbols and bibliographic names remain as authored.
+
+
+## Account access and SEO
+
+The header calls the learning section **درس‌نامهٔ کروی**. Google sign-in is offered in a homepage dialog and is required for the main 3D sphere, star sensor, and Sufi atlas; lessons remain public. The user account store lives on the namespace-local SQLite PVC, and the allowlisted administrator can review verified Google registrations at `/admin`. Secrets belong only in ignored `.env` / Kubernetes Secret settings. See [deployment and account configuration](deploy/README.md).
+
+Public pages have canonical metadata and a social preview; `/robots.txt` points to `/sitemap.xml`, which includes the reviewed lesson pages and excludes protected/account pages. `/about`, `/tools`, and `/privacy` explain the teaching approach, tool limitations, and account data use.

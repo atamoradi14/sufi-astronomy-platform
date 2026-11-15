@@ -17,7 +17,6 @@ import { julianDay } from "@/lib/astronomy/time";
 import type { SkyContext } from "@/lib/sensor/catalog";
 import {
   addAberration,
-  radecToVec,
   vecToRaDec,
   type Vec3,
 } from "@/lib/sensor/math";

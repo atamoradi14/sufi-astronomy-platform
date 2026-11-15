@@ -1,6 +1,6 @@
 # Manderia deployment
 
-Public URL: https://manderia.daryajan.com. This follows the existing Darvazeh/Hamafarin worker pattern: context `ravand`, node `ravand-worker-01`, namespace `astronomy`, Deployment and ClusterIP Service `manderia`. The shared Caddy stays in `hamafarin-apps`; no new Ingress, host port, database or Caddy instance is required.
+Public URL: https://manderia.daryajan.com. This follows the existing Darvazeh/Hamafarin worker pattern: context `ravand`, node `ravand-worker-01`, namespace `astronomy`, Deployment and ClusterIP Service `manderia`. The shared Caddy stays in `hamafarin-apps`; no new Ingress, host port, separate database server or Caddy instance is required.
 
 ## Release
 
@@ -22,7 +22,7 @@ Prerequisites: Python 3.12+, Docker Linux engine/buildx, Docker Hub login for `a
 
 Build uses a Git archive, excludes local env files/caches/source books, builds Linux amd64, and labels the image with its full Git source revision. Each unique release record in `.releases/` contains the pushed digest and source revision. Deploy validates the fixed target and exact digest, saves the previous Deployment under `.local/deployment-backups/`, validates on the API server, rolls out, and verifies placement/readiness/running image identity. It stops on failure and never deletes a namespace or PVC. A digest-pinned `IfNotPresent` image and namespace-local Docker Hub Secret are used. Do not edit a release record to substitute another image.
 
-The Next server runs as UID/GID 1001, with no Kubernetes API token, no Linux capabilities, resource limits, and startup/readiness/liveness probes at `/api/health`. The app currently has no server-side user database or volume.
+The Next server runs as UID/GID 1001, with no Kubernetes API token, no Linux capabilities, resource limits, and startup/readiness/liveness probes at `/api/health`. The account store is SQLite on the `manderia-users` 1 Gi PVC at `/data/users.sqlite`. The Deployment uses one replica and Recreate to preserve a single writer. Before later deployments the driver takes an online SQLite snapshot, checks its integrity, and retains a private off-pod copy under `.local/user-backups/`. Never delete this PVC during a release.
 
 ## DNS and shared gateway
 
@@ -43,4 +43,15 @@ The ConfigMap is mounted with `subPath`: updating it alone does not change the r
 
 Check HTTPS, the title/logo/favicon, both content languages and numeral formats, course/proof navigation, sphere interaction, sky search, the live-chart tabs, and API responses. Also verify the existing Hamafarin and Darvazeh hostnames after the shared reload. Live ISS calls can return a clearly marked sample when the upstream provider times out; do not report that sample as live tracking.
 
-For an application rollback, run deploy with a previously recorded, compatible release tag. Only `astronomy/manderia` changes. The previous Deployment snapshot is retained for inspection. For gateway recovery, use the matching snapshot and restore the owning files plus the ConfigMap with a concurrent-change guard, then reload `caddy-runtime.before.json` through `kubectl --context ravand -n hamafarin-apps exec -i deployment/caddy -- caddy reload --config -` (JSON, no adapter). Do not blindly restart the shared gateway or apply an outdated full cluster manifest. Restore/remove only Manderia's DNS record according to `dns.before.json` if DNS rollback is needed.
+For an application rollback, run deploy with a previously recorded, compatible authenticated release tag (`authSchema: 1`). The driver refuses older stateless releases because they would remove login protection. Only `astronomy/manderia` changes. The previous Deployment snapshot is retained for inspection. For gateway recovery, use the matching snapshot and restore the owning files plus the ConfigMap with a concurrent-change guard, then reload `caddy-runtime.before.json` through `kubectl --context ravand -n hamafarin-apps exec -i deployment/caddy -- caddy reload --config -` (JSON, no adapter). Do not blindly restart the shared gateway or apply an outdated full cluster manifest. Restore/remove only Manderia's DNS record according to `dns.before.json` if DNS rollback is needed.
+
+
+## Google sign-in and the user administrator
+
+The ignored root `.env` supplies `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, a unique 32+ character `NEXTAUTH_SECRET`, `NEXTAUTH_URL=https://manderia.daryajan.com`, and comma-separated `ADMIN_EMAILS`. See `auth.env.example` for names only. The deployment driver validates these settings and creates `astronomy/manderia-auth` without logging its values. The app never receives the Cloudflare token. When reusing the existing Google client, preserve Darvazeh’s origin/callback and add the Manderia origin plus `https://manderia.daryajan.com/api/auth/callback/google`.
+
+Google sign-in uses NextAuth’s OAuth code flow, state and PKCE, and only `openid email profile`. Unverified email identities are rejected. Google’s subject identifier, rather than email alone, keys account records. Only basic profile information and login timestamps/counts are saved; OAuth access/refresh tokens and Gmail messages are not stored. The session is encrypted/signed by NextAuth and uses secure cookies in HTTPS production.
+
+The homepage offers a dismissible login dialog. `/lab`, `/sensor`, and `/atlas` are checked on the server; the embedded course lab checks the validated session too. The public lessons, proofs and informational pages remain available without signing in. `/admin` and `/api/admin/users` check the server session and the configured exact email allowlist, including on each API request. Ordinary users cannot read the account list. The admin page shows real registrations, search and pagination; it does not pre-create or fabricate Google accounts.
+
+SEO uses canonical URLs, `robots.txt`, `sitemap.xml`, social-card metadata, and escaped Website/LearningResource JSON-LD. Protected tools, auth endpoints and admin pages are excluded from the sitemap and marked noindex.

@@ -1,3 +1,5 @@
+import { SITE_URL, safeJsonLd } from "@/lib/seo";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 import { LanguageRoot } from "@/components/language/Language";
 import type { Metadata, Viewport } from "next";
 import { SiteHeader } from "@/components/layout/SiteHeader";
@@ -12,9 +14,22 @@ import "@fontsource/amiri/latin-400.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://manderia.daryajan.com"),
-  title: "ماندریا | Manderia | آموزش ریاضیات کروی و نجوم",
+  title: {
+    default: "ماندریا | درس‌نامهٔ کروی و ابزارهای نجوم",
+    template: "%s | ماندریا",
+  },
   description:
-    "آموزش تعاملی ریاضیات کروی، قطب‌نما و قبله، نقشه ماهواره‌ای، نمودارهای نجومی و صورت‌های فلکی به سبک عبدالرحمن صوفی — به زبان فارسی.",
+    "درس‌نامهٔ کروی ماندریا بر پایهٔ اسمارت؛ آموزش فارسی و انگلیسی مثلثات کروی، اثبات‌ها و مثال‌ها، کرهٔ سه‌بعدی، حسگر ستاره، آسمان تعاملی و اطلس صوفی.",
+  alternates: { canonical: "/" },
+  keywords: [
+    "درس‌نامه کروی",
+    "مثلثات کروی",
+    "نجوم اسمارت",
+    "اطلس صوفی",
+    "حسگر ستاره",
+    "spherical astronomy",
+  ],
+  twitter: { card: "summary_large_image", images: ["/social-card.png"] },
   applicationName: "ماندریا",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
@@ -36,6 +51,14 @@ export const metadata: Metadata = {
     url: "https://manderia.daryajan.com",
     type: "website",
     locale: "fa_IR",
+    images: [
+      {
+        url: "/social-card.png",
+        width: 1200,
+        height: 630,
+        alt: "Manderia — spherical astronomy",
+      },
+    ],
   },
 };
 
@@ -56,11 +79,27 @@ export default function RootLayout({
       <body className="antialiased">
         <LanguageRoot>
           <DigitRemount>
-            <div className="app-shell flex min-h-dvh flex-col">
-              <SiteHeader />
-              <main className="flex-1">{children}</main>
-              <SiteFooter />
-            </div>
+            <AuthProvider>
+              <div className="app-shell flex min-h-dvh flex-col">
+                <SiteHeader />
+                <main className="flex-1">{children}</main>
+                <SiteFooter />
+                <script
+                  type="application/ld+json"
+                  dangerouslySetInnerHTML={{
+                    __html: safeJsonLd({
+                      "@context": "https://schema.org",
+                      "@type": "WebSite",
+                      name: "ماندریا",
+                      alternateName: "Manderia",
+                      url: SITE_URL,
+                      inLanguage: ["fa", "en"],
+                      description: "درس‌نامهٔ کروی و ابزارهای آموزشی نجوم",
+                    }),
+                  }}
+                />
+              </div>
+            </AuthProvider>
           </DigitRemount>
         </LanguageRoot>
       </body>

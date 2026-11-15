@@ -2,6 +2,7 @@
 """Manderia release driver: committed source -> Docker Hub digest -> astronomy namespace."""
 import argparse
 import base64
+import hashlib
 from datetime import datetime, timezone
 import json
 import os
@@ -80,20 +81,60 @@ def build_push(args):
     digest = digest_match[1]
     raw = json.loads(run(['docker', 'buildx', 'imagetools', 'inspect', '--raw', image]))
     platform_digest = next((m['digest'] for m in raw.get('manifests', []) if m.get('platform', {}).get('os') == 'linux' and m.get('platform', {}).get('architecture') == 'amd64'), digest)
-    value = {'application': 'Manderia', 'namespace': 'astronomy', 'context': 'ravand', 'tag': args.tag, 'sourceRevision': sha, 'image': image, 'digest': f'{REPOSITORY}@{digest}', 'platformDigest': platform_digest, 'builtAt': datetime.now(timezone.utc).isoformat()}
+    value = {'application': 'Manderia', 'namespace': 'astronomy', 'context': 'ravand', 'tag': args.tag, 'sourceRevision': sha, 'image': image, 'digest': f'{REPOSITORY}@{digest}', 'platformDigest': platform_digest, 'authSchema': 1, 'builtAt': datetime.now(timezone.utc).isoformat()}
     save(path, value)
     print('Pushed:', value['digest'])
     print('Release record:', path)
 
 def load_release(tag):
     release = json.loads(record_path(tag).read_text(encoding='utf-8'))
+    if release.get('authSchema') != 1:
+        raise RuntimeError('This release predates account protection; deploy an authenticated release instead')
     if release['namespace'] != 'astronomy' or release['context'] != 'ravand' or not re.fullmatch(re.escape(REPOSITORY) + r'@sha256:[a-f0-9]{64}', release['digest']) or not re.fullmatch('[a-f0-9]{40}', release['sourceRevision']):
         raise RuntimeError('Invalid release provenance or deployment target')
     return release
 
+def auth_settings():
+    path = ROOT / '.env'
+    values = {}
+    if path.exists():
+        for line in path.read_text(encoding='utf-8-sig').splitlines():
+            if '=' in line and not line.lstrip().startswith('#'):
+                key, value = line.split('=', 1)
+                values[key.strip()] = value.strip().strip('"').strip("'")
+    keys = ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET', 'NEXTAUTH_SECRET', 'NEXTAUTH_URL', 'ADMIN_EMAILS']
+    settings = {key: os.getenv(key) or values.get(key, '') for key in keys}
+    if any(not value for value in settings.values()) or len(settings['NEXTAUTH_SECRET']) < 32 or settings['NEXTAUTH_URL'] != 'https://manderia.daryajan.com':
+        raise RuntimeError('Complete the private .env auth settings for https://manderia.daryajan.com before deployment')
+    return settings
+
+def backup_users(before, stamp):
+    if not before:
+        return
+    backup = '/data/backups/users-' + stamp + '.sqlite'
+    code = "const fs=require('node:fs'),{DatabaseSync}=require('node:sqlite');const path=process.env.AUTH_DB_PATH||'/data/users.sqlite';if(!fs.existsSync(path)){console.log('No existing account database');process.exit(0)}fs.mkdirSync('/data/backups',{recursive:true});const db=new DatabaseSync(path);if(db.prepare('PRAGMA quick_check').get().quick_check!=='ok')process.exit(2);db.prepare('VACUUM INTO ?').run(" + json.dumps(backup) + ");db.close();"
+    run(KUBE + ['exec','deployment/manderia','--','node','-e',code], private=True)
+    local = ROOT / '.local' / 'user-backups' / ('users-' + stamp + '.sqlite')
+    local.parent.mkdir(parents=True, exist_ok=True)
+    result = subprocess.run(KUBE + ['exec','deployment/manderia','--','cat',backup], capture_output=True)
+    if result.returncode:
+        raise RuntimeError('Account database backup was not readable; deployment stopped')
+    remote_hash = run(KUBE + ['exec','deployment/manderia','--','node','-e',"console.log(require('node:crypto').createHash('sha256').update(require('node:fs').readFileSync(" + json.dumps(backup) + ")).digest('hex'))"], private=True).decode().strip()
+    if hashlib.sha256(result.stdout).hexdigest() != remote_hash:
+        raise RuntimeError('Database backup checksum verification failed')
+    local.write_bytes(result.stdout)
+    local.chmod(0o600)
+    import sqlite3
+    with sqlite3.connect(str(local)) as db:
+        if db.execute('PRAGMA quick_check').fetchone()[0] != 'ok':
+            raise RuntimeError('Local account database backup failed integrity verification')
+    print('Account database backed up locally and on its volume before deployment.')
+
 def deploy(args):
     release = load_release(args.tag)
-    manifest = (ROOT / 'deploy/k8s/manderia.yaml').read_text(encoding='utf-8-sig').replace('IMAGE_REF', release['digest']).replace('SOURCE_REVISION', release['sourceRevision']).encode()
+    settings = auth_settings()
+    config_sha = hashlib.sha256(json.dumps(settings, sort_keys=True).encode()).hexdigest()
+    manifest = (ROOT / 'deploy/k8s/manderia.yaml').read_text(encoding='utf-8-sig').replace('IMAGE_REF', release['digest']).replace('SOURCE_REVISION', release['sourceRevision']).replace('AUTH_CONFIG_SHA', config_sha).encode()
     if args.dry_run:
         result = run(KUBE + ['apply', '--dry-run=client', '-f', '-'], manifest)
         print(result.decode(), end='')
@@ -104,10 +145,13 @@ def deploy(args):
     before = json.loads(run(KUBE + ['get', 'deployment', 'manderia', '--ignore-not-found', '-o', 'json']) or b'null')
     stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
     save(ROOT / '.local' / 'deployment-backups' / f'{stamp}-{args.tag}.json', before)
+    backup_users(before, stamp)
     namespace = json.dumps({'apiVersion':'v1','kind':'Namespace','metadata':{'name':'astronomy','labels':{'app.kubernetes.io/part-of':'manderia'}}}).encode()
     run(KUBE + ['apply', '-f', '-'], namespace)
     secret = {'apiVersion': 'v1', 'kind': 'Secret', 'metadata': {'name': 'manderia-registry', 'namespace': 'astronomy'}, 'type': 'kubernetes.io/dockerconfigjson', 'data': {'.dockerconfigjson': base64.b64encode(json.dumps(credentials).encode()).decode()}}
     run(KUBE + ['apply', '-f', '-'], json.dumps(secret).encode(), private=True)
+    auth_secret = {'apiVersion':'v1','kind':'Secret','metadata':{'name':'manderia-auth','namespace':'astronomy'},'type':'Opaque','stringData':settings}
+    run(KUBE + ['apply','-f','-'], json.dumps(auth_secret).encode(), private=True)
     print(run(KUBE + ['apply', '--dry-run=server', '-f', '-'], manifest).decode(), end='')
     print(run(KUBE + ['apply', '-f', '-'], manifest).decode(), end='')
     run(KUBE + ['rollout', 'status', 'deployment/manderia', '--timeout=300s'], capture=False)

@@ -5,6 +5,17 @@ metadata:
   labels:
     app.kubernetes.io/part-of: manderia
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: manderia-users
+  namespace: astronomy
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 1Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,10 +28,7 @@ spec:
   revisionHistoryLimit: 5
   progressDeadlineSeconds: 300
   strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
+    type: Recreate
   selector:
     matchLabels:
       app.kubernetes.io/name: manderia
@@ -30,6 +38,7 @@ spec:
         app.kubernetes.io/name: manderia
       annotations:
         manderia.app/source-revision: "SOURCE_REVISION"
+        manderia.app/auth-config: "AUTH_CONFIG_SHA"
     spec:
       nodeSelector:
         kubernetes.io/hostname: ravand-worker-01
@@ -44,6 +53,10 @@ spec:
         fsGroup: 1001
         seccompProfile:
           type: RuntimeDefault
+      volumes:
+        - name: users
+          persistentVolumeClaim:
+            claimName: manderia-users
       containers:
         - name: web
           image: IMAGE_REF
@@ -51,7 +64,15 @@ spec:
           ports:
             - name: http
               containerPort: 3847
+          volumeMounts:
+            - name: users
+              mountPath: /data
+          envFrom:
+            - secretRef:
+                name: manderia-auth
           env:
+            - name: AUTH_DB_PATH
+              value: /data/users.sqlite
             - name: PORT
               value: "3847"
             - name: HOSTNAME

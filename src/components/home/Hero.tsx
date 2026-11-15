@@ -54,7 +54,7 @@ export function Hero() {
                 <Button asChild variant="secondary" size="lg">
                   <Link href="/learn">
                     <BookOpen className="h-4 w-4" />
-                    {t("درس‌نامه", "Course")}
+                    {t("درس‌نامهٔ کروی", "Spherical course")}
                   </Link>
                 </Button>
               </div>

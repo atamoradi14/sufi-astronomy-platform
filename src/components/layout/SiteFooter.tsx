@@ -16,6 +16,9 @@ export function SiteFooter() {
               )}
             </p>
             <div className="flex flex-wrap gap-4">
+              <Link href="/about">{t("دربارهٔ ماندریا", "About")}</Link>
+              <Link href="/privacy">{t("حریم خصوصی", "Privacy")}</Link>
+              <Link href="/tools">{t("راهنمای ابزارها", "Tool guide")}</Link>
               <Link href="/course" className="hover:text-[var(--parchment)]">
                 {t("دروس", "Course")}
               </Link>

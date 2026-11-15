@@ -1,4 +1,5 @@
 "use client";
+import { AuthGate } from "@/components/auth/AuthProvider";
 import { selectSourceText } from "@/lib/language";
 import { LocalizedDigits } from "@/components/digits/DigitScript";
 import { useLanguage } from "@/components/language/Language";
@@ -62,7 +63,7 @@ export function CourseHub({ initialTab = "path" }: { initialTab?: CourseTab }) {
             </p>
             <h1 className="font-[family-name:var(--font-display)] text-3xl text-[var(--gold-soft)] md:text-4xl">
               {t(
-                "درس‌نامهٔ متمرکز · فصل‌های ۱ تا ۳",
+                "درس‌نامهٔ کروی · فصل‌های ۱ تا ۳",
                 "Spherical astronomy · Chapters I–III",
               )}
             </h1>
@@ -349,7 +350,9 @@ export function CourseHub({ initialTab = "path" }: { initialTab?: CourseTab }) {
                   "Toggle layers, select vertex A, B, or C, and place it on the sphere. Measure sides and angles as you explore the constructions from Chapters I–II.",
                 )}
               </p>
-              <SphereLab />
+              <AuthGate feature="3D sphere">
+                <SphereLab />
+              </AuthGate>
             </div>
           )}
         </div>

@@ -23,7 +23,7 @@ import {
 const FEATURES = [
   {
     href: "/course",
-    title: "درس‌نامهٔ متمرکز",
+    title: "درس‌نامهٔ کروی",
     titleEn: "Course hub",
     desc: "فصل‌های ۱–۳ اسمارت در یک فهرست: مسیر، دروس، مثال‌ها، مسائل، اثبات‌ها و کره.",
     descEn:
@@ -61,7 +61,7 @@ const FEATURES = [
     href: "/sensor",
     title: "حسگر ستاره (هوش مصنوعی ستاره‌یاب)",
     titleEn: "Star sensor (AI star finder)",
-    desc: "عکس آسمان را بخوانید: صورت‌ها، بعد و میل، و ارتفاع و سمت تا چند ثانیه قوسی.",
+    desc: "الگوی ستاره‌ها را در عکس آسمان تطبیق دهید و جهت تصویر را تخمین بزنید.",
     descEn:
       "Read a sky photo: constellations, RA/Dec, and altitude/azimuth to a few arcseconds.",
     icon: Crosshair,
@@ -129,7 +129,7 @@ export default function HomePage() {
                 href="/course"
                 className="text-sm text-[var(--muted)] hover:text-[var(--gold-soft)]"
               >
-                {t("ورود به درس‌نامه", "Open the course")}
+                {t("ورود به درس‌نامهٔ کروی", "Open the course")}
               </Link>
             </div>
             <div className="mt-5 grid gap-3 md:grid-cols-3">

@@ -1,6 +1,7 @@
 "use client";
 import { useLanguage } from "@/components/language/Language";
 import { setLanguage } from "@/lib/language";
+import { AccountButton } from "@/components/auth/AuthProvider";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -13,7 +14,7 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 const NAV = [
   { href: "/", label: "خانه", en: "Home" },
-  { href: "/course", label: "درس‌نامه", en: "Course" },
+  { href: "/course", label: "درس‌نامهٔ کروی", en: "Spherical course" },
   { href: "/lab", label: "کره", en: "Sphere" },
   { href: "/sky", label: "آسمان", en: "Sky" },
   { href: "/sensor", label: "حسگر ستاره", en: "Star sensor" },
@@ -67,6 +68,7 @@ export function SiteHeader() {
             </nav>
 
             <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-end">
+              <AccountButton />
               <div
                 role="group"
                 aria-label="Content language"

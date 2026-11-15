@@ -1,5 +1,10 @@
 "use client";
-import { useEffect, useSyncExternalStore, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import {
   getLanguage,
   setLanguage,
@@ -15,7 +20,10 @@ export function useLanguage() {
   return {
     language,
     fa: language === "fa",
-    t: (fa: string, en: string) => (language === "fa" ? fa : en),
+    t: useCallback(
+      (fa: string, en: string) => (language === "fa" ? fa : en),
+      [language],
+    ),
   };
 }
 export function LanguageRoot({ children }: { children: ReactNode }) {

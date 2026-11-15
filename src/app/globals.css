@@ -394,3 +394,6 @@ summary {
   width: max-content;
   min-width: 100%;
 }
+
+.auth-dialog { width: min(92vw, 460px); max-height: 90dvh; overflow: auto; margin: auto; }
+.auth-dialog::backdrop { background: #020913bb; backdrop-filter: blur(8px); }
