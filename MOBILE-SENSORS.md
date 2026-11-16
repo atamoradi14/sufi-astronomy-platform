@@ -1,4 +1,4 @@
-# Private phone sensor lab
+# Phone sensors & live 3D dynamics
 
 URL: `https://fanous.online/admin/sensors`. Only the verified Google account
 `atamoradi8@gmail.com` can open it. The server checks the session identity before
@@ -8,7 +8,7 @@ public sitemap. It is not bound to a particular phone model.
 
 ## On an Android phone
 
-1. Sign in with the authorized account, then choose **Phone sensors** in the menu.
+1. Sign in with the authorized account, then choose **Phone sensors & live 3D** in the menu.
 2. Press **Start & request permission** and allow motion/orientation and location.
    Each stream reports its own availability. A missing magnetometer API is not
    evidence that the phone has no compass: browser orientation may still work.
@@ -19,8 +19,8 @@ public sitemap. It is not bound to a particular phone model.
 4. Browser-reference mode is the default. Calibrated raw fusion is offered only
    after a successful magnetometer calibration. Neither mode invents readings.
 5. Select the screen normal (+Z), rear camera direction (-Z), or physical top
-   edge (+Y). The default is the direction out of the front screen, not the rear
-   camera. Face-up means altitude +90 degrees; azimuth there is undefined.
+   edge (+Y). The default is now the rear camera direction, toward the sky while
+   you look at the screen. Face-up means altitude +90 degrees; azimuth there is undefined.
 6. Enter the current local magnetic declination (east positive) and confirm it
    to enable approximate RA/Dec with a fresh GPS fix. Zero is not an automatic
    geomagnetic-model calculation. Device clock accuracy matters.
@@ -29,7 +29,8 @@ Stop, navigation away, sign-out/account loss, or hiding the page stops capture.
 Returning to the page requires Start again. Samples and calibrations exist only
 in page memory; no telemetry endpoint, location upload, or database storage is
 used. Reloading clears them. Capture is bounded to 300 samples per vector stream
-at approximately 10 Hz and 300 GPS fixes. Optional raw acquisition requests 50 Hz.
+at approximately 10 Hz and 300 GPS fixes. Quaternion and filter diagnostic
+histories are also bounded to 300 records. Optional raw acquisition requests 50 Hz.
 
 ## Coordinates and filtering
 
@@ -89,3 +90,46 @@ References: [W3C orientation and motion](https://www.w3.org/TR/orientation-event
 [W3C orientation reference axes](https://www.w3.org/TR/orientation-sensor/),
 [Chrome sensor capabilities](https://developer.chrome.com/docs/capabilities/web-apis/generic-sensor),
 [Markley and Bauer, attitude error representations](https://ntrs.nasa.gov/citations/20020060647).
+
+## Quaternion plots, rear optical sky and filter dynamics
+
+All views remain internal tabs of `/admin/sensors`; capture survives tab switches.
+The new Persian name is **سنسورهای گوشی و دینامیک سه بعدی لایو**.
+
+- Quaternion traces plot all four `[x,y,z,w]` components for reference,
+  gyro prediction and corrected estimate. Reference signs align to the current
+  quaternion hemisphere; `q` and `-q` are not displayed as different attitudes.
+- The optional dynamics tab uses actual recorded innovations, corrections,
+  covariance, gain and NIS from the running filter. Equations describe the actual
+  noise constants, covariance floor, gyro bias calibration and Joseph/recentering
+  steps. Translational equations are explanatory; no IMU position is invented.
+- The rear optical sky uses the existing 15,544-star J2000 catalog and IAU figure
+  dataset. J2000 vectors rotate to the current local horizon with Astronomy Engine,
+  including precession and nutation. Refraction is optional. Figure segments follow
+  great-circle arcs. Camera projection is rectilinear and unmirrored, with physical
+  forward `-Z`, right `+X`, up `+Y`; display orientation rotates right/up without
+  changing the optical axis. No azimuth/altitude Euler camera is used at zenith.
+- A short-side FOV setting adapts to the viewport aspect automatically. Exact lens
+  intrinsics and camera/IMU mounting offsets are not supplied by browsers: FOV and
+  absolute alignment still need physical calibration against known stars. Gyro
+  extrapolation is bounded to 100 ms and uses the estimate timestamp, not the older
+  reference timestamp, to avoid double-counting already-integrated rotation.
+- Optional rear video requests `facingMode: environment` and never requests audio.
+  Video is local-only and stops on tab exit, page hide, stop or account loss.
+  The camera Permissions-Policy allows self only on `/admin/sensors`; public pages
+  continue to deny camera, and microphone remains denied everywhere.
+
+### Missing raw magnetometer
+
+A magnetic `deviceorientationabsolute` stream can work while `window.Magnetometer`
+is missing. They are different browser APIs. Chromium currently gates Magnetometer
+behind `SensorExtraClasses`, an experimental runtime feature. The page distinguishes
+working magnetic orientation from missing raw microtesla readings, offers restart/
+permission diagnostics, and explains an optional Chrome experimental-feature test.
+The site cannot turn on browser flags or derive a measured field vector from angles.
+No unit field, WMM estimate or fabricated vector is substituted for raw readings.
+
+Primary implementation references:
+[Chromium Magnetometer IDL](https://raw.githubusercontent.com/chromium/chromium/main/third_party/blink/renderer/modules/sensor/magnetometer.idl),
+[Chromium runtime features](https://chromium.googlesource.com/chromium/src/+/main/third_party/blink/renderer/platform/runtime_enabled_features.json5),
+[Chrome experimental flags](https://developer.chrome.com/docs/web-platform/chrome-flags/).

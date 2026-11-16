@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 const CSP = [
   "default-src 'self'",
@@ -14,14 +14,14 @@ const CSP = [
   "object-src 'none'",
 ].join("; ");
 
-export function middleware() {
+export function middleware(request: NextRequest) {
   const res = NextResponse.next();
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("X-Frame-Options", "DENY");
   res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   res.headers.set(
     "Permissions-Policy",
-    "camera=(), microphone=(), geolocation=(self), accelerometer=(self), gyroscope=(self), magnetometer=(self)",
+    `camera=${request.nextUrl.pathname === "/admin/sensors" ? "(self)" : "()"}, microphone=(), geolocation=(self), accelerometer=(self), gyroscope=(self), magnetometer=(self)`,
   );
   res.headers.set("Content-Security-Policy", CSP);
   return res;

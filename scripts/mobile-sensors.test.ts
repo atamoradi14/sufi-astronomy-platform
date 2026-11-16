@@ -1,5 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import katex from "katex";
+import { expandStars } from "../src/lib/sky/catalog";
 import {
   AttitudeKalman,
   calibrateMag,
@@ -21,6 +24,12 @@ import {
 } from "../src/lib/mobile-sensors/math";
 import { canUseMobileSensors } from "../src/lib/mobile-sensors/access";
 import { SensorCapture } from "../src/lib/mobile-sensors/capture";
+import {
+  cameraProject,
+  extrapolate,
+  rearCameraFrame,
+  verticalFovFromShortSide,
+} from "../src/lib/mobile-sensors/camera";
 import { equatorialToHorizontal } from "../src/lib/astronomy/sphere";
 import { lstHours } from "../src/lib/astronomy/time";
 const near = (a: number, b: number, tol = 1e-6) =>
@@ -220,4 +229,109 @@ test("Sky pointing round-trips both hemispheres; poles/zenith and declination si
   assert.equal(skyPoint(fromOrientation(0, 0, 0), [0, 0, 1], 0, date).az, null);
   near(skyPoint(exp([0, 0, 0]), [0, 1, 0], 12, date).az!, 12);
   near(skyPoint(exp([0, 0, 0]), [0, 0, -1], 0, date).alt, -90);
+});
+
+test("Rear optical frame centres -Z, preserves right/up and never mirrors the sky", () => {
+  const q = fromOrientation(0, 90, 0),
+    frame = rearCameraFrame(q);
+  const north = cameraProject([0, 1, 0], frame, 60, 0.5);
+  assert.ok(north.visible);
+  near(north.x, 0);
+  near(north.y, 0);
+  const east = cameraProject([0.1, 1, 0], frame, 60, 0.5),
+    up = cameraProject([0, 1, 0.1], frame, 60, 0.5);
+  assert.ok(east.x > 0 && up.y > 0);
+  assert.equal(cameraProject([0, -1, 0], frame, 60, 0.5).visible, false);
+  const rolled = rearCameraFrame(mul(q, exp([0, 0, Math.PI / 2])));
+  near(cameraProject([0, 1, 0], rolled, 60, 0.5).x, 0);
+  assert.ok(cameraProject([0.1, 1, 0], rolled, 60, 0.5).y < 0);
+  const landscape = rearCameraFrame(q, 90);
+  assert.ok(cameraProject([0.1, 1, 0], landscape, 60, 2).y < 0);
+  for (const beta of [179.999, 180, 180.001]) {
+    const zenith = rearCameraFrame(fromOrientation(40, beta, 0));
+    const p = cameraProject(zenith.forward, zenith, 60, 1);
+    near(p.x, 0);
+    near(p.y, 0);
+  }
+});
+test("Optical FOV is rectilinear; bounded gyro extrapolation cannot run away", () => {
+  const frame = rearCameraFrame(fromOrientation(0, 90, 0));
+  near(cameraProject([0, 1, Math.tan(Math.PI / 6)], frame, 60, 1).y, 1);
+  const q = fromOrientation(0, 0, 0),
+    rate: Vec = [0, 0, 1];
+  near(norm(log(mul(conjugate(q), extrapolate(q, rate, 10)))), 0.1);
+  near(norm(extrapolate(q, rate, 0.05)), 1);
+  assert.deepEqual(extrapolate(q, null, 1), q);
+  const portrait = cameraProject(
+    [0.1, 1, 0.05],
+    frame,
+    verticalFovFromShortSide(50, 0.5),
+    0.5,
+  );
+  const landscape = cameraProject(
+    [0.1, 1, 0.05],
+    rearCameraFrame(fromOrientation(0, 90, 0), 90),
+    verticalFovFromShortSide(50, 2),
+    2,
+  );
+  near((landscape.x * 780) / 2, (portrait.y * 780) / 2);
+  near((landscape.y * 390) / 2, (-portrait.x * 390) / 2);
+});
+test("Diagnostics record the actual Kalman innovation, correction, gain and reference sign", () => {
+  const filter = new AttitudeKalman();
+  filter.update(fromOrientation(0, 0, 0));
+  filter.update(fromOrientation(10, 0, 0), 5, 0.1, false);
+  near(filter.residual[2], (10 * Math.PI) / 180);
+  assert.ok(
+    filter.correction[2] > 0 && filter.correction[2] < filter.residual[2],
+  );
+  assert.ok(filter.gain.every((r, i) => r[i] > 0 && r[i] < 1));
+  assert.ok(filter.nis > 0 && Number.isFinite(filter.nis));
+  const same = filter.q!.map((v) => -v) as typeof filter.q;
+  filter.update(same!);
+  assert.ok(
+    filter.measured!.reduce((sum, v, i) => sum + v * filter.q![i], 0) > 0,
+  );
+});
+
+test("Shared sky decoder preserves the complete packed J2000 catalog", () => {
+  const raw = JSON.parse(
+    readFileSync(
+      new URL("../public/data/stars-mag7.json", import.meta.url),
+      "utf8",
+    ),
+  );
+  const { stars, count } = expandStars(raw);
+  assert.equal(raw.e, "J2000");
+  assert.equal(count, 15544);
+  assert.equal(stars.length, count);
+  assert.ok(
+    stars.every(
+      (s) =>
+        s.ra >= 0 &&
+        s.ra < 24 &&
+        s.dec >= -90 &&
+        s.dec <= 90 &&
+        Number.isFinite(s.mag),
+    ),
+  );
+  // Independent Buffer read avoids relying on the decoder's TypedArray construction.
+  near(stars[0].ra, Buffer.from(raw.ra, "base64").readInt32LE(0) / 10000);
+});
+test("Every displayed dynamics/filter expression parses as strict KaTeX", () => {
+  const source = readFileSync(
+    new URL(
+      "../src/components/mobile-sensors/FilterDynamics.tsx",
+      import.meta.url,
+    ),
+    "utf8",
+  );
+  const expressions = [...source.matchAll(/String\.raw`([^`]+)`/g)].map(
+    (m) => m[1],
+  );
+  assert.ok(expressions.length >= 9);
+  for (const expression of expressions)
+    assert.doesNotThrow(() =>
+      katex.renderToString(expression, { throwOnError: true, strict: "error" }),
+    );
 });

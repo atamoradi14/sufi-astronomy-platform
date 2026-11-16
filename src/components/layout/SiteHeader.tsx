@@ -32,7 +32,11 @@ export function SiteHeader() {
   const navigation = canUseMobileSensors(session?.user?.email)
     ? [
         ...NAV,
-        { href: "/admin/sensors", label: "حسگرهای گوشی", en: "Phone sensors" },
+        {
+          href: "/admin/sensors",
+          label: "سنسورهای گوشی و دینامیک سه بعدی لایو",
+          en: "Phone sensors & live 3D",
+        },
       ]
     : NAV;
   const [open, setOpen] = useState(false);

@@ -13,6 +13,7 @@ import {
   SourceLock,
   stationaryBias,
   Vec,
+  topHeading,
 } from "./math";
 
 export type Stream = "accel" | "gyro" | "mag" | "orientation" | "gps";
@@ -35,7 +36,27 @@ export type Fix = {
   course: number | null;
   at: number;
 };
+export type QuaternionSample = {
+  at: number;
+  measured: Quat;
+  predicted: Quat;
+  filtered: Quat;
+};
+export type FilterSample = {
+  at: number;
+  innovation: Vec;
+  correction: Vec;
+  sigma: Vec;
+  gain: Vec;
+  nis: number;
+};
 export type Snapshot = {
+  quaternions: QuaternionSample[];
+  diagnostics: FilterSample[];
+  covariance: number[][];
+  poseAt: number;
+  rate: Vec | null;
+  magneticHeading: number | null;
   running: boolean;
   status: Record<Stream, Status>;
   sources: Partial<Record<Stream, string>>;
@@ -102,6 +123,8 @@ export class SensorCapture {
   private low: Partial<Record<Stream, Vec>> = {};
   private values: Partial<Record<Stream, Vec>> = {};
   private filter = new AttitudeKalman();
+  private quaternions: QuaternionSample[] = [];
+  private diagnostics: FilterSample[] = [];
   private lock = new SourceLock();
   private lastUpdate = 0;
   private gyroAt = 0;
@@ -137,6 +160,8 @@ export class SensorCapture {
     });
     this.startedAt = performance.now();
     this.last = {};
+    this.quaternions = [];
+    this.diagnostics = [];
     this.histories = {
       accel: [],
       gyro: [],
@@ -228,7 +253,16 @@ export class SensorCapture {
       ["Magnetometer", "mag"],
     ] as const) {
       if ((key === "accel" || key === "gyro") && !permits(mp)) continue;
-      const Constructor = (window as SensorWindow)[name];
+      if (key === "mag" && !permits(op)) {
+        this.status.mag = "denied";
+        continue;
+      }
+      const Constructor =
+        (window as SensorWindow)[name] ??
+        (key === "mag"
+          ? (window as Window & { webkitMagnetometer?: SensorConstructor })
+              .webkitMagnetometer
+          : undefined);
       if (!Constructor) {
         if (key === "mag") this.status.mag = "unsupported";
         continue;
@@ -266,8 +300,13 @@ export class SensorCapture {
         });
         this.cleanups.push(() => sensor.stop());
         sensor.start();
-      } catch {
-        if (key === "mag") this.status.mag = "unavailable";
+      } catch (error) {
+        if (key === "mag")
+          this.status.mag =
+            error instanceof DOMException &&
+            (error.name === "NotAllowedError" || error.name === "SecurityError")
+              ? "denied"
+              : "unavailable";
       }
     }
     if (!navigator.geolocation) this.status.gps = "unsupported";
@@ -464,6 +503,25 @@ export class SensorCapture {
   }
   private recordPose(measured: Quat, now: number) {
     if (!this.filter.q) return;
+    const measuredQ = this.filter.measured ?? measured;
+    this.quaternions.push({
+      at: now,
+      measured: [...measuredQ],
+      predicted: [...(this.filter.predicted ?? measured)],
+      filtered: [...this.filter.q],
+    });
+    if (this.quaternions.length > 300) this.quaternions.shift();
+    this.diagnostics.push({
+      at: now,
+      innovation: this.filter.residual.map((v) => v / RAD) as Vec,
+      correction: this.filter.correction.map((v) => v / RAD) as Vec,
+      sigma: this.filter.p.map(
+        (r, i) => Math.sqrt(Math.max(0, r[i])) / RAD,
+      ) as Vec,
+      gain: this.filter.gain.map((r, i) => r[i]) as Vec,
+      nis: this.filter.nis,
+    });
+    if (this.diagnostics.length > 300) this.diagnostics.shift();
     const a = poseAngles(measured),
       b = poseAngles(this.filter.q);
     this.record(
@@ -510,6 +568,18 @@ export class SensorCapture {
         status[s] = "stale";
     });
     return {
+      quaternions: this.quaternions.slice(),
+      diagnostics: this.diagnostics.slice(),
+      covariance: this.filter.p.map((r) => r.slice()),
+      poseAt: Math.max(this.orientationAt, this.gyroAt),
+      rate:
+        now - this.gyroAt < 200
+          ? ((this.values.gyro?.map((v, i) => v - this.bias[i]) as Vec) ?? null)
+          : null,
+      magneticHeading:
+        this.absolute && this.filter.q && now - this.orientationAt < freshMs
+          ? topHeading(this.filter.q)
+          : null,
       running: this.running,
       status,
       sources: { ...this.sources },

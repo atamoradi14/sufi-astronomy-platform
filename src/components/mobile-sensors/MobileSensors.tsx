@@ -17,10 +17,20 @@ import { useLanguage } from "@/components/language/Language";
 import { LocalizedDigits } from "@/components/digits/DigitScript";
 import { SensorPlot } from "./SensorPlot";
 import { GpsPlots } from "./GpsPlots";
+import { QuaternionPlots } from "./QuaternionPlots";
+import { MagnetometerHelp } from "./MagnetometerHelp";
 import "./sensors.css";
 const PhoneScene = dynamic(() => import("./PhoneScene"), {
   ssr: false,
   loading: () => <div className="h-80 grid place-items-center">3D…</div>,
+});
+const CameraSky = dynamic(() => import("./CameraSky"), {
+  ssr: false,
+  loading: () => <p>…</p>,
+});
+const FilterDynamics = dynamic(() => import("./FilterDynamics"), {
+  ssr: false,
+  loading: () => <p>…</p>,
 });
 const fmt = (v: number | null | undefined, places = 1) =>
   v == null || !Number.isFinite(v) ? "—" : v.toFixed(places);
@@ -52,7 +62,7 @@ export function MobileSensors() {
   const [state, setState] = useState<Snapshot | null>(null),
     [starting, setStarting] = useState(false),
     [tab, setTab] = useState("pose"),
-    [axis, setAxis] = useState("screen");
+    [axis, setAxis] = useState("camera");
   const [declination, setDeclination] = useState(0),
     [trueNorth, setTrueNorth] = useState(false),
     [now, setNow] = useState(() => Date.now());
@@ -119,7 +129,7 @@ export function MobileSensors() {
     state?.calibration === "gyro" || state?.calibration === "mag";
   return (
     <LocalizedDigits>
-      <main
+      <div
         className="sensor-lab mx-auto max-w-7xl px-4 py-8 md:py-12"
         dir={fa ? "rtl" : "ltr"}
       >
@@ -131,7 +141,10 @@ export function MobileSensors() {
             )}
           </p>
           <h1 className="text-3xl md:text-4xl text-[var(--gold-soft)]">
-            {t("آزمایشگاه حسگرهای گوشی", "Phone sensor lab")}
+            {t(
+              "سنسورهای گوشی و دینامیک سه بعدی لایو",
+              "Phone sensors & live 3D dynamics",
+            )}
           </h1>
           <p className="text-sm leading-7 text-[var(--muted)]">
             {t(
@@ -180,7 +193,7 @@ export function MobileSensors() {
             [
               ["accel", t("شتاب‌سنج", "Accelerometer")],
               ["gyro", t("ژیروسکوپ", "Gyroscope")],
-              ["mag", t("مغناطیس‌سنج", "Magnetometer")],
+              ["mag", t("مغناطیس‌سنج خام", "Raw magnetometer")],
               ["orientation", t("جهت‌گیری مرورگر", "Browser orientation")],
               ["gps", "GPS"],
             ] as const
@@ -199,18 +212,42 @@ export function MobileSensors() {
                 data-digit-literal
               >
                 {state?.sources[key] ?? "—"}
+                {key === "mag" &&
+                  state?.running &&
+                  state.absolute &&
+                  state.q &&
+                  state.status.mag !== "live" && (
+                    <p className="text-[var(--teal)] mt-1">
+                      {t(
+                        "قطب‌نمای مغناطیسی فعال؛ میدان خام در دسترس نیست.",
+                        "Magnetic compass active; raw field unavailable.",
+                      )}
+                    </p>
+                  )}
               </div>
             </div>
           ))}
         </section>
+        <MagnetometerHelp
+          state={state}
+          retry={() => {
+            engine.current?.stop();
+            void start();
+          }}
+        />
         <div
           role="tablist"
-          aria-label={t("نمای آزمایشگاه", "Lab view")}
+          aria-label={t("نماهای سنسور و دینامیک", "Sensor & dynamics views")}
           className="sensor-tabs mb-6"
         >
           {[
             ["pose", t("جهت و آسمان", "Attitude & sky")],
-            ["traces", t("نمودار حسگرها", "Sensor traces")],
+            ["sky", t("آسمان زندهٔ دوربین عقب", "Live rear-camera sky")],
+            ["traces", t("نمودار حسگرها و کواترنیون", "Sensors & quaternions")],
+            [
+              "dynamics",
+              t("فیلتر و دینامیک؛ اختیاری", "Filter & dynamics · optional"),
+            ],
             ["calibration", t("کالیبراسیون", "Calibration")],
           ].map(([id, label]) => (
             <button
@@ -223,9 +260,19 @@ export function MobileSensors() {
               onKeyDown={(e) => {
                 if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
                   e.preventDefault();
-                  const ids = ["pose", "traces", "calibration"],
+                  const ids = [
+                      "pose",
+                      "sky",
+                      "traces",
+                      "dynamics",
+                      "calibration",
+                    ],
                     i = ids.indexOf(tab),
-                    next = ids[(i + (e.key === "ArrowRight" ? 1 : 2)) % 3];
+                    next =
+                      ids[
+                        (i + (e.key === "ArrowRight" ? 1 : ids.length - 1)) %
+                          ids.length
+                      ];
                   setTab(next);
                   document.getElementById(`tab-${next}`)?.focus();
                 }
@@ -237,6 +284,15 @@ export function MobileSensors() {
           ))}
         </div>
         <div id={`panel-${tab}`} role="tabpanel" aria-labelledby={`tab-${tab}`}>
+          {tab === "sky" && (
+            <CameraSky
+              snapshot={state}
+              declination={declination}
+              northConfirmed={trueNorth}
+              onReference={() => setTab("pose")}
+            />
+          )}
+          {tab === "dynamics" && <FilterDynamics snapshot={state} />}
           {tab === "pose" && (
             <div className="grid gap-5 lg:grid-cols-2">
               <section className="sensor-panel">
@@ -299,10 +355,7 @@ export function MobileSensors() {
               </section>
               <section className="sensor-panel space-y-4">
                 <h2>
-                  {t(
-                    "صفحهٔ گوشی به کجای آسمان نگاه می‌کند؟",
-                    "Where does the screen point on the sky?",
-                  )}
+                  {t("جهت نگاه گوشی به آسمان", "Phone pointing on the sky")}
                 </h2>
                 <label className="sensor-label">
                   {t("جهت انتخابی", "Pointing axis")}
@@ -536,6 +589,7 @@ export function MobileSensors() {
                   </p>
                 </section>
               ))}
+              <QuaternionPlots samples={state?.quaternions ?? []} />
               <section className="sensor-panel lg:col-span-2">
                 <h2>{t("تاریخچهٔ GPS", "GPS history")}</h2>
                 <GpsPlots fixes={state?.gpsHistory ?? []} />
@@ -736,7 +790,7 @@ export function MobileSensors() {
             "A secure browser and actual sensors are required. Android support varies by phone and browser; browser-reference mode remains usable when raw magnetometer access is unavailable. Missing measurements are never replaced with simulated readings.",
           )}
         </p>
-      </main>
+      </div>
     </LocalizedDigits>
   );
 }
@@ -756,7 +810,8 @@ function Readout({
         dir="ltr"
         className="text-xl tabular-nums break-words text-[var(--gold-soft)]"
       >
-        {value} <span className="text-xs text-[var(--muted)]">{unit}</span>
+        <LocalizedDigits>{value}</LocalizedDigits>{" "}
+        <span className="text-xs text-[var(--muted)]">{unit}</span>
       </div>
     </div>
   );

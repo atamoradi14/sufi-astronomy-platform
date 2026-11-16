@@ -1,4 +1,5 @@
 "use client";
+import { LocalizedDigits } from "@/components/digits/DigitScript";
 import { Sample } from "@/lib/mobile-sensors/capture";
 import { useLanguage } from "@/components/language/Language";
 const colors = ["var(--rose-ink)", "var(--teal)", "var(--gold)"];
@@ -7,16 +8,18 @@ export function SensorPlot({
   unit,
   labels = ["X", "Y", "Z"],
   rawOnly = false,
+  rawLabel,
 }: {
   samples: Sample[];
   unit: string;
   labels?: string[];
   rawOnly?: boolean;
+  rawLabel?: string;
 }) {
   const { t } = useLanguage();
   const values = samples.flatMap((s) => [...s.raw, ...s.filtered]);
   const lo = Math.min(0, ...values),
-    hi = Math.max(1, ...values),
+    hi = Math.max(0.000001, ...values),
     range = hi - lo,
     pad = range * 0.08;
   const start = samples[0]?.at ?? 0,
@@ -35,81 +38,83 @@ export function SensorPlot({
       )
       .join(" ");
   return (
-    <div className="min-w-0" dir="ltr">
-      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs mb-2">
-        {labels.map((label, i) => (
-          <span key={label} style={{ color: colors[i] }}>
-            {label}
+    <LocalizedDigits>
+      <div className="min-w-0" dir="ltr">
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs mb-2">
+          {labels.map((label, i) => (
+            <span key={label} style={{ color: colors[i] }}>
+              {label}
+            </span>
+          ))}
+          <span className="text-[var(--muted)]">
+            {rawOnly
+              ? (rawLabel ?? t("زاویه‌های خام", "Raw angles"))
+              : t(
+                  "خط پیوسته: فیلتر · خط‌چین: خام",
+                  "Solid: filtered · dashed: raw",
+                )}{" "}
+            · {unit}
           </span>
-        ))}
-        <span className="text-[var(--muted)]">
-          {rawOnly
-            ? t("زاویه‌های خام", "Raw angles")
-            : t(
-                "خط پیوسته: فیلتر · خط‌چین: خام",
-                "Solid: filtered · dashed: raw",
-              )}{" "}
-          · {unit}
-        </span>
-      </div>
-      <svg
-        viewBox="0 0 650 190"
-        role="img"
-        aria-label={`${labels.join(", ")} (${unit})`}
-        className="w-full overflow-visible"
-      >
-        {[0, 0.5, 1].map((f) => (
-          <g key={f}>
-            <line
-              x1="44"
-              x2="634"
-              y1={20 + 140 * f}
-              y2={20 + 140 * f}
-              stroke="var(--border)"
-            />
-            <text x="2" y={24 + 140 * f} fill="var(--muted)" fontSize="10">
-              {(hi + pad - f * (range + 2 * pad)).toFixed(1)}
-            </text>
-          </g>
-        ))}
-        {labels.map((_, axis) => (
-          <g key={axis}>
-            <path
-              d={path(axis, false)}
-              fill="none"
-              stroke={colors[axis]}
-              strokeWidth={rawOnly ? 1.6 : 1}
-              strokeDasharray={rawOnly ? undefined : "3 4"}
-              opacity={rawOnly ? 1 : 0.35}
-            />
-            {!rawOnly && (
+        </div>
+        <svg
+          viewBox="0 0 650 190"
+          role="img"
+          aria-label={`${labels.join(", ")} (${unit})`}
+          className="w-full overflow-visible"
+        >
+          {[0, 0.5, 1].map((f) => (
+            <g key={f}>
+              <line
+                x1="44"
+                x2="634"
+                y1={20 + 140 * f}
+                y2={20 + 140 * f}
+                stroke="var(--border)"
+              />
+              <text x="2" y={24 + 140 * f} fill="var(--muted)" fontSize="10">
+                {(hi + pad - f * (range + 2 * pad)).toPrecision(3)}
+              </text>
+            </g>
+          ))}
+          {labels.map((_, axis) => (
+            <g key={axis}>
               <path
-                d={path(axis, true)}
+                d={path(axis, false)}
                 fill="none"
                 stroke={colors[axis]}
-                strokeWidth="1.8"
+                strokeWidth={rawOnly ? 1.6 : 1}
+                strokeDasharray={rawOnly ? undefined : "3 4"}
+                opacity={rawOnly ? 1 : 0.35}
               />
-            )}
-          </g>
-        ))}
-        <text x="44" y="183" fill="var(--muted)" fontSize="11">
-          {Math.min(30, (end - start) / 1000).toFixed(0)} s ←
-        </text>
-        <text x="610" y="183" fill="var(--muted)" fontSize="11">
-          0 s
-        </text>
-        {!samples.length && (
-          <text
-            x="330"
-            y="95"
-            textAnchor="middle"
-            fill="var(--muted)"
-            fontSize="13"
-          >
-            {t("منتظر دادهٔ واقعی حسگر", "Waiting for actual sensor data")}
+              {!rawOnly && (
+                <path
+                  d={path(axis, true)}
+                  fill="none"
+                  stroke={colors[axis]}
+                  strokeWidth="1.8"
+                />
+              )}
+            </g>
+          ))}
+          <text x="44" y="183" fill="var(--muted)" fontSize="11">
+            {Math.min(30, (end - start) / 1000).toFixed(0)} s ←
           </text>
-        )}
-      </svg>
-    </div>
+          <text x="610" y="183" fill="var(--muted)" fontSize="11">
+            0 s
+          </text>
+          {!samples.length && (
+            <text
+              x="330"
+              y="95"
+              textAnchor="middle"
+              fill="var(--muted)"
+              fontSize="13"
+            >
+              {t("منتظر دادهٔ واقعی حسگر", "Waiting for actual sensor data")}
+            </text>
+          )}
+        </svg>
+      </div>
+    </LocalizedDigits>
   );
 }

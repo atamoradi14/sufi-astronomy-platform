@@ -6,7 +6,8 @@ import { AccessRequired } from "@/components/auth/AuthProvider";
 import { MobileSensors } from "@/components/mobile-sensors/MobileSensors";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "آزمایشگاه حسگرهای گوشی | Phone sensor lab",
+  title:
+    "سنسورهای گوشی و دینامیک سه بعدی لایو | Phone sensors & live 3D dynamics",
   alternates: { canonical: "/admin/sensors" },
   robots: { index: false, follow: false },
 };

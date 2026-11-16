@@ -32,7 +32,19 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   output: "standalone",
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      {
+        source: "/admin/sensors",
+        headers: [
+          {
+            key: "Permissions-Policy",
+            value:
+              "camera=(self), microphone=(), geolocation=(self), accelerometer=(self), gyroscope=(self), magnetometer=(self)",
+          },
+        ],
+      },
+    ];
   },
 };
 

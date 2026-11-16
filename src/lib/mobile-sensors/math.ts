@@ -129,6 +129,13 @@ function inverse(a: Matrix): Matrix {
  */
 export class AttitudeKalman {
   q: Quat | null = null;
+  measured: Quat | null = null;
+  predicted: Quat | null = null;
+  residual: Vec = [0, 0, 0];
+  correction: Vec = [0, 0, 0];
+  gain: Matrix = identity();
+  noiseDeg = 5;
+  nis = 0;
   p: Matrix = identity().map((r) => r.map((x) => x * (8 * RAD) ** 2));
   predict(rate: Vec, dt: number) {
     if (!this.q || dt <= 0 || dt > 0.15 || !finiteVec(rate)) return;
@@ -147,6 +154,13 @@ export class AttitudeKalman {
   update(measurement: Quat, noiseDeg = 5, dt = 0.1, hasGyro = false) {
     if (!measurement.every(Number.isFinite) || norm(measurement) < 0.5) return;
     const measured = normalized(measurement);
+    // q and -q encode the same attitude; align signs for continuous component plots.
+    this.measured =
+      this.q && measured.reduce((s, v, i) => s + v * this.q![i], 0) < 0
+        ? (measured.map((v) => -v) as Quat)
+        : measured;
+    this.predicted = this.q ? [...this.q] : [...measured];
+    this.noiseDeg = noiseDeg;
     if (!this.q) {
       this.q = measured;
       return;
@@ -159,14 +173,22 @@ export class AttitudeKalman {
         ),
       );
     const residual = log(mul(conjugate(this.q), measured));
+    this.residual = residual;
     // Large innovations during a real turn need quick acquisition, not a slow lock.
     const floor = (Math.max(2, noiseDeg) * RAD) ** 2;
     this.p = this.p.map((r, i) =>
       r.map((v, j) => (i === j ? Math.max(v, floor * 0.08) : v)),
     );
     const r = identity().map((row) => row.map((v) => v * floor));
-    const k = mm(this.p, inverse(add(this.p, r)));
+    const inverseS = inverse(add(this.p, r));
+    const k = mm(this.p, inverseS);
+    this.nis = dot(
+      residual,
+      inverseS.map((row) => dot(row as Vec, residual)) as Vec,
+    );
+    this.gain = k;
     const correction = k.map((row) => dot(row as Vec, residual)) as Vec;
+    this.correction = correction;
     this.q = normalized(mul(this.q, exp(correction)));
     const imk = identity().map((row, i) => row.map((v, j) => v - k[i][j]));
     this.p = add(
