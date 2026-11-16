@@ -1,4 +1,4 @@
-import { pageMetadata } from "@/lib/seo";
+import { pageMetadata, aboutStructuredData, safeJsonLd } from "@/lib/seo";
 import { BuilderStory } from "@/components/home/BuilderStory";
 import { InfoPage } from "@/components/seo/InfoPage";
 export const metadata = pageMetadata(
@@ -10,7 +10,13 @@ export default function Page() {
   return (
     <>
       <InfoPage kind="about" />
-      <BuilderStory />
+      <div id="ata-moradi">
+        <BuilderStory />
+      </div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(aboutStructuredData()) }}
+      />
     </>
   );
 }

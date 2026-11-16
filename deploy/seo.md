@@ -1,0 +1,15 @@
+# Search discovery and sitemap
+
+Canonical site: **https://fanous.online**. Submit **https://fanous.online/sitemap.xml** in the verified Search Console property's **Sitemaps** report. The public, human-readable directory is **https://fanous.online/directory** and is linked from the footer. Submission and verification in Search Console are separate from deployment; deployment does not mean Google has indexed the pages.
+
+The XML sitemap derives its canonical public page paths from `src/lib/site-pages.ts` and all lesson IDs from `LESSONS`. It currently contains 44 URLs, including all 33 lessons. It excludes redirect aliases, query variants, architecture notes, sign-in/admin and account-only sphere/sensor/atlas workspaces. Do not add invented modification dates or refresh every URL's date on each build. No split sitemap index is necessary at this size.
+
+`robots.txt` allows public pages and assets and advertises the XML sitemap. It disallows API crawling. Account-only HTML pages remain crawlable so Google can read their explicit `noindex`; server authentication and the administrator allowlist still protect their actual contents. Do not use robots.txt as access control, or block these HTML paths while relying on their noindex tag.
+
+Each public page has a distinct title, description and self-canonical URL. Course/proof query variants consolidate to their main route. Social metadata uses the current lantern identity and domain. Homepage `WebSite` data identifies the Persian name, English alternate and actual builder. About describes the same Person entity; lesson `LearningResource` data references that author, Smart's book and a `BreadcrumbList` matching the visible Home → Course → Lesson navigation. These schemas do not claim ratings, certification, complete textbook coverage or guaranteed search enhancements.
+
+Persian is the initial server-rendered language. English remains a user-selected view of the same URL. No fictional language URLs or identical-URL hreflang alternates are advertised. Separate, crawlable locale routes would be needed for full independent English search targeting.
+
+Before release, run the focused SEO/auth/language tests, lint/type checks and a production build. After deployment, use normal DNS/TLS without host overrides to retrieve `/sitemap.xml` and `/robots.txt`. Parse XML, verify every listed URL returns 200 and a matching canonical, check that private HTML remains noindex, verify unknown lesson URLs return 404, and check directory/breadcrumb rendering in both languages and small viewports. Preserve Google verification records and existing account backups.
+
+References: [Google sitemap guidance](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap), [noindex and robots interaction](https://developers.google.com/search/docs/crawling-indexing/block-indexing), [site names](https://developers.google.com/search/docs/appearance/site-names), [breadcrumbs](https://developers.google.com/search/docs/appearance/structured-data/breadcrumb), [multilingual URL guidance](https://developers.google.com/search/docs/specialty/international/managing-multi-regional-sites).

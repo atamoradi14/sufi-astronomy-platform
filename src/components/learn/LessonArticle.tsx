@@ -28,6 +28,30 @@ export function LessonArticle({ lesson }: { lesson: Lesson }) {
         >
           <div className="lesson-body space-y-7">
             <header className="space-y-5 pb-3">
+              <nav
+                aria-label={t("مسیر صفحه", "Breadcrumb")}
+                className="flex flex-wrap items-center gap-2 text-sm text-[var(--muted)]"
+              >
+                <Link
+                  prefetch={false}
+                  href="/"
+                  className="underline underline-offset-4"
+                >
+                  {t("خانه", "Home")}
+                </Link>
+                <span aria-hidden="true">/</span>
+                <Link
+                  prefetch={false}
+                  href="/course"
+                  className="underline underline-offset-4"
+                >
+                  {t("درس‌نامهٔ کروی", "Spherical course")}
+                </Link>
+                <span aria-hidden="true">/</span>
+                <span aria-current="page">
+                  {fa ? lesson.titleFa : lesson.titleEn}
+                </span>
+              </nav>
               <p className="study-kicker" dir="ltr">
                 {t("اسمارت / فصل", "SMART / CHAPTER")} {lesson.smart.chapter} /{" "}
                 {lesson.smart.sections}

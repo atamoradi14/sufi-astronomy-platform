@@ -1,4 +1,9 @@
-import { SITE_URL, safeJsonLd } from "@/lib/seo";
+import {
+  SITE_URL,
+  SITE_DESCRIPTION,
+  safeJsonLd,
+  websiteStructuredData,
+} from "@/lib/seo";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { LanguageRoot } from "@/components/language/Language";
 import type { Metadata, Viewport } from "next";
@@ -18,8 +23,14 @@ export const metadata: Metadata = {
     default: "فانوس خیال | نجوم، آسمان و میراث ایران",
     template: "%s | فانوس خیال",
   },
-  description:
-    "فانوس خیال، ساختهٔ عطا مرادی، وب‌سایتی برای شناختن زیبایی‌های آسمان؛ نقشهٔ شب، حسگر ستاره، کرهٔ تعاملی، اطلس صوفی و درس‌نامهٔ کروی در حال توسعه.",
+  description: SITE_DESCRIPTION,
+  authors: [{ name: "عطا مرادی", url: SITE_URL + "/about" }],
+  creator: "عطا مرادی",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { "max-image-preview": "large", "max-snippet": -1 },
+  },
   alternates: { canonical: "/" },
   keywords: [
     "درس‌نامه کروی",
@@ -29,7 +40,12 @@ export const metadata: Metadata = {
     "حسگر ستاره",
     "spherical astronomy",
   ],
-  twitter: { card: "summary_large_image", images: ["/social-card.png"] },
+  twitter: {
+    card: "summary_large_image",
+    title: "فانوس خیال | نجوم، آسمان و میراث ایران",
+    description: SITE_DESCRIPTION,
+    images: ["/social-card.png"],
+  },
   applicationName: "فانوس خیال",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
@@ -48,6 +64,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "فانوس خیال | Fanous-e Khial",
     siteName: "Fanous-e Khial",
+    description: SITE_DESCRIPTION,
     url: SITE_URL,
     type: "website",
     locale: "fa_IR",
@@ -97,20 +114,7 @@ export default function RootLayout({
                   <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{
-                      __html: safeJsonLd({
-                        "@context": "https://schema.org",
-                        "@type": "WebSite",
-                        name: "فانوس خیال",
-                        alternateName: "Fanous-e Khial",
-                        url: SITE_URL,
-                        inLanguage: ["fa", "en"],
-                        description: "پنجره‌ای برای شناختن زیبایی‌های آسمان",
-                        creator: {
-                          "@type": "Person",
-                          name: "Ata Moradi",
-                          alternateName: "عطا مرادی",
-                        },
-                      }),
+                      __html: safeJsonLd(websiteStructuredData()),
                     }}
                   />
                 </SiteFrame>

@@ -1,5 +1,11 @@
 import { LocalizedDigits } from "@/components/digits/DigitScript";
 import { TrackerMap } from "@/components/map/TrackerMap";
+import { pageMetadata } from "@/lib/seo";
+export const metadata = pageMetadata(
+  "نقشه و هندسهٔ کروی زمین",
+  "نقشهٔ تعاملی موقعیت و مسیر، دایره‌های زمینی و سمت قبله؛ نمونه‌هایی از کاربرد هندسهٔ کروی در فانوس خیال.",
+  "/map",
+);
 export default function MapPage() {
   return (
     <LocalizedDigits>

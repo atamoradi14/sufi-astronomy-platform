@@ -5,7 +5,9 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/api/", "/admin", "/sign-in", "/lab", "/sensor", "/atlas"],
+      // Let crawlers read the HTML noindex tags on account-only pages.
+      // Authentication, not robots.txt, protects their actual contents.
+      disallow: ["/api/"],
     },
     sitemap: SITE_URL + "/sitemap.xml",
     host: SITE_URL,

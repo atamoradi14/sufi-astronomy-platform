@@ -45,10 +45,10 @@ export function SiteFooter() {
               </Link>
               <Link
                 prefetch={false}
-                href="/architecture"
+                href="/directory"
                 className="hover:text-[var(--parchment)]"
               >
-                {t("معماری خدمات", "Architecture")}
+                {t("نقشهٔ سایت", "Sitemap")}
               </Link>
             </div>
           </div>

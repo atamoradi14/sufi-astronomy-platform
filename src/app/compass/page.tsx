@@ -1,5 +1,11 @@
 import { LocalizedDigits } from "@/components/digits/DigitScript";
 import { CompassQibla } from "@/components/compass/CompassQibla";
+import { pageMetadata } from "@/lib/seo";
+export const metadata = pageMetadata(
+  "قطب‌نما و محاسبهٔ سمت قبله",
+  "محاسبهٔ سمت قبله با هندسهٔ دایرهٔ عظیمه و نمایش جهت با حسگر دستگاه در صورت پشتیبانی؛ ابزار نجومی فانوس خیال.",
+  "/compass",
+);
 export default function CompassPage() {
   return (
     <LocalizedDigits>

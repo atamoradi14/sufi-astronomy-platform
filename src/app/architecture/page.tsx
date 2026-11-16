@@ -1,3 +1,9 @@
+import type { Metadata } from "next";
+export const metadata: Metadata = {
+  title: "معماری فنی",
+  alternates: { canonical: "/architecture" },
+  robots: { index: false, follow: true },
+};
 import { LocalizedDigits } from "@/components/digits/DigitScript";
 import {
   Card,

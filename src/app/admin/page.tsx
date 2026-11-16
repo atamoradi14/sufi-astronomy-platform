@@ -7,6 +7,7 @@ import { AdminUsers } from "@/components/auth/AdminUsers";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "مدیریت کاربران",
+  alternates: { canonical: "/admin" },
   robots: { index: false, follow: false },
 };
 export default async function Page() {
