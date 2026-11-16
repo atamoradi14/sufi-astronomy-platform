@@ -24,11 +24,13 @@ import {
 } from "../src/lib/mobile-sensors/math";
 import { canUseMobileSensors } from "../src/lib/mobile-sensors/access";
 import { SensorCapture } from "../src/lib/mobile-sensors/capture";
+import { automaticNorth } from "../src/lib/mobile-sensors/north";
 import {
   cameraProject,
   extrapolate,
   rearCameraFrame,
   verticalFovFromShortSide,
+  skyReadiness,
 } from "../src/lib/mobile-sensors/camera";
 import { equatorialToHorizontal } from "../src/lib/astronomy/sphere";
 import { lstHours } from "../src/lib/astronomy/time";
@@ -334,4 +336,64 @@ test("Every displayed dynamics/filter expression parses as strict KaTeX", () => 
     assert.doesNotThrow(() =>
       katex.renderToString(expression, { throwOnError: true, strict: "error" }),
     );
+});
+test("Automatic north correction needs no manual confirmation and matches published WMM fixtures", () => {
+  // Standard WMM2015 test values distributed with the model's reference tests.
+  for (const [lat, lon, decl] of [
+    [80, 0, -3.85],
+    [0, 120, 0.57],
+    [-80, -120, 69.81],
+  ]) {
+    const reference = automaticNorth(
+      new Date("2015-01-01T00:00:00Z"),
+      lat,
+      lon,
+      0,
+    );
+    near(reference.declination!, decl, 0.011);
+  }
+  const auckland = automaticNorth(
+    new Date("2026-11-17T12:00:00Z"),
+    -36.85,
+    174.76,
+    25,
+  );
+  assert.equal(auckland.model, "WMM-2025");
+  assert.ok(auckland.declination! > 19 && auckland.declination! < 22);
+  assert.equal(
+    automaticNorth(new Date(), undefined, undefined).reason,
+    "location",
+  );
+  assert.equal(automaticNorth(new Date("2040-01-01"), 35, 51).reason, "date");
+});
+test("Normal fused orientation plus GPS opens the sky without raw magnetometer or setup checkbox", () => {
+  const s = new SensorCapture().snapshot(),
+    now = Date.now();
+  s.running = true;
+  s.q = [0, 0, 0, 1];
+  s.absolute = true;
+  s.status.mag = "unsupported";
+  s.status.gps = "live";
+  s.gps = {
+    lat: 35,
+    lon: 51,
+    altitude: null,
+    accuracy: 5,
+    altitudeAccuracy: null,
+    speed: null,
+    course: null,
+    at: now,
+  };
+  const north = automaticNorth(new Date("2026-11-17"), 35, 51);
+  assert.equal(skyReadiness(s, north.declination !== null, now), null);
+  s.status.gps = "denied";
+  assert.equal(skyReadiness(s, true, now), "gps-denied");
+  s.status.gps = "live";
+  s.gps.at = now - 31000;
+  assert.equal(skyReadiness(s, true, now), "gps");
+  s.gps.at = now;
+  s.q = null;
+  assert.equal(skyReadiness(s, true, now), "orientation");
+  s.running = false;
+  assert.equal(skyReadiness(s, true, now), "stopped");
 });

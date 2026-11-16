@@ -9,6 +9,19 @@ import {
   rotate,
   Vec,
 } from "./math";
+import type { Snapshot } from "./capture";
+export function skyReadiness(
+  s: Snapshot | null,
+  northReady: boolean,
+  now = Date.now(),
+): "stopped" | "orientation" | "gps-denied" | "gps" | "north" | null {
+  if (!s?.running) return "stopped";
+  if (!s.q || !s.absolute) return "orientation";
+  if (s.status.gps === "denied") return "gps-denied";
+  if (!s.gps || s.status.gps !== "live" || now - s.gps.at > 30000) return "gps";
+  if (!northReady) return "north";
+  return null;
+}
 
 /** Physical rear camera: forward -Z, right +X, up +Y, never mirrored.
  * Display rotation changes right/up, not the physical rear pointing vector.

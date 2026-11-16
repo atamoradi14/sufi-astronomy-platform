@@ -1,7 +1,15 @@
 "use client";
-import { useEffect, useRef, useState, Component, ReactNode } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  Component,
+  ReactNode,
+} from "react";
 import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
+import { automaticNorth } from "@/lib/mobile-sensors/north";
 import { canUseMobileSensors } from "@/lib/mobile-sensors/access";
 import { SensorCapture, Snapshot, Status } from "@/lib/mobile-sensors/capture";
 import {
@@ -38,7 +46,10 @@ const statusText: Record<Status, [string, string]> = {
   idle: ["خاموش", "Off"],
   waiting: ["در انتظار مجوز یا داده", "Waiting for permission/data"],
   live: ["دریافت فعال", "Receiving"],
-  unsupported: ["API پشتیبانی نمی‌شود", "API unsupported"],
+  unsupported: [
+    "دادهٔ خام اختیاری در دسترس نیست",
+    "Optional raw data unavailable",
+  ],
   denied: ["مجوز رد شد", "Permission denied"],
   unavailable: ["داده‌ای دریافت نشد", "No data received"],
   stale: ["داده قدیمی است", "Stale data"],
@@ -63,9 +74,27 @@ export function MobileSensors() {
     [starting, setStarting] = useState(false),
     [tab, setTab] = useState("pose"),
     [axis, setAxis] = useState("camera");
-  const [declination, setDeclination] = useState(0),
-    [trueNorth, setTrueNorth] = useState(false),
+  const [manualDeclination, setManualDeclination] = useState(0),
+    [manualNorth, setManualNorth] = useState(false),
     [now, setNow] = useState(() => Date.now());
+  const day = new Date(now).toISOString().slice(0, 10);
+  const latitude = state?.gps?.lat,
+    longitude = state?.gps?.lon,
+    altitude = state?.gps?.altitude;
+  const north = useMemo(
+    () =>
+      automaticNorth(
+        new Date(day + "T12:00:00Z"),
+        latitude,
+        longitude,
+        altitude,
+      ),
+    [day, latitude, longitude, altitude],
+  );
+  const declination = manualNorth
+    ? manualDeclination
+    : (north.declination ?? 0);
+  const trueNorth = manualNorth || north.declination !== null;
   const authorized = canUseMobileSensors(session?.user?.email);
   useEffect(() => {
     const capture = new SensorCapture();
@@ -290,6 +319,7 @@ export function MobileSensors() {
               declination={declination}
               northConfirmed={trueNorth}
               onReference={() => setTab("pose")}
+              onStart={() => void start()}
             />
           )}
           {tab === "dynamics" && <FilterDynamics snapshot={state} />}
@@ -405,37 +435,57 @@ export function MobileSensors() {
                     unit="°"
                   />
                 </div>
-                <label className="sensor-label">
-                  {t(
-                    "میل مغناطیسی محل؛ شرق مثبت (درجه)",
-                    "Local magnetic declination; east positive (degrees)",
-                  )}
-                  <input
-                    type="number"
-                    min="-180"
-                    max="180"
-                    step="0.1"
-                    value={declination}
-                    onChange={(e) => {
-                      const v = Number(e.target.value);
-                      if (Number.isFinite(v))
-                        setDeclination(Math.max(-180, Math.min(180, v)));
-                      setTrueNorth(false);
-                    }}
-                  />
-                </label>
-                <label className="flex gap-2 items-start text-sm leading-6">
-                  <input
-                    className="mt-1"
-                    type="checkbox"
-                    checked={trueNorth}
-                    onChange={(e) => setTrueNorth(e.target.checked)}
-                  />
-                  {t(
-                    "میل مغناطیسی فعلی محل را بررسی و وارد کرده‌ام؛ مرجع شمال حقیقی را تأیید می‌کنم.",
-                    "I checked and entered the current local magnetic declination; confirm true-north correction.",
-                  )}
-                </label>
+                <p className="sensor-note" role="status">
+                  {north.declination !== null
+                    ? t(
+                        `تصحیح خودکار شمال حقیقی از GPS و مدل ${north.model}: ${north.declination.toFixed(2)}°؛ نیازی به تأیید دستی نیست.`,
+                        `Automatic true-north correction from GPS and ${north.model}: ${north.declination.toFixed(2)}°; no manual confirmation needed.`,
+                      )
+                    : t(
+                        "پس از دریافت GPS، تصحیح شمال به‌طور خودکار محاسبه می‌شود.",
+                        "True-north correction is calculated automatically after GPS arrives.",
+                      )}
+                </p>
+                <details className="text-sm leading-7">
+                  <summary className="cursor-pointer">
+                    {t(
+                      "تنظیم دستی شمال؛ اختیاری",
+                      "Manual north override · optional",
+                    )}
+                  </summary>
+                  <label className="flex gap-2 mt-3">
+                    <input
+                      type="checkbox"
+                      checked={manualNorth}
+                      onChange={(e) => setManualNorth(e.target.checked)}
+                    />
+                    {t(
+                      "استفاده از مقدار دستی به جای محاسبهٔ خودکار",
+                      "Use a manual value instead of automatic calculation",
+                    )}
+                  </label>
+                  <label className="sensor-label mt-3">
+                    {t(
+                      "میل مغناطیسی دستی؛ شرق مثبت (درجه)",
+                      "Manual magnetic declination; east positive (degrees)",
+                    )}
+                    <input
+                      type="number"
+                      min="-180"
+                      max="180"
+                      step="0.1"
+                      disabled={!manualNorth}
+                      value={manualDeclination}
+                      onChange={(e) => {
+                        const v = Number(e.target.value);
+                        if (Number.isFinite(v))
+                          setManualDeclination(
+                            Math.max(-180, Math.min(180, v)),
+                          );
+                      }}
+                    />
+                  </label>
+                </details>
                 <p className="sensor-note">
                   {!state?.absolute
                     ? t(
@@ -444,8 +494,8 @@ export function MobileSensors() {
                       )
                     : !trueNorth
                       ? t(
-                          "سمت نسبت به شمال مغناطیسی است (با آفست واردشده). برای بعد و میل، تصحیح شمال حقیقی را تأیید کنید.",
-                          "Azimuth uses magnetic north plus the entered offset. Confirm true-north correction to enable RA/Dec.",
+                          "سمت نسبت به شمال مغناطیسی است (با آفست واردشده). تصحیح خودکار شمال فعلاً در دسترس نیست.",
+                          "Azimuth uses magnetic north plus the entered offset. Automatic north correction is currently unavailable.",
                         )
                       : !freshGPS
                         ? t(

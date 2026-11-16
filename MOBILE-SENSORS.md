@@ -21,9 +21,10 @@ public sitemap. It is not bound to a particular phone model.
 5. Select the screen normal (+Z), rear camera direction (-Z), or physical top
    edge (+Y). The default is now the rear camera direction, toward the sky while
    you look at the screen. Face-up means altitude +90 degrees; azimuth there is undefined.
-6. Enter the current local magnetic declination (east positive) and confirm it
-   to enable approximate RA/Dec with a fresh GPS fix. Zero is not an automatic
-   geomagnetic-model calculation. Device clock accuracy matters.
+6. North correction is automatic from the current GPS fix and date using the
+   bundled WMM model (WMM2025 for current dates). No confirmation checkbox or
+   Chrome flags are needed. Advanced users can optionally override declination.
+
 
 Stop, navigation away, sign-out/account loss, or hiding the page stops capture.
 Returning to the page requires Start again. Samples and calibrations exist only
@@ -58,7 +59,8 @@ histories are also bounded to 300 records. Optional raw acquisition requests 50 
   yaw/roll lose uniqueness near pitch +/-90 degrees; the quaternion remains valid.
 - Positive magnetic declination applies a clockwise ENU correction to both the
   phone model and sky direction. Relative orientation cannot supply north or
-  equatorial sky coordinates. Fresh orientation and GPS checks prevent an old
+  equatorial sky coordinates. Automatic model correction is distinct from measured raw field data.
+  Fresh orientation and GPS checks prevent an old
   pose or location from looking live. RA/Dec are geometric approximations of date,
   without refraction, rather than a precision telescope pointing solution.
 - The 3D model shows attitude at a fixed origin. GPS is geographic position;
@@ -123,11 +125,17 @@ The new Persian name is **سنسورهای گوشی و دینامیک سه بع�
 
 A magnetic `deviceorientationabsolute` stream can work while `window.Magnetometer`
 is missing. They are different browser APIs. Chromium currently gates Magnetometer
-behind `SensorExtraClasses`, an experimental runtime feature. The page distinguishes
-working magnetic orientation from missing raw microtesla readings, offers restart/
-permission diagnostics, and explains an optional Chrome experimental-feature test.
-The site cannot turn on browser flags or derive a measured field vector from angles.
-No unit field, WMM estimate or fabricated vector is substituted for raw readings.
+behind `SensorExtraClasses`, an experimental runtime feature. Normal use does
+not require it: orientation, quaternion filtering and live sky use the browser's
+standard fused compass with motion and GPS permissions. Raw microtesla plots and
+TRIAD calibration remain optional and only use actual exposed raw readings.
+
+The sky no longer blocks on manual north confirmation. The modelled correction is
+computed locally and never replaces measured raw X/Y/Z. Missing GPS, denied GPS,
+missing orientation, catalog failures and model-date limits have separate status
+messages. Canvas exceptions have a retryable local error panel rather than taking
+down the page. The WMM model is pinned to geomagnetism 0.2.0; golden WMM fixtures
+and the normal-browser/no-raw-magnetometer path are regression tested.
 
 Primary implementation references:
 [Chromium Magnetometer IDL](https://raw.githubusercontent.com/chromium/chromium/main/third_party/blink/renderer/modules/sensor/magnetometer.idl),
