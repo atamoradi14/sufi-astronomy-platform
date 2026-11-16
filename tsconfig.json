@@ -23,5 +23,5 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", ".local", "tmp", "output"]
+  "exclude": ["node_modules", ".local", "tmp", "output", "android", "services/satellite"]
 }

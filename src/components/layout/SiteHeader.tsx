@@ -13,8 +13,6 @@ import {
 import { Menu, X, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/components/layout/Theme";
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { canUseMobileSensors } from "@/lib/mobile-sensors/access";
 const NAV = [
   { href: "/", label: "خانه", en: "Home" },
   { href: "/course", label: "درس‌نامهٔ کروی", en: "Spherical course" },
@@ -24,21 +22,12 @@ const NAV = [
   { href: "/atlas", label: "اطلس صوفی", en: "Sufi atlas" },
   { href: "/charts", label: "داده های لایو", en: "Live data" },
   { href: "/map", label: "نقشه", en: "Map" },
+  { href: "/satellite", label: "ماهوارهٔ خودت را بساز", en: "Build your own satellite" },
 ];
 export function SiteHeader() {
   const { language, fa, t } = useLanguage();
   const pathname = usePathname();
-  const { data: session } = useSession();
-  const navigation = canUseMobileSensors(session?.user?.email)
-    ? [
-        ...NAV,
-        {
-          href: "/admin/sensors",
-          label: "گوشی در نقش ماهواره",
-          en: "Phone as satellite",
-        },
-      ]
-    : NAV;
+  const navigation = NAV;
   const [open, setOpen] = useState(false);
   const digits = useDigitScript();
   const { theme, toggle } = useTheme();

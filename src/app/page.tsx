@@ -38,6 +38,21 @@ type Feature = {
 };
 const FEATURES: Feature[] = [
   {
+    id: "satellite",
+    href: "/satellite",
+    title: "ماهوارهٔ خودت را بساز",
+    titleEn: "Build your own satellite",
+    eyebrow: "گوشی، حسگرها و مدار",
+    eyebrowEn: "Your phone, sensors & orbit",
+    description:
+      "برنامهٔ اندروید را نصب کن، گوشی را با حساب گوگل تأیید کن و حسگرها، وضعیت سه‌بعدی و آسمان دوربین را روی گوشی یا لپ‌تاپ ببین. با شش عنصر مداری، ماهوارهٔ آزمایشی خودت را شبیه‌سازی کن.",
+    descriptionEn:
+      "Install the Android app, approve your phone with Google, and watch live sensors, 3D attitude and the camera-aligned sky on your phone or laptop. Simulate a spacecraft with six orbital elements.",
+    cta: "دانلود و اتصال گوشی",
+    ctaEn: "Download & connect your phone",
+    developing: true,
+  },
+  {
     id: "sky",
     href: "/sky",
     title: "امشب، آسمان را جور دیگری ببینید.",

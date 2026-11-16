@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fanous-satellite-data
+  namespace: astronomy
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fanous-satellite
+  namespace: astronomy
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: fanous-satellite
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: fanous-satellite
+      annotations:
+        fanous.online/source-revision: "SOURCE_REVISION"
+        fanous.online/config: "CONFIG_SHA"
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: ravand-worker-01
+      automountServiceAccountToken: false
+      imagePullSecrets:
+        - name: manderia-registry
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: fanous-satellite-data
+      containers:
+        - name: telemetry
+          image: IMAGE_REF
+          ports:
+            - name: http
+              containerPort: 3860
+          envFrom:
+            - secretRef:
+                name: fanous-satellite-config
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          resources:
+            requests:
+              cpu: 100m
+              memory: 96Mi
+            limits:
+              cpu: "1"
+              memory: 384Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fanous-satellite
+  namespace: astronomy
+spec:
+  selector:
+    app.kubernetes.io/name: fanous-satellite
+  ports:
+    - name: http
+      port: 3860
+      targetPort: http

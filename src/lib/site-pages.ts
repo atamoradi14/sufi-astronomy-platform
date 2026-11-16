@@ -13,6 +13,11 @@ export const PUBLIC_PAGES = [
     en: "About the site and builder",
   },
   { path: "/tools", fa: "راهنمای ابزارهای نجوم", en: "Astronomy tool guide" },
+  {
+    path: "/satellite",
+    fa: "ماهوارهٔ خودت را بساز",
+    en: "Build your own satellite",
+  },
   { path: "/privacy", fa: "حریم خصوصی", en: "Privacy" },
   {
     path: "/directory",

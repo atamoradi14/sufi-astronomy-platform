@@ -35,12 +35,12 @@ const nextConfig: NextConfig = {
     return [
       { source: "/:path*", headers: securityHeaders },
       {
-        source: "/admin/sensors",
+        source: "/satellite",
         headers: [
           {
             key: "Permissions-Policy",
             value:
-              "camera=(self), microphone=(), geolocation=(self), accelerometer=(self), gyroscope=(self), magnetometer=(self)",
+              "camera=(), microphone=(), geolocation=(), accelerometer=(), gyroscope=(), magnetometer=()",
           },
         ],
       },

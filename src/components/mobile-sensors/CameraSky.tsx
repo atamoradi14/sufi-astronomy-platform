@@ -23,6 +23,9 @@ import {
 } from "@/lib/mobile-sensors/camera";
 import { exp, mul, Quat, RAD, Vec } from "@/lib/mobile-sensors/math";
 import { greatArc, sphToCart, cartToLonLat } from "@/lib/astronomy/sphereGeom";
+import type { CameraFrame } from "@/lib/satellite/remote";
+import { earthOccults, EARTH_RADIUS_KM } from "@/lib/satellite/orbit";
+import { unit, cross } from "@/lib/mobile-sensors/math";
 import { Snapshot } from "@/lib/mobile-sensors/capture";
 type Constellation = {
   id: string;
@@ -38,17 +41,29 @@ export default function CameraSky({
   northConfirmed,
   onReference,
   onStart,
+  remote,
+  spaceView,
 }: {
   snapshot: Snapshot | null;
   declination: number;
   northConfirmed: boolean;
   onReference: () => void;
   onStart: () => void;
+  remote?: { screenAngle: number; image: CameraFrame | null };
+  spaceView?: { q: Quat; positionKm: Vec };
 }) {
   const { t, fa } = useLanguage(),
     digits = useDigitScript();
   const latest = useRef(snapshot);
   latest.current = snapshot;
+  const latestRemote = useRef(remote);
+  latestRemote.current = remote;
+  const latestSpace = useRef(spaceView);
+  latestSpace.current = spaceView;
+  const remoteMode = !!remote,
+    spaceMode = !!spaceView;
+  const [showRemoteCamera, setShowRemoteCamera] = useState(true);
+  const [nativeFov, setNativeFov] = useState(true);
   const canvas = useRef<HTMLCanvasElement>(null),
     stage = useRef<HTMLDivElement>(null),
     video = useRef<HTMLVideoElement>(null);
@@ -169,31 +184,48 @@ export default function CameraSky({
       const { w, h } = size;
       if (!w || !h) return;
       ctx.clearRect(0, 0, w, h);
-      if (!camera) {
+      const remoteFrame = latestRemote.current?.image;
+      const remoteVisible =
+        !!remoteFrame &&
+        showRemoteCamera &&
+        !spaceMode &&
+        Date.now() - remoteFrame.receivedAt < 5000;
+      if (!camera && !remoteVisible) {
         ctx.fillStyle = "#081522";
         ctx.fillRect(0, 0, w, h);
       }
       const s = latest.current,
         gps = s?.gps;
-      const valid = skyReadiness(s, northConfirmed) === null;
-      if (!valid || !catalog || renderError || !s?.q || !gps) return;
+      const valid = spaceMode || skyReadiness(s, northConfirmed) === null;
+      if (!valid || !catalog || renderError || (!spaceMode && (!s?.q || !gps)))
+        return;
       try {
         // Date-dependent J2000 -> local horizon rotation, including precession/nutation.
-        const key = `${Math.floor(Date.now() / 1000)}:${gps.lat}:${gps.lon}:${magnitude}:${refract}`;
+        const key = spaceMode
+          ? `space:${magnitude}`
+          : `${Math.floor(Date.now() / 1000)}:${gps!.lat}:${gps!.lon}:${magnitude}:${refract}`;
         if (key !== cacheKey) {
           cacheKey = key;
           const date = new Date(),
             time = MakeTime(date),
-            rotation = Rotation_EQJ_HOR(
-              time,
-              new Observer(gps.lat, gps.lon, 0),
-            );
+            rotation = spaceMode
+              ? null
+              : Rotation_EQJ_HOR(time, new Observer(gps!.lat, gps!.lon, 0));
           const toENU = (ra: number, dec: number): Vec => {
+            if (spaceMode) {
+              const a = ra * 15 * RAD,
+                d = dec * RAD;
+              return [
+                Math.cos(d) * Math.cos(a),
+                Math.cos(d) * Math.sin(a),
+                Math.sin(d),
+              ];
+            }
             const a = ra * 15 * RAD,
               d = dec * RAD,
               cd = Math.cos(d),
               v = RotateVector(
-                rotation,
+                rotation!,
                 new Vector(
                   cd * Math.cos(a),
                   cd * Math.sin(a),
@@ -236,24 +268,52 @@ export default function CameraSky({
             ),
           );
         }
-        const extrapolated = extrapolate(
-          s.q!,
-          s.rate,
-          (performance.now() - s.poseAt) / 1000,
-        );
-        const corrected: Quat = mul(
-            exp([0, 0, -declination * RAD]),
-            extrapolated,
-          ),
-          frame = rearCameraFrame(corrected, screen.orientation?.angle ?? 0);
+        const extrapolated = spaceMode
+          ? latestSpace.current!.q
+          : remoteVisible && remoteFrame?.q
+            ? remoteFrame.q
+            : extrapolate(
+                s!.q!,
+                s!.rate,
+                (performance.now() - s!.poseAt) / 1000,
+              );
+        const corrected: Quat = spaceMode
+            ? extrapolated
+            : mul(exp([0, 0, -declination * RAD]), extrapolated),
+          frame = rearCameraFrame(
+            corrected,
+            remoteMode
+              ? remoteVisible
+                ? remoteFrame!.screenAngle
+                : latestRemote.current!.screenAngle
+              : (screen.orientation?.angle ?? 0),
+          );
+        const aspect = remoteVisible
+          ? remoteFrame!.width / remoteFrame!.height
+          : w / h;
+        const vw = Math.min(w, h * aspect),
+          vh = vw / aspect;
+        const reportedFov = remoteFrame?.shortFovDegrees;
+        const opticalFov =
+          remoteVisible &&
+          nativeFov &&
+          reportedFov &&
+          reportedFov > 10 &&
+          reportedFov < 150
+            ? reportedFov
+            : fov;
         const project = (v: Vec) => {
-          const verticalFov = verticalFovFromShortSide(fov, w / h);
-          const p = cameraProject(v, frame, verticalFov, w / h);
-          return { ...p, x: w / 2 + (p.x * w) / 2, y: h / 2 - (p.y * h) / 2 };
+          const p = cameraProject(
+            v,
+            frame,
+            verticalFovFromShortSide(opticalFov, aspect),
+            aspect,
+          );
+          return { ...p, x: w / 2 + (p.x * vw) / 2, y: h / 2 - (p.y * vh) / 2 };
         };
         ctx.save();
         ctx.beginPath();
-        ctx.rect(0, 0, w, h);
+        ctx.rect((w - vw) / 2, (h - vh) / 2, vw, vh);
         ctx.clip();
         if (lines) {
           ctx.strokeStyle = camera
@@ -266,7 +326,9 @@ export default function CameraSky({
             for (const v of segment) {
               const p = project(v);
               if (
-                v[2] >= 0 &&
+                (spaceMode
+                  ? !earthOccults(latestSpace.current!.positionKm, v)
+                  : v[2] >= 0) &&
                 p.visible &&
                 Math.abs(p.x - w / 2) < w * 3 &&
                 Math.abs(p.y - h / 2) < h * 3
@@ -283,7 +345,12 @@ export default function CameraSky({
         ctx.font = `11px ${fontFamily}`;
         let count = 0;
         for (const { star, v } of stars) {
-          if (v[2] < 0) continue;
+          if (
+            spaceMode
+              ? earthOccults(latestSpace.current!.positionKm, v)
+              : v[2] < 0
+          )
+            continue;
           const p = project(v);
           if (!p.visible || p.x < 0 || p.x > w || p.y < 0 || p.y > h) continue;
           count++;
@@ -302,25 +369,59 @@ export default function CameraSky({
             ctx.fillText(star.n, p.x + 5, p.y - 4);
           }
         }
-        // Geometric horizon follows all camera rotations; no flat-screen horizon assumption.
-        ctx.beginPath();
-        ctx.strokeStyle = "#d5b574";
-        ctx.lineWidth = 1.5;
-        let pen = false;
-        for (let az = 0; az <= 360; az++) {
-          const a = az * RAD,
-            p = project([Math.sin(a), Math.cos(a), 0]);
-          if (
-            p.visible &&
-            Math.abs(p.x - w / 2) < w * 4 &&
-            Math.abs(p.y - h / 2) < h * 4
-          ) {
-            if (pen) ctx.lineTo(p.x, p.y);
-            else ctx.moveTo(p.x, p.y);
-            pen = true;
-          } else pen = false;
+        if (spaceMode) {
+          const r = latestSpace.current!.positionKm,
+            center = unit(r.map((v) => -v) as Vec),
+            edge = unit(
+              cross(center, Math.abs(center[2]) < 0.8 ? [0, 0, 1] : [0, 1, 0]),
+            ),
+            other = cross(center, edge),
+            radius = Math.asin(EARTH_RADIUS_KM / Math.hypot(...r));
+          ctx.beginPath();
+          ctx.strokeStyle = "#6cacd6";
+          ctx.lineWidth = 2;
+          let pen = false;
+          for (let i = 0; i <= 360; i++) {
+            const a = i * RAD,
+              v = center.map(
+                (n, j) =>
+                  n * Math.cos(radius) +
+                  (edge[j] * Math.cos(a) + other[j] * Math.sin(a)) *
+                    Math.sin(radius),
+              ) as Vec,
+              p = project(v);
+            if (
+              p.visible &&
+              Math.abs(p.x - w / 2) < w * 4 &&
+              Math.abs(p.y - h / 2) < h * 4
+            ) {
+              if (pen) ctx.lineTo(p.x, p.y);
+              else ctx.moveTo(p.x, p.y);
+              pen = true;
+            } else pen = false;
+          }
+          ctx.stroke();
+        } else {
+          // Geometric horizon follows all camera rotations; no flat-screen horizon assumption.
+          ctx.beginPath();
+          ctx.strokeStyle = "#d5b574";
+          ctx.lineWidth = 1.5;
+          let pen = false;
+          for (let az = 0; az <= 360; az++) {
+            const a = az * RAD,
+              p = project([Math.sin(a), Math.cos(a), 0]);
+            if (
+              p.visible &&
+              Math.abs(p.x - w / 2) < w * 4 &&
+              Math.abs(p.y - h / 2) < h * 4
+            ) {
+              if (pen) ctx.lineTo(p.x, p.y);
+              else ctx.moveTo(p.x, p.y);
+              pen = true;
+            } else pen = false;
+          }
+          ctx.stroke();
         }
-        ctx.stroke();
         ctx.strokeStyle = "#e7c888";
         ctx.beginPath();
         ctx.arc(w / 2, h / 2, 9, 0, Math.PI * 2);
@@ -368,13 +469,21 @@ export default function CameraSky({
     fa,
     digits,
     renderError,
+    remoteMode,
+    spaceMode,
+    showRemoteCamera,
+    nativeFov,
   ]);
-  const readiness = skyReadiness(snapshot, northConfirmed);
+  const readiness = spaceMode ? null : skyReadiness(snapshot, northConfirmed);
   const readinessMessage =
     readiness === "stopped"
       ? t(
-          "برای نمایش آسمان، دریافت حسگر و موقعیت را شروع کنید.",
-          "Start sensors and location to show the sky.",
+          remoteMode
+            ? "ارسال را در برنامهٔ اندروید شروع کنید تا آسمان این گوشی نمایش داده شود."
+            : "برای نمایش آسمان، دریافت حسگر و موقعیت را شروع کنید.",
+          remoteMode
+            ? "Start transmission in the Android app to show this phone’s sky."
+            : "Start sensors and location to show the sky.",
         )
       : readiness === "orientation"
         ? t(
@@ -399,7 +508,11 @@ export default function CameraSky({
               : null;
   return (
     <section className="sensor-panel space-y-4">
-      <h2>{t("آسمان زنده از پشت گوشی", "Live rear-camera sky")}</h2>
+      <h2>
+        {spaceMode
+          ? t("آسمان شبیه‌سازی‌شده از مدار", "Simulated sky from orbit")
+          : t("آسمان زنده از پشت گوشی", "Live rear-camera sky")}
+      </h2>
       <p className="sensor-note">
         {t(
           "مرکز میدان دید دقیقاً در راستای −Z گوشی است؛ راست و بالای تصویر از محورهای فیزیکی و چرخش نمایشگر می‌آیند. با حرکت یا چرخاندن گوشی، ستاره‌ها و صور فلکی در همین تب به‌روز می‌شوند؛ تغییر تب دریافت حسگر را قطع نمی‌کند.",
@@ -411,6 +524,19 @@ export default function CameraSky({
         className="relative h-[min(65vh,620px)] min-h-80 overflow-hidden rounded-xl border border-[var(--border)] bg-[#081522]"
         style={{ touchAction: "pan-y" }}
       >
+        {remoteMode &&
+          !spaceMode &&
+          showRemoteCamera &&
+          remote?.image &&
+          Date.now() - remote.image.receivedAt < 5000 && (
+            // Native JPEG object URLs must remain unmodified for geometric alignment.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={remote.image.url}
+              alt={t("تصویر دوربین گوشی متصل", "Connected phone camera frame")}
+              className="absolute inset-0 h-full w-full object-contain"
+            />
+          )}
         <video
           ref={video}
           playsInline
@@ -449,11 +575,12 @@ export default function CameraSky({
                       "Loading the star catalog…",
                     ))}
             </p>
-            {(readiness === "stopped" || readiness === "gps-denied") && (
-              <button className="sensor-primary" onClick={onStart}>
-                {t("شروع و درخواست مجوز", "Start & request permission")}
-              </button>
-            )}
+            {!remoteMode &&
+              (readiness === "stopped" || readiness === "gps-denied") && (
+                <button className="sensor-primary" onClick={onStart}>
+                  {t("شروع و درخواست مجوز", "Start & request permission")}
+                </button>
+              )}
             {readiness === "north" && (
               <button className="sensor-button" onClick={onReference}>
                 {t("تنظیم پیشرفتهٔ شمال", "Advanced north settings")}
@@ -499,7 +626,10 @@ export default function CameraSky({
             max="110"
             step="1"
             value={fov}
-            onChange={(e) => setFov(Number(e.target.value))}
+            onChange={(e) => {
+              setFov(Number(e.target.value));
+              setNativeFov(false);
+            }}
           />
           <span>{formatDigits(fov, digits)}°</span>
         </label>
@@ -527,28 +657,69 @@ export default function CameraSky({
               t("شکست استاندارد جو", "Standard refraction"),
             ],
           ] as const
-        ).map(([value, set, label]) => (
-          <label key={label} className="flex gap-2 items-center">
+        )
+          .filter(
+            ([, , label]) =>
+              !spaceMode ||
+              label !== t("شکست استاندارد جو", "Standard refraction"),
+          )
+          .map(([value, set, label]) => (
+            <label key={label} className="flex gap-2 items-center">
+              <input
+                type="checkbox"
+                checked={value}
+                onChange={(e) => set(e.target.checked)}
+              />
+              {label}
+            </label>
+          ))}
+      </div>
+      {remoteMode ? (
+        <p className="sensor-note">
+          {t(
+            "دوربین و ارسال حسگر فقط از برنامهٔ اندروید آغاز می‌شود.",
+            "Camera and sensor publishing can only be started in the Android app.",
+          )}
+        </p>
+      ) : (
+        <button
+          className="sensor-button"
+          disabled={!snapshot?.running || cameraBusy}
+          onClick={() => (camera ? stopCamera() : void startCamera())}
+        >
+          {camera
+            ? t("خاموش‌کردن دوربین", "Turn camera off")
+            : cameraBusy
+              ? t("درخواست مجوز دوربین…", "Requesting camera permission…")
+              : t(
+                  "نمایش دوربین عقب با مجوز",
+                  "Show rear camera with permission",
+                )}
+        </button>
+      )}
+      {remoteMode && !spaceMode && (
+        <div className="space-y-3">
+          <label className="flex gap-2 text-sm">
             <input
               type="checkbox"
-              checked={value}
-              onChange={(e) => set(e.target.checked)}
+              checked={showRemoteCamera}
+              onChange={(e) => setShowRemoteCamera(e.target.checked)}
             />
-            {label}
+            {t("نمایش تصویر دریافتی گوشی", "Show received phone camera frames")}
           </label>
-        ))}
-      </div>
-      <button
-        className="sensor-button"
-        disabled={!snapshot?.running || cameraBusy}
-        onClick={() => (camera ? stopCamera() : void startCamera())}
-      >
-        {camera
-          ? t("خاموش‌کردن دوربین", "Turn camera off")
-          : cameraBusy
-            ? t("درخواست مجوز دوربین…", "Requesting camera permission…")
-            : t("نمایش دوربین عقب با مجوز", "Show rear camera with permission")}
-      </button>
+          <label className="flex gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={nativeFov}
+              onChange={(e) => setNativeFov(e.target.checked)}
+            />
+            {t(
+              "استفاده از میدان دید گزارش‌شدهٔ لنز گوشی",
+              "Use phone-reported lens field of view",
+            )}
+          </label>
+        </div>
+      )}
       {cameraError && (
         <p role="status" className="sensor-note">
           {t(
@@ -558,10 +729,20 @@ export default function CameraSky({
         </p>
       )}
       <p className="sensor-note">
-        {t(
-          "این تصویر آینه‌ای نیست. با تغییر جهت نمایشگر، نسبت میدان دید افقی و عمودی خودکار تغییر می‌کند. مرورگر پارامترهای دقیق لنز و هم‌راستایی حسگر با دوربین را ارائه نمی‌کند؛ میدان دید را با ستاره‌های شناخته‌شده تنظیم کنید. ستاره‌ها از کاتالوگ واقعی J2000 با تصحیح تقدیم، ترقّص و زمان/موقعیت فعلی محاسبه می‌شوند؛ دقت نهایی به قطب‌نما، میل مغناطیسی و لنز بستگی دارد. تصویر دوربین روی دستگاه می‌ماند و هنگام ترک این تب یا پنهان‌شدن صفحه متوقف می‌شود.",
-          "This view is not mirrored. Horizontal/vertical FOV adapts to display aspect. Browsers do not expose exact lens intrinsics or sensor-to-camera alignment; tune FOV against known stars. Real J2000 catalog stars include precession/nutation and current time/location. Final alignment depends on compass, declination and lens calibration. Camera video stays on-device and stops when leaving this tab or hiding the page.",
-        )}
+        {spaceMode
+          ? t(
+              "آسمان مداری از کاتالوگ J2000 و وضعیت شبیه‌سازی‌شده رسم می‌شود؛ زمین ستاره‌های پشت خود را می‌پوشاند. این نما تصویر واقعی دوربین نیست.",
+              "The orbital sky uses the J2000 catalog and simulated attitude; Earth occults stars behind it. This is a simulated view.",
+            )
+          : remoteMode
+            ? t(
+                "تصویر دوربین با فعال‌سازی روی گوشی به سرور و نمایشگرهای همان حساب ارسال می‌شود؛ ذخیرهٔ تاریخی نمی‌شود. برای قطع ارسال از برنامهٔ گوشی استفاده کن. میدان دید از مشخصات لنز تخمین زده می‌شود و تنظیم دستی هم دارد؛ دقت نهایی به قطب‌نما، کالیبراسیون و هم‌راستایی لنز بستگی دارد.",
+                "Camera frames, when enabled on the phone, pass through the server to viewers on your account without historical recording. Stop transmission in the phone app. Lens specifications estimate FOV, with manual adjustment available; final alignment depends on compass, calibration and lens alignment.",
+              )
+            : t(
+                "این تصویر آینه‌ای نیست. با تغییر جهت نمایشگر، نسبت میدان دید افقی و عمودی خودکار تغییر می‌کند. مرورگر پارامترهای دقیق لنز و هم‌راستایی حسگر با دوربین را ارائه نمی‌کند؛ میدان دید را با ستاره‌های شناخته‌شده تنظیم کنید. ستاره‌ها از کاتالوگ واقعی J2000 با تصحیح تقدیم، ترقّص و زمان/موقعیت فعلی محاسبه می‌شوند؛ دقت نهایی به قطب‌نما، میل مغناطیسی و لنز بستگی دارد. تصویر دوربین روی دستگاه می‌ماند و هنگام ترک این تب یا پنهان‌شدن صفحه متوقف می‌شود.",
+                "This view is not mirrored. Horizontal/vertical FOV adapts to display aspect. Browsers do not expose exact lens intrinsics or sensor-to-camera alignment; tune FOV against known stars. Real J2000 catalog stars include precession/nutation and current time/location. Final alignment depends on compass, declination and lens calibration. Camera video stays on-device and stops when leaving this tab or hiding the page.",
+              )}
       </p>
     </section>
   );

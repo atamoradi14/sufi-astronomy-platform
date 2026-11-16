@@ -53,6 +53,13 @@ export function InfoPage({ kind }: { kind: "about" | "privacy" | "tools" }) {
       ),
       sections: [
         [
+          t("گوشی به‌عنوان ماهواره", "Phone satellite relay"),
+          t(
+            "برنامهٔ اندروید فقط پس از شروع شما حسگرها و موقعیت را به سرویس ماهواره می‌فرستد. دوربین اختیاری است و فقط روی گوشی روشن می‌شود. داده‌ها و فریم‌های دوربین برای نمایش زنده از سرور عبور می‌کنند و ذخیرهٔ تاریخی ندارند؛ حافظهٔ موقت تا ۶۰۰ نمونهٔ آخر را نگه می‌دارد. نام و مدل گوشی، مالک، زمان اتصال و وضعیت ابطال در پایگاه دادهٔ جدا ذخیره می‌شود. فقط نشست‌های همان حساب تأییدشده دسترسی دارند. ارسال را از اعلان اندروید متوقف و دسترسی گوشی را از اتاق کنترل باطل کنید.",
+            "The Android app sends sensors and location only after you start it. Camera is optional and can only be enabled on the phone. Telemetry and camera frames pass through the server for live viewing without historical recording; memory holds up to 600 recent samples. Device name/model, owner, connection times and revocation state are stored in a separate database. Only sessions of the approving account can view them. Stop sending from the Android notification and revoke a device from your control room.",
+          ),
+        ],
+        [
           t("اطلاعات حساب", "Account information"),
           t(
             "شناسهٔ گوگل، نام، ایمیل، نشانی تصویر نمایه، زمان ثبت‌نام، آخرین ورود و تعداد ورود در پایگاه دادهٔ حساب‌ها ذخیره می‌شوند. فقط مدیر مجاز فهرست کاربران را می‌بیند.",

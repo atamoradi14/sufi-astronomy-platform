@@ -48,3 +48,11 @@ next-env.d.ts
 /.releases/
 
 __pycache__/
+
+# Native Android and isolated satellite service build outputs
+/android/.gradle/
+/android/**/build/
+/android/local.properties
+/android/*.jks
+/services/satellite/node_modules/
+/services/satellite/dist/

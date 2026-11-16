@@ -1,0 +1,10 @@
+{
+  "version": "1.0.0",
+  "bytes": 1036370,
+  "url": "/satellite-api/download/fanous-satellite.apk",
+  "targetSdk": 35,
+  "versionCode": 1,
+  "minSdk": 26,
+  "package": "online.fanous.satellite",
+  "sha256": "a79d8d5761b290dff90ab4eb785deb5c541d47d85494a733c42b1224eb83b9fd"
+}

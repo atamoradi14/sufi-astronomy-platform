@@ -9,6 +9,7 @@ export type PreviewKind =
   | "charts"
   | "course"
   | "map"
+  | "satellite"
   | "compass";
 function Stars() {
   return (
@@ -97,6 +98,47 @@ export function FeaturePreview({
           </defs>
           <rect width="640" height="360" fill={"url(#" + id + "glow)"} />
           <Stars />
+          {kind === "satellite" && (
+            <>
+              <circle
+                cx="320"
+                cy="195"
+                r="100"
+                fill="#183f59"
+                stroke="#6c9fae"
+              />
+              <ellipse
+                cx="320"
+                cy="195"
+                rx="245"
+                ry="65"
+                transform="rotate(-25 320 195)"
+                stroke="#d5b574"
+                strokeDasharray="6 7"
+              />
+              <g transform="translate(495 120) rotate(25)">
+                <rect
+                  x="-19"
+                  y="-32"
+                  width="38"
+                  height="64"
+                  rx="5"
+                  fill="#d5b574"
+                />
+                <rect x="-14" y="-25" width="28" height="48" fill="#54aabb" />
+                <path
+                  d="M-23 0h-54m100 0h54"
+                  stroke="#95bdcb"
+                  strokeWidth="24"
+                />
+              </g>
+              <path
+                d="M464 169Q481 190 477 214M448 181Q461 195 457 212"
+                stroke="#6cc5ba"
+                strokeWidth="3"
+              />
+            </>
+          )}
           {(kind === "sky" || kind === "sensor") && (
             <>
               <g stroke="#43677b" strokeWidth=".8" opacity=".4">
