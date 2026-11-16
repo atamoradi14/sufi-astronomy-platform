@@ -131,6 +131,10 @@ export class SensorCapture {
     this.stop();
     this.running = true;
     const generation = ++this.generation;
+    // Permission dialogs can outlive visibility: cancel before any stream starts.
+    this.listen(document, "visibilitychange", () => {
+      if (document.hidden) this.stop();
+    });
     this.startedAt = performance.now();
     this.last = {};
     this.histories = {
@@ -174,6 +178,10 @@ export class SensorCapture {
     );
     const [op, mp] = await Promise.allSettled([orientation, motion]);
     if (!this.running || generation !== this.generation) return;
+    if (document.hidden) {
+      this.stop();
+      return;
+    }
     if (!isSecureContext) {
       streams.forEach((s) => (this.status[s] = "unavailable"));
       this.stop();
@@ -294,9 +302,6 @@ export class SensorCapture {
       );
       this.cleanups.push(() => navigator.geolocation.clearWatch(watch));
     }
-    this.listen(document, "visibilitychange", () => {
-      if (document.hidden) this.stop();
-    });
   }
   private listen(
     target: Window | Document,

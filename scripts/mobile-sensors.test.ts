@@ -20,10 +20,63 @@ import {
   Vec,
 } from "../src/lib/mobile-sensors/math";
 import { canUseMobileSensors } from "../src/lib/mobile-sensors/access";
+import { SensorCapture } from "../src/lib/mobile-sensors/capture";
 import { equatorialToHorizontal } from "../src/lib/astronomy/sphere";
 import { lstHours } from "../src/lib/astronomy/time";
 const near = (a: number, b: number, tol = 1e-6) =>
   assert.ok(Math.abs(a - b) < tol, `${a} != ${b}`);
+test("Hiding while permission is pending cancels capture before GPS or raw sensors start", async () => {
+  const saved = new Map(
+    ["window", "document", "navigator"].map((key) => [
+      key,
+      Object.getOwnPropertyDescriptor(globalThis, key),
+    ]),
+  );
+  const pending: ((value: string) => void)[] = [];
+  const permission = () =>
+    new Promise<string>((resolve) => pending.push(resolve));
+  const doc = Object.assign(new EventTarget(), { hidden: false });
+  let gpsRequests = 0;
+  const win = Object.assign(new EventTarget(), {
+    DeviceOrientationEvent: { requestPermission: permission },
+    DeviceMotionEvent: { requestPermission: permission },
+  });
+  try {
+    Object.defineProperty(globalThis, "window", {
+      value: win,
+      configurable: true,
+    });
+    Object.defineProperty(globalThis, "document", {
+      value: doc,
+      configurable: true,
+    });
+    Object.defineProperty(globalThis, "navigator", {
+      value: {
+        geolocation: {
+          watchPosition() {
+            gpsRequests++;
+          },
+        },
+      },
+      configurable: true,
+    });
+    const capture = new SensorCapture(),
+      started = capture.start();
+    assert.equal(pending.length, 2);
+    doc.hidden = true;
+    doc.dispatchEvent(new Event("visibilitychange"));
+    pending.forEach((resolve) => resolve("granted"));
+    await started;
+    assert.equal(capture.snapshot().running, false);
+    assert.equal(gpsRequests, 0);
+    capture.stop();
+  } finally {
+    for (const [key, descriptor] of saved) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else Reflect.deleteProperty(globalThis, key);
+    }
+  }
+});
 test("Dedicated account gate cannot be widened by a suffix or the general admin role", () => {
   assert.ok(canUseMobileSensors(" ATAMORADI8@gmail.com "));
   for (const email of [
