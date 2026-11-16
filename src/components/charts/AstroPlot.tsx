@@ -36,10 +36,10 @@ function tickText(value: unknown) {
   return localizeDigits(String(value ?? ""));
 }
 const tipStyle = {
-  background: "#101a2c",
-  border: "1px solid rgba(230,211,154,0.35)",
+  background: "var(--panel)",
+  border: "1px solid var(--border)",
   borderRadius: 10,
-  color: "#e8e2d4",
+  color: "var(--parchment)",
   fontSize: 12,
 };
 export function PlotCard({
@@ -110,18 +110,18 @@ export function AreaSeries({
                 <stop offset="100%" stopColor={color} stopOpacity={0.02} />
               </linearGradient>
             </defs>
-            <CartesianGrid stroke="rgba(154,166,184,0.16)" vertical={false} />
+            <CartesianGrid stroke="var(--border)" vertical={false} />
             <XAxis
               dataKey={xKey}
-              stroke="#9aa6b8"
-              tick={{ fontSize: 11, fill: "#c5d0de" }}
+              stroke="var(--muted)"
+              tick={{ fontSize: 11, fill: "var(--parchment)" }}
               interval="preserveStartEnd"
               minTickGap={28}
               tickFormatter={formatTick}
             />
             <YAxis
-              stroke="#9aa6b8"
-              tick={{ fontSize: 11, fill: "#c5d0de" }}
+              stroke="var(--muted)"
+              tick={{ fontSize: 11, fill: "var(--parchment)" }}
               domain={domain ?? ["auto", "auto"]}
               width={52}
               tickFormatter={formatTick}
@@ -131,7 +131,7 @@ export function AreaSeries({
                       value: yLabel,
                       angle: -90,
                       position: "insideLeft",
-                      fill: "#9aa6b8",
+                      fill: "var(--muted)",
                       fontSize: 11,
                     }
                   : undefined
@@ -203,11 +203,11 @@ export function DualLine({
             data={data}
             margin={{ top: 12, right: 12, left: 0, bottom: 4 }}
           >
-            <CartesianGrid stroke="rgba(154,166,184,0.16)" vertical={false} />
+            <CartesianGrid stroke="var(--border)" vertical={false} />
             <XAxis
               dataKey={xKey}
-              stroke="#9aa6b8"
-              tick={{ fontSize: 11, fill: "#c5d0de" }}
+              stroke="var(--muted)"
+              tick={{ fontSize: 11, fill: "var(--parchment)" }}
               minTickGap={28}
               tickFormatter={formatTick}
             />

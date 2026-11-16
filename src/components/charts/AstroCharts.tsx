@@ -139,17 +139,18 @@ export function AstroCharts() {
             >
               <ResponsiveContainer width="100%" height={260}>
                 <LineChart data={daySeries}>
-                  <CartesianGrid stroke="rgba(201,162,39,0.12)" />
+                  <CartesianGrid stroke="var(--border)" />
                   <XAxis
                     dataKey="label"
-                    stroke="#9aa6b8"
+                    stroke="var(--muted)"
                     tick={{ fontSize: 10 }}
                   />
-                  <YAxis stroke="#9aa6b8" tick={{ fontSize: 10 }} />
+                  <YAxis stroke="var(--muted)" tick={{ fontSize: 10 }} />
                   <Tooltip
                     contentStyle={{
-                      background: "#152238",
-                      border: "1px solid rgba(201,162,39,0.3)",
+                      background: "var(--panel)",
+                      border: "1px solid var(--border)",
+                      color: "var(--parchment)",
                       borderRadius: 8,
                       direction: "rtl",
                     }}
@@ -181,17 +182,18 @@ export function AstroCharts() {
             >
               <ResponsiveContainer width="100%" height={260}>
                 <LineChart data={daySeries}>
-                  <CartesianGrid stroke="rgba(201,162,39,0.12)" />
+                  <CartesianGrid stroke="var(--border)" />
                   <XAxis
                     dataKey="label"
-                    stroke="#9aa6b8"
+                    stroke="var(--muted)"
                     tick={{ fontSize: 10 }}
                   />
-                  <YAxis stroke="#9aa6b8" tick={{ fontSize: 10 }} />
+                  <YAxis stroke="var(--muted)" tick={{ fontSize: 10 }} />
                   <Tooltip
                     contentStyle={{
-                      background: "#152238",
-                      border: "1px solid rgba(201,162,39,0.3)",
+                      background: "var(--panel)",
+                      border: "1px solid var(--border)",
+                      color: "var(--parchment)",
                       borderRadius: 8,
                       direction: "rtl",
                     }}
@@ -224,26 +226,26 @@ export function AstroCharts() {
           >
             <ResponsiveContainer width="100%" height={280}>
               <LineChart data={starSeries}>
-                <CartesianGrid stroke="rgba(201,162,39,0.12)" />
+                <CartesianGrid stroke="var(--border)" />
                 <XAxis
                   dataKey="ra"
                   name="RA"
                   type="number"
                   domain={[0, 24]}
-                  stroke="#9aa6b8"
+                  stroke="var(--muted)"
                   tick={{ fontSize: 10 }}
                   label={{
                     value: "RA (ʰ)",
                     position: "insideBottom",
                     offset: -2,
-                    fill: "#9aa6b8",
+                    fill: "var(--muted)",
                   }}
                 />
                 <YAxis
                   dataKey="dec"
                   type="number"
                   domain={[-40, 70]}
-                  stroke="#9aa6b8"
+                  stroke="var(--muted)"
                   tick={{ fontSize: 10 }}
                 />
                 <Tooltip
@@ -255,8 +257,9 @@ export function AstroCharts() {
                     payload?.[0]?.payload?.name ?? ""
                   }
                   contentStyle={{
-                    background: "#152238",
-                    border: "1px solid rgba(201,162,39,0.3)",
+                    background: "var(--panel)",
+                    border: "1px solid var(--border)",
+                    color: "var(--parchment)",
                     borderRadius: 8,
                     direction: "rtl",
                   }}
