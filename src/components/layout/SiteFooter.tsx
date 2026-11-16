@@ -7,14 +7,14 @@ export function SiteFooter() {
   return (
     <LocalizedDigits>
       {
-        <footer className="mt-auto border-t border-[var(--border)] bg-[var(--ink-deep)]">
+        <footer className="site-footer mt-auto border-t border-[var(--border)] bg-[var(--ink-deep)]">
           <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 text-sm text-[var(--muted)] md:flex-row md:items-center md:justify-between">
             <div className="min-w-0 space-y-3 md:max-w-md">
               <p>
-              {t(
-                "فانوس خیال — پنجره‌ای برای شناختن زیبایی‌های آسمان، با نگاهی به میراث صوفی.",
-                "Fanous-e Khial — a window to the beauty of the sky, with a connection to al-Sufi’s legacy.",
-              )}
+                {t(
+                  "فانوس خیال — پنجره‌ای برای شناختن زیبایی‌های آسمان، با نگاهی به میراث صوفی.",
+                  "Fanous-e Khial — a window to the beauty of the sky, with a connection to al-Sufi’s legacy.",
+                )}
               </p>
               <a
                 href="mailto:atamoradi8@gmail.com"
@@ -27,13 +27,24 @@ export function SiteFooter() {
               </a>
             </div>
             <div className="flex flex-wrap gap-4">
-              <Link href="/about">{t("دربارهٔ فانوس خیال", "About")}</Link>
-              <Link href="/privacy">{t("حریم خصوصی", "Privacy")}</Link>
-              <Link href="/tools">{t("راهنمای ابزارها", "Tool guide")}</Link>
-              <Link href="/course" className="hover:text-[var(--parchment)]">
+              <Link prefetch={false} href="/about">
+                {t("دربارهٔ فانوس خیال", "About")}
+              </Link>
+              <Link prefetch={false} href="/privacy">
+                {t("حریم خصوصی", "Privacy")}
+              </Link>
+              <Link prefetch={false} href="/tools">
+                {t("راهنمای ابزارها", "Tool guide")}
+              </Link>
+              <Link
+                prefetch={false}
+                href="/course"
+                className="hover:text-[var(--parchment)]"
+              >
                 {t("دروس", "Course")}
               </Link>
               <Link
+                prefetch={false}
                 href="/architecture"
                 className="hover:text-[var(--parchment)]"
               >

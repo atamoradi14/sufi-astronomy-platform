@@ -26,7 +26,7 @@ export function SceneLabel({
     const lines = display.split("\n");
     const canvas = document.createElement("canvas"),
       ctx = canvas.getContext("2d")!;
-    ctx.font = "500 24px sans-serif";
+    ctx.font = "500 24px Vazirmatn Variable, sans-serif";
     const width =
         Math.ceil(
           Math.max(...lines.map((line) => ctx.measureText(line).width)),
@@ -35,7 +35,7 @@ export function SceneLabel({
     canvas.width = width * 2;
     canvas.height = height * 2;
     ctx.scale(2, 2);
-    ctx.font = "500 24px sans-serif";
+    ctx.font = "500 24px Vazirmatn Variable, sans-serif";
     ctx.fillStyle = "#07121ff2";
     ctx.beginPath();
     ctx.roundRect(0, 0, width, height, 8);

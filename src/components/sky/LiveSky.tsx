@@ -9,12 +9,15 @@ import {
   equatorialToAzAlt,
   magToRadius,
   panLook,
-  projectAzAlt,
+  dragLook,
+  createSkyProjector,
   zoomLook,
   type Look,
   type SkyStar,
 } from "@/lib/sky/project";
 import { formatDigits } from "@/lib/digits";
+import { useLanguage } from "@/components/language/Language";
+import { equatorialToHorizontal } from "@/lib/astronomy/sphere";
 import { lstHours } from "@/lib/astronomy/time";
 import { greatArc, sphToCart, cartToLonLat } from "@/lib/astronomy/sphereGeom";
 import { Button } from "@/components/ui/button";
@@ -120,11 +123,26 @@ function expandStars(raw: StarCatalogV1 | StarCatalogV2): {
 }
 export function LiveSky() {
   const script = useDigitScript();
+  const { fa, t } = useLanguage();
+  const [visible, setVisible] = useState(true);
+  const groundCache = useRef<{ key: string; canvas: HTMLCanvasElement } | null>(
+    null,
+  );
   const [lat, setLat] = useState(35.6892),
     [lon, setLon] = useState(51.389);
-  const [locationLabel, setLocationLabel] = useState(
-    "نمونهٔ تهران · Tehran sample",
-  );
+  const [locationStatus, setLocationStatus] = useState("sample");
+  const locationLabel = (
+    {
+      sample: t("نمونهٔ تهران", "Tehran sample"),
+      manual: t("مختصات دستی", "Manual coordinates"),
+      waiting: t("در حال دریافت موقعیت…", "Finding your location…"),
+      device: t("موقعیت دستگاه", "Device location"),
+      unavailable: t(
+        "موقعیت دریافت نشد؛ مختصات فعلی حفظ شد.",
+        "Location unavailable; current coordinates retained.",
+      ),
+    } as Record<string, string>
+  )[locationStatus];
   const [now, setNow] = useState(() => new Date()),
     [playing, setPlaying] = useState(true);
   const [magLimit, setMagLimit] = useState(5.5),
@@ -176,7 +194,7 @@ export function LiveSky() {
       ),
     ])
       .then(([s, c]) => {
-        setStarsAll(expandStars(s).stars);
+        setStarsAll(expandStars(s).stars.sort((a, b) => a.mag - b.mag));
         setCons(c);
         setLoaded(true);
       })
@@ -189,44 +207,70 @@ export function LiveSky() {
     return () => abort.abort();
   }, [retry]);
   useEffect(() => {
-    if (!playing) return;
+    const stage = stageRef.current;
+    if (!stage) return;
+    let intersecting = true;
+    const sync = () =>
+      setVisible(intersecting && document.visibilityState === "visible");
+    const observer = new IntersectionObserver(([entry]) => {
+      intersecting = entry.isIntersecting;
+      sync();
+    });
+    observer.observe(stage);
+    document.addEventListener("visibilitychange", sync);
+    sync();
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", sync);
+    };
+  }, []);
+  useEffect(() => {
+    if (!playing || !visible) return;
     setNow(new Date());
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
-  }, [playing]);
+  }, [playing, visible]);
+  const localSidereal = useMemo(() => lstHours(now, lon), [now, lon]);
   const horizontal = useMemo(
     () =>
       starsAll
         .filter((s) => s.mag <= magLimit)
         .map((star) => ({
           star,
-          ...equatorialToAzAlt(star.ra, star.dec, lat, lon, now),
+          ...equatorialToHorizontal(star.ra, star.dec, lat, localSidereal),
         })),
-    [starsAll, magLimit, lat, lon, now],
+    [starsAll, magLimit, lat, localSidereal],
   );
-  const constellationPaths = useMemo(
+  const celestialPaths = useMemo(
     () =>
       cons?.constellations.flatMap((c) =>
         c.lines.flatMap((line) =>
-          line.slice(1).map((p, i) =>
-            greatArc(
-              sphToCart(line[i][0] * 15, line[i][1]),
-              sphToCart(p[0] * 15, p[1]),
-              12,
-            ).map((v) => {
-              const p = cartToLonLat(v);
-              return equatorialToAzAlt(
-                (((p.lon / 15) % 24) + 24) % 24,
-                p.lat,
-                lat,
-                lon,
-                now,
-              );
-            }),
-          ),
+          line
+            .slice(1)
+            .map((p, i) =>
+              greatArc(
+                sphToCart(line[i][0] * 15, line[i][1]),
+                sphToCart(p[0] * 15, p[1]),
+                12,
+              ).map((v) => cartToLonLat(v)),
+            ),
         ),
       ) ?? [],
-    [cons, lat, lon, now],
+    [cons],
+  );
+  const constellationPaths = useMemo(
+    () =>
+      celestialPaths.map((points) =>
+        points.map((p) =>
+          equatorialToHorizontal(
+            (((p.lon / 15) % 24) + 24) % 24,
+            p.lat,
+            lat,
+            localSidereal,
+          ),
+        ),
+      ),
+    [celestialPaths, lat, localSidereal],
   );
   const draw = useCallback(() => {
     const canvas = canvasRef.current,
@@ -236,14 +280,31 @@ export function LiveSky() {
       h = canvas.clientHeight;
     if (!w || !h) return;
     const dpr = Math.min(devicePixelRatio || 1, 2);
-    canvas.width = Math.round(w * dpr);
-    canvas.height = Math.round(h * dpr);
+    if (
+      canvas.width !== Math.round(w * dpr) ||
+      canvas.height !== Math.round(h * dpr)
+    ) {
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+    }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const cx = w / 2,
       cy = h / 2,
-      scale = h / 2;
+      scale =
+        look.projection === "dome"
+          ? Math.max(1, Math.min(w, h) / 2 - 30)
+          : h / 2;
+    const projector = createSkyProjector(look);
+    ctx.fillStyle = "#07121c";
+    ctx.fillRect(0, 0, w, h);
+    ctx.save();
+    if (look.projection === "dome") {
+      ctx.beginPath();
+      ctx.arc(cx, cy, scale, 0, Math.PI * 2);
+      ctx.clip();
+    }
     const screen = (az: number, alt: number) => {
-      const p = projectAzAlt(az, alt, look);
+      const p = projector.project(az, alt);
       return { ...p, x: cx + p.x * scale, y: cy - p.y * scale };
     };
     const gradient = ctx.createLinearGradient(0, 0, 0, h);
@@ -251,20 +312,6 @@ export function LiveSky() {
     gradient.addColorStop(1, "#162d46");
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, w, h);
-    const horizonY =
-      cy +
-      (scale * Math.tan((look.alt * Math.PI) / 180)) /
-        Math.tan((look.fov * Math.PI) / 360);
-    if (showHorizon) {
-      ctx.fillStyle = "#101f24";
-      ctx.fillRect(0, Math.max(0, horizonY), w, h);
-      ctx.strokeStyle = "#91b4a8";
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(0, horizonY);
-      ctx.lineTo(w, horizonY);
-      ctx.stroke();
-    }
     const path = (
       points: Array<{
         az: number;
@@ -299,6 +346,12 @@ export function LiveSky() {
       }
       ctx.stroke();
     };
+    if (showHorizon)
+      path(
+        Array.from({ length: 721 }, (_, i) => ({ az: i / 2, alt: 0 })),
+        "#9eb9ae",
+        1.5,
+      );
     if (showGrid) {
       for (const alt of [0, 15, 30, 45, 60, 75])
         path(
@@ -321,11 +374,18 @@ export function LiveSky() {
       x: number;
       y: number;
     }> = [];
-    const occupied: Array<{
-      x: number;
-      y: number;
-    }> = [];
-    for (const q of horizontal) {
+    const occupied: { x: number; y: number; width: number; height: number }[] =
+      look.projection === "dome" && w < 500
+        ? []
+        : [{ x: fa ? w - 225 : 16, y: 16, width: 210, height: 80 }];
+    let labels = 0;
+    const ordered = selected
+      ? [
+          ...horizontal.filter((q) => q.star.id === selected.id),
+          ...horizontal.filter((q) => q.star.id !== selected.id),
+        ]
+      : horizontal;
+    for (const q of ordered) {
       if (q.alt < 0) continue;
       const p = screen(q.az, q.alt);
       if (!p.visible || p.x < -10 || p.y < -10 || p.x > w + 10 || p.y > h + 10)
@@ -356,27 +416,93 @@ export function LiveSky() {
       if (
         showNames &&
         q.star.n &&
-        q.star.mag < 2.5 &&
-        !occupied.some(
-          (t) => Math.abs(t.x - p.x) < 100 && Math.abs(t.y - p.y) < 20,
-        )
+        (q.star.mag < (w < 500 ? 1.9 : 2.5) || selected?.id === q.star.id) &&
+        labels < (w < 500 ? 9 : 35)
       ) {
-        ctx.font = "12px sans-serif";
+        ctx.font = "14px Vazirmatn Variable, sans-serif";
         ctx.textAlign = "left";
-        ctx.fillStyle = "#d7e4ef";
-        ctx.fillText(formatDigits(q.star.n, script), p.x + radius + 7, p.y + 4);
-        occupied.push(p);
+        ctx.direction = "ltr";
+        const name = formatDigits(q.star.n, script),
+          width = ctx.measureText(name).width;
+        const candidates = [
+          { x: p.x + radius + 7, y: p.y - 10, width, height: 18 },
+          { x: p.x - width - radius - 7, y: p.y - 10, width, height: 18 },
+          { x: p.x - width / 2, y: p.y - radius - 24, width, height: 18 },
+          { x: p.x - width / 2, y: p.y + radius + 8, width, height: 18 },
+        ];
+        const place = candidates.find((r) => {
+          if (
+            r.x < 8 ||
+            r.y < 8 ||
+            r.x + r.width > w - 8 ||
+            r.y + r.height > h - 8
+          )
+            return false;
+          if (
+            look.projection === "dome" &&
+            [
+              [r.x, r.y],
+              [r.x + r.width, r.y],
+              [r.x, r.y + r.height],
+              [r.x + r.width, r.y + r.height],
+            ].some(([x, y]) => Math.hypot(x - cx, y - cy) > scale - 5)
+          )
+            return false;
+          return !occupied.some(
+            (o) =>
+              r.x < o.x + o.width + 10 &&
+              r.x + r.width + 10 > o.x &&
+              r.y < o.y + o.height + 5 &&
+              r.y + r.height + 5 > o.y,
+          );
+        });
+        if (place) {
+          ctx.fillStyle = "#d7e4ef";
+          ctx.fillText(name, place.x, place.y + 14);
+          occupied.push(place);
+          labels++;
+        }
       }
     }
+
+    if (showHorizon && look.projection !== "dome") {
+      const key = JSON.stringify([w, h, dpr, look]);
+      if (groundCache.current?.key !== key) {
+        const mask = document.createElement("canvas");
+        mask.width = canvas.width;
+        mask.height = canvas.height;
+        const mc = mask.getContext("2d")!;
+        mc.scale(dpr, dpr);
+        mc.fillStyle = "#13221f";
+        for (let row = 0; row < mask.height; row++) {
+          const y = row / dpr;
+          for (const [left, right] of projector.groundSpans(
+            (cy - y - 0.5 / dpr) / scale,
+            -cx / scale,
+            cx / scale,
+          ))
+            mc.fillRect(cx + left * scale, y, (right - left) * scale, 1 / dpr);
+        }
+        groundCache.current = { key, canvas: mask };
+      }
+      ctx.drawImage(groundCache.current.canvas, 0, 0, w, h);
+      path(
+        Array.from({ length: 721 }, (_, i) => ({ az: i / 2, alt: 0 })),
+        "#9eb9ae",
+        1.5,
+      );
+    }
+    ctx.restore();
     pickRef.current = hits;
+    canvas.dataset.visibleStars = String(hits.length);
     if (showHorizon) {
       ctx.textAlign = "center";
-      ctx.font = "bold 12px sans-serif";
+      ctx.font = "600 14px Vazirmatn Variable, sans-serif";
       for (const [az, label] of [
-        [0, "N · شمال"],
-        [90, "E · شرق"],
-        [180, "S · جنوب"],
-        [270, "W · غرب"],
+        [0, t("شمال", "North")],
+        [90, t("شرق", "East")],
+        [180, t("جنوب", "South")],
+        [270, t("غرب", "West")],
       ] as const) {
         const p = screen(az, 0);
         if (p.visible && p.x > 25 && p.x < w - 25 && p.y > 0 && p.y < h) {
@@ -405,22 +531,60 @@ export function LiveSky() {
     showHorizon,
     selected,
     script,
+    fa,
+    t,
   ]);
+  const drawRef = useRef(draw);
+  const pendingFrame = useRef<number | null>(null);
+  const scheduleDraw = useCallback(() => {
+    if (pendingFrame.current != null) return;
+    pendingFrame.current = requestAnimationFrame(() => {
+      pendingFrame.current = null;
+      drawRef.current();
+    });
+  }, []);
   useEffect(() => {
-    const id = requestAnimationFrame(draw);
-    const ro = new ResizeObserver(draw);
+    drawRef.current = draw;
+    scheduleDraw();
+  }, [draw, scheduleDraw]);
+  useEffect(() => {
+    const ro = new ResizeObserver(scheduleDraw);
     if (canvasRef.current) ro.observe(canvasRef.current);
+    let mounted = true;
+    void document.fonts.ready.then(() => {
+      if (mounted) scheduleDraw();
+    });
     return () => {
-      cancelAnimationFrame(id);
+      mounted = false;
       ro.disconnect();
+      if (pendingFrame.current != null)
+        cancelAnimationFrame(pendingFrame.current);
+      pendingFrame.current = null;
     };
-  }, [draw]);
+  }, [scheduleDraw]);
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const wheel = (e: WheelEvent) => {
       e.preventDefault();
-      setLook((l) => zoomLook(l, Math.exp(e.deltaY * 0.001)));
+      const r = canvas.getBoundingClientRect();
+      const x = e.clientX - r.left - r.width / 2,
+        y = r.height / 2 - (e.clientY - r.top);
+      setLook((l) => {
+        const scale =
+          l.projection === "dome"
+            ? Math.min(r.width, r.height) / 2 - 30
+            : r.height / 2;
+        if (l.projection === "dome" && Math.hypot(x, y) > scale) return l;
+        return zoomLook(
+          l,
+          Math.exp(Math.max(-200, Math.min(200, e.deltaY)) * 0.0015),
+          x / scale,
+          y / scale,
+          x / (r.height / 2),
+          y / (r.height / 2),
+        );
+      });
     };
     canvas.addEventListener("wheel", wheel, { passive: false });
     return () => canvas.removeEventListener("wheel", wheel);
@@ -445,11 +609,42 @@ export function LiveSky() {
     if (!old) return;
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pointers.current.size === 2) {
-      const [a, b] = [...pointers.current.values()],
-        distance = Math.hypot(a.x - b.x, a.y - b.y);
-      if (distance > 0 && gesture.current.pinch > 0)
-        setLook((l) => zoomLook(l, gesture.current.pinch / distance));
+      const [a, b] = [...pointers.current.values()];
+      const distance = Math.hypot(a.x - b.x, a.y - b.y);
+      const other = [...pointers.current.entries()].find(
+        ([id]) => id !== e.pointerId,
+      )![1];
+      const r = e.currentTarget.getBoundingClientRect();
+      const from = { x: (old.x + other.x) / 2, y: (old.y + other.y) / 2 };
+      const to = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      const previousDistance = Math.hypot(old.x - other.x, old.y - other.y);
+      if (distance > 0 && previousDistance > 0)
+        setLook((l) => {
+          const scale =
+            l.projection === "dome"
+              ? Math.min(r.width, r.height) / 2 - 30
+              : r.height / 2;
+          const x = (from.x - r.left - r.width / 2) / scale,
+            y = (r.height / 2 - from.y + r.top) / scale;
+          const zoomed = zoomLook(
+            l,
+            previousDistance / distance,
+            x,
+            y,
+            (from.x - r.left - r.width / 2) / (r.height / 2),
+            (r.height / 2 - from.y + r.top) / (r.height / 2),
+          );
+          const nextScale = r.height / 2;
+          return dragLook(
+            zoomed,
+            (from.x - r.left - r.width / 2) / nextScale,
+            (r.height / 2 - from.y + r.top) / nextScale,
+            (to.x - r.left - r.width / 2) / nextScale,
+            (r.height / 2 - to.y + r.top) / nextScale,
+          );
+        });
       gesture.current.pinch = distance;
+      gesture.current.moved = true;
       return;
     }
     if (
@@ -459,14 +654,33 @@ export function LiveSky() {
       gesture.current.moved = true;
     // Read the event before setState. React may replay the updater during
     // render, after the pointer event has been released and currentTarget is null.
-    const dx = e.clientX - old.x;
-    const dy = e.clientY - old.y;
-    const viewH = e.currentTarget?.clientHeight || 690;
-    setLook((l) => panLook(l, dx, dy, viewH));
+    const r = e.currentTarget.getBoundingClientRect();
+    const fromX = old.x - r.left - r.width / 2,
+      fromY = r.height / 2 - old.y + r.top;
+    const toX = e.clientX - r.left - r.width / 2,
+      toY = r.height / 2 - e.clientY + r.top;
+    setLook((l) => {
+      const scale =
+        l.projection === "dome"
+          ? Math.min(r.width, r.height) / 2 - 30
+          : r.height / 2;
+      return dragLook(
+        l,
+        fromX / scale,
+        fromY / scale,
+        toX / scale,
+        toY / scale,
+      );
+    });
   };
   const onUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!pointers.current.has(e.pointerId)) return;
     pointers.current.delete(e.pointerId);
+    // A remaining finger starts a fresh drag after a pinch; never turn it into a click.
+    if (pointers.current.size === 1) {
+      const remaining = [...pointers.current.values()][0];
+      gesture.current = { ...remaining, moved: true, pinch: 0 };
+    }
     if (!gesture.current.moved && e.type !== "pointercancel") {
       const r = e.currentTarget.getBoundingClientRect();
       let best: SkyStar | null = null,
@@ -488,19 +702,17 @@ export function LiveSky() {
   };
   const locate = () => {
     if (!navigator.geolocation) {
-      setLocationLabel(
-        "موقعیت‌یابی پشتیبانی نمی‌شود؛ مختصات را دستی وارد کنید.",
-      );
+      setLocationStatus("unavailable");
       return;
     }
-    setLocationLabel("در حال دریافت موقعیت…");
+    setLocationStatus("waiting");
     navigator.geolocation.getCurrentPosition(
       (p) => {
         setLat(p.coords.latitude);
         setLon(p.coords.longitude);
-        setLocationLabel("موقعیت دستگاه · Device location");
+        setLocationStatus("device");
       },
-      () => setLocationLabel("موقعیت دریافت نشد؛ مختصات فعلی حفظ شد."),
+      () => setLocationStatus("unavailable"),
       { timeout: 10000 },
     );
   };
@@ -510,7 +722,9 @@ export function LiveSky() {
     setLook((l) => ({
       ...l,
       az: p.az,
-      alt: Math.max(-85, Math.min(90, p.alt)),
+      alt: Math.max(-89, Math.min(90, p.alt)),
+      roll: 0,
+      projection: "stereographic",
     }));
     setQuery("");
   };
@@ -531,12 +745,46 @@ export function LiveSky() {
       {
         <div className="space-y-5">
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px] items-start">
-            <div className="workspace" ref={stageRef}>
+            <div className="workspace sky-workspace" ref={stageRef}>
               <div className="workspace-toolbar">
-                <span className="study-kicker">SKY / OBSERVATORY</span>
+                <fieldset className="sky-view-switch">
+                  <legend className="sr-only">
+                    {t("نمای آسمان", "Sky view")}
+                  </legend>
+                  <button
+                    type="button"
+                    aria-pressed={look.projection !== "dome"}
+                    onClick={() =>
+                      setLook({
+                        az: 180,
+                        alt: 35,
+                        fov: 100,
+                        roll: 0,
+                        projection: "stereographic",
+                      })
+                    }
+                  >
+                    {t("گردش در آسمان", "Explore")}
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={look.projection === "dome"}
+                    onClick={() =>
+                      setLook({
+                        az: 180,
+                        alt: 90,
+                        fov: 180,
+                        roll: 0,
+                        projection: "dome",
+                      })
+                    }
+                  >
+                    {t("تمام آسمان", "All-sky dome")}
+                  </button>
+                </fieldset>
                 <div className="relative min-w-0 flex-1">
                   <label className="sr-only" htmlFor="star-search">
-                    جست‌وجوی ستاره / Search stars
+                    {t("جست\u200cوجوی ستاره / Search stars", "Search stars")}
                   </label>
                   <Search
                     size={15}
@@ -545,7 +793,10 @@ export function LiveSky() {
                   <input
                     id="star-search"
                     className="control-input !ps-9"
-                    placeholder="نام ستاره یا شناسه · Sirius"
+                    placeholder={t(
+                      "نام ستاره یا شناسه · Sirius",
+                      "Star name or ID · Sirius",
+                    )}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                   />
@@ -565,7 +816,9 @@ export function LiveSky() {
                         </button>
                       ))}
                       {results.length === 0 && (
-                        <p className="p-3 text-xs">ستاره‌ای یافت نشد.</p>
+                        <p className="p-3 text-xs">
+                          {t("ستاره\u200cای یافت نشد.", "No stars found.")}
+                        </p>
                       )}
                     </div>
                   )}
@@ -573,7 +826,7 @@ export function LiveSky() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  aria-label="Fullscreen sky / تمام‌صفحه"
+                  aria-label={t("Fullscreen sky / تمام‌صفحه", "Fullscreen sky")}
                   onClick={() => {
                     if (document.fullscreenElement)
                       void document.exitFullscreen();
@@ -589,6 +842,8 @@ export function LiveSky() {
                   role="img"
                   aria-label="Interactive sky chart. Arrow keys pan, plus and minus zoom. Drag or pinch to explore; click a star to select."
                   tabIndex={0}
+                  data-projection={look.projection ?? "stereographic"}
+                  data-visible-stars={pickRef.current.length}
                   className="h-[min(72vh,690px)] min-h-[360px] w-full cursor-grab active:cursor-grabbing"
                   onPointerDown={onDown}
                   onPointerMove={onMove}
@@ -615,30 +870,35 @@ export function LiveSky() {
                       } else if (["+", "=", "-"].includes(key))
                         setLook((l) => zoomLook(l, key === "-" ? 1.15 : 0.85));
                       else
-                        setLook((l) => ({
-                          ...l,
-                          az:
-                            (l.az +
-                              (key === "ArrowRight"
-                                ? 5
-                                : key === "ArrowLeft"
-                                  ? -5
-                                  : 0) +
-                              360) %
-                            360,
-                          alt: Math.max(
-                            -85,
-                            Math.min(
-                              89,
-                              l.alt +
-                                (key === "ArrowUp"
-                                  ? 5
+                        setLook((l) =>
+                          l.projection === "dome"
+                            ? {
+                                ...l,
+                                az:
+                                  (l.az +
+                                    (key === "ArrowRight"
+                                      ? 5
+                                      : key === "ArrowLeft"
+                                        ? -5
+                                        : 0) +
+                                    360) %
+                                  360,
+                              }
+                            : panLook(
+                                l,
+                                key === "ArrowRight"
+                                  ? -35
+                                  : key === "ArrowLeft"
+                                    ? 35
+                                    : 0,
+                                key === "ArrowUp"
+                                  ? 35
                                   : key === "ArrowDown"
-                                    ? -5
-                                    : 0),
-                            ),
-                          ),
-                        }));
+                                    ? -35
+                                    : 0,
+                                690,
+                              ),
+                        );
                     }
                   }}
                 />
@@ -647,10 +907,18 @@ export function LiveSky() {
                     className="absolute inset-0 flex flex-col gap-4 items-center justify-center bg-[#07121fe6] p-6 text-sm text-center"
                     role="status"
                   >
-                    {error ?? "در حال دریافت کاتالوگ ستارگان…"}
+                    {error
+                      ? t(
+                          "دریافت کاتالوگ ناموفق بود. دوباره تلاش کنید.",
+                          "The star catalogue could not be loaded. Try again.",
+                        )
+                      : t(
+                          "در حال دریافت کاتالوگ ستارگان…",
+                          "Loading the star catalogue…",
+                        )}
                     {error && (
                       <Button size="sm" onClick={() => setRetry((v) => v + 1)}>
-                        تلاش دوباره
+                        {t("تلاش دوباره", "Try again")}
                       </Button>
                     )}
                   </div>
@@ -663,15 +931,17 @@ export function LiveSky() {
                     AZ {look.az.toFixed(1)}° · ALT {look.alt.toFixed(1)}°
                   </p>
                   <p className="text-[#9fb5cc]">
-                    VERTICAL FOV {look.fov.toFixed(0)}° ·{" "}
-                    {playing ? "LIVE" : "PAUSED"}
+                    {look.projection === "dome"
+                      ? "ALL-SKY · 180°"
+                      : `FOV ${look.fov.toFixed(0)}°`}{" "}
+                    · {playing ? "LIVE" : "PAUSED"}
                   </p>
                 </div>
                 <div className="absolute end-3 bottom-3 flex flex-col gap-2">
                   <Button
                     size="icon"
                     variant="secondary"
-                    aria-label="Zoom in / بزرگ‌نمایی"
+                    aria-label={t("Zoom in / بزرگ‌نمایی", "Zoom in")}
                     onClick={() => setLook((l) => zoomLook(l, 0.8))}
                   >
                     <Plus size={17} />
@@ -679,7 +949,7 @@ export function LiveSky() {
                   <Button
                     size="icon"
                     variant="secondary"
-                    aria-label="Zoom out / کوچک‌نمایی"
+                    aria-label={t("Zoom out / کوچک‌نمایی", "Zoom out")}
                     onClick={() => setLook((l) => zoomLook(l, 1.25))}
                   >
                     <Minus size={17} />
@@ -687,16 +957,24 @@ export function LiveSky() {
                 </div>
               </div>
               <div className="workspace-legend">
-                <span>شمال ۰° · شرق ۹۰° · جنوب ۱۸۰° · غرب ۲۷۰°</span>
                 <span>
-                  کشیدن / کلیدهای جهت · زوم دو انگشتی · انتخاب با کلیک
+                  {t(
+                    "شمال ۰° · شرق ۹۰° · جنوب ۱۸۰° · غرب ۲۷۰°",
+                    "North 0° · East 90° · South 180° · West 270°",
+                  )}
+                </span>
+                <span>
+                  {t(
+                    "کشیدن / کلیدهای جهت · زوم دو انگشتی · انتخاب با کلیک",
+                    "Drag or use arrow keys · pinch to zoom · select a star",
+                  )}
                 </span>
               </div>
             </div>
             <aside className="space-y-4 rounded-2xl border border-[var(--border)] bg-[#101d30] p-5">
               <p className="study-kicker">OBSERVER / TIME</p>
               <h2 className="text-lg text-[var(--gold-soft)]">
-                مکان و زمان رصد
+                {t("مکان و زمان رصد", "Observer and time")}
               </h2>
               <p
                 role="status"
@@ -704,23 +982,24 @@ export function LiveSky() {
               >
                 {locationLabel}
               </p>
+
               <div className="grid grid-cols-2 gap-3">
                 <CoordinateInput
-                  label="عرض شمالی φ"
+                  label={t("عرض شمالی φ", "Latitude φ")}
                   value={lat}
                   limit={90}
                   onCommit={(v) => {
                     setLat(v);
-                    setLocationLabel("مختصات دستی · Manual coordinates");
+                    setLocationStatus("manual");
                   }}
                 />
                 <CoordinateInput
-                  label="طول شرقی λ"
+                  label={t("طول شرقی λ", "Longitude λ")}
                   value={lon}
                   limit={180}
                   onCommit={(v) => {
                     setLon(v);
-                    setLocationLabel("مختصات دستی · Manual coordinates");
+                    setLocationStatus("manual");
                   }}
                 />
               </div>
@@ -731,10 +1010,10 @@ export function LiveSky() {
                 onClick={locate}
               >
                 <LocateFixed size={15} />
-                موقعیت دستگاه
+                {t("موقعیت دستگاه", "Use my location")}
               </Button>
               <label className="block text-xs space-y-2">
-                زمان UTC
+                {t("زمان UTC", "UTC time")}
                 <input
                   aria-label="Observation time UTC"
                   type="datetime-local"
@@ -757,7 +1036,7 @@ export function LiveSky() {
                   onClick={() => setPlaying((p) => !p)}
                 >
                   {playing ? <Pause size={14} /> : <Play size={14} />}{" "}
-                  {playing ? "توقف" : "زنده"}
+                  {playing ? t("توقف", "Pause") : t("زنده", "Live")}
                 </Button>
                 <Button
                   size="sm"
@@ -768,7 +1047,7 @@ export function LiveSky() {
                   }}
                 >
                   <RotateCcw size={14} />
-                  اکنون
+                  {t("اکنون", "Now")}
                 </Button>
               </div>
               <div className="grid grid-cols-2 gap-2">
@@ -780,7 +1059,7 @@ export function LiveSky() {
                     setPlaying(false);
                   }}
                 >
-                  −۱ ساعت
+                  {t("−۱ ساعت", "−1 hour")}
                 </Button>
                 <Button
                   size="sm"
@@ -790,18 +1069,30 @@ export function LiveSky() {
                     setPlaying(false);
                   }}
                 >
-                  +۱ ساعت
+                  {t("+۱ ساعت", "+1 hour")}
                 </Button>
               </div>
               <div className="border-t border-[var(--border)] pt-4 space-y-3">
                 <h3 className="text-sm text-[var(--gold-soft)]">
-                  لایه‌ها و جهت نگاه
+                  {t("لایه\u200cها و جهت نگاه", "Layers and direction")}
                 </h3>
                 {[
-                  [showLines, setShowLines, "خطوط صورت‌های فلکی"],
-                  [showNames, setShowNames, "نام ستاره‌ها"],
-                  [showGrid, setShowGrid, "شبکهٔ سمت و ارتفاع"],
-                  [showHorizon, setShowHorizon, "افق هندسی"],
+                  [
+                    showLines,
+                    setShowLines,
+                    t("خطوط صورت‌های فلکی", "Constellation lines"),
+                  ],
+                  [showNames, setShowNames, t("نام ستاره‌ها", "Star names")],
+                  [
+                    showGrid,
+                    setShowGrid,
+                    t("شبکهٔ سمت و ارتفاع", "Altitude and azimuth grid"),
+                  ],
+                  [
+                    showHorizon,
+                    setShowHorizon,
+                    t("افق هندسی", "Geometric horizon"),
+                  ],
                 ].map(([value, setter, label], i) => (
                   <label
                     className="flex items-center justify-between gap-2 text-xs"
@@ -819,9 +1110,12 @@ export function LiveSky() {
                   </label>
                 ))}
                 <label className="block text-xs">
-                  حد قدر · {magLimit.toFixed(1)}
+                  {t("حد قدر", "Limiting magnitude")} · {magLimit.toFixed(1)}
                   <input
-                    aria-label="Limiting magnitude / حد قدر"
+                    aria-label={t(
+                      "Limiting magnitude / حد قدر",
+                      "Limiting magnitude",
+                    )}
                     type="range"
                     min={2}
                     max={7}
@@ -843,7 +1137,13 @@ export function LiveSky() {
                       size="sm"
                       variant="outline"
                       onClick={() =>
-                        setLook((l) => ({ ...l, az: Number(az), alt: 25 }))
+                        setLook((l) => ({
+                          ...l,
+                          az: Number(az),
+                          alt: 25,
+                          roll: 0,
+                          projection: "stereographic",
+                        }))
                       }
                     >
                       {label}
@@ -852,9 +1152,17 @@ export function LiveSky() {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => setLook((l) => ({ ...l, alt: 90, fov: 90 }))}
+                    onClick={() =>
+                      setLook((l) => ({
+                        ...l,
+                        alt: 90,
+                        fov: 90,
+                        roll: 0,
+                        projection: "stereographic",
+                      }))
+                    }
                   >
-                    سرسو
+                    {t("سرسو", "Zenith")}
                   </Button>
                 </div>
               </div>
@@ -878,7 +1186,7 @@ export function LiveSky() {
                   variant="ghost"
                   onClick={() => setSelected(null)}
                 >
-                  بستن انتخاب
+                  {t("بستن انتخاب", "Close selection")}
                 </Button>
               </div>
               <p className="text-sm" dir="ltr">
@@ -888,19 +1196,19 @@ export function LiveSky() {
               </p>
               {selectedH.alt < 0 && (
                 <p className="text-sm text-[var(--rose-ink)]">
-                  این ستاره در زمان و مکان انتخابی زیر افق است. برای دیدن آن،
-                  زمان را تغییر دهید.
+                  {t(
+                    "این ستاره در زمان و مکان انتخابی زیر افق است. برای دیدن آن، زمان را تغییر دهید.",
+                    "This star is below the horizon at the selected time and place. Change the time to see it.",
+                  )}
                 </p>
               )}
             </section>
           )}
-          <p className="max-w-4xl text-xs leading-7 text-[var(--muted)]">
-            نمای گنومونیک با میدان دید عمودی؛ موقعیت‌ها هندسی‌اند و شکست جو
-            اعمال نشده است. مختصات کاتالوگ HYG/Hipparcos با زمان نجومی متوسط
-            تقریبی تبدیل می‌شوند؛ تقدیم، ترقّص و حرکت خاص برای تاریخ رصد اعمال
-            نشده‌اند. این ابزار آموزشی جای محاسبهٔ اخترسنجی دقیق را نمی‌گیرد.
-            شمار ستاره‌های کاتالوگ یا فیلتر قدر، شمار ستاره‌های قابل‌دیدن در قاب
-            نیست.
+          <p className="max-w-4xl text-sm leading-7 text-[var(--muted)]">
+            {t(
+              "نمای گردش، استریوگرافیک است؛ نمای تمام‌آسمان فاصلهٔ زاویه‌ای از سرسو را حفظ می‌کند. ستاره‌ها، شبکه و افق از یک مدل کروی رسم می‌شوند. موقعیت‌ها هندسی‌اند؛ شکست جو، تقدیم، ترقّص و حرکت خاص برای تاریخ رصد اعمال نشده‌اند. این ابزار آموزشی جای محاسبهٔ اخترسنجی دقیق را نمی‌گیرد.",
+              "Explore uses stereographic projection; the all-sky dome preserves angular distance from the zenith. Stars, grid and horizon share one spherical model. Positions are geometric: refraction, precession, nutation and proper motion for the observation date are not applied. This educational chart does not replace precise astrometry.",
+            )}
           </p>
         </div>
       }
@@ -918,6 +1226,7 @@ function CoordinateInput({
   limit: number;
   onCommit: (v: number) => void;
 }) {
+  const { t } = useLanguage();
   const [draft, setDraft] = useState(String(value));
   const [error, setError] = useState(false);
   useEffect(() => {
@@ -955,7 +1264,10 @@ function CoordinateInput({
           />
           {error && (
             <span role="alert" className="block text-[var(--rose-ink)]">
-              عددی بین {-limit} و {limit} وارد کنید.
+              {t(
+                `عددی بین ${-limit} و ${limit} وارد کنید.`,
+                `Enter a number between ${-limit} and ${limit}.`,
+              )}
             </span>
           )}
         </label>

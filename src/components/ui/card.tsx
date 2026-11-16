@@ -10,7 +10,7 @@ export function Card({
       {
         <div
           className={cn(
-            "min-w-0 rounded-xl border border-[var(--border)] bg-[var(--panel)]/90 text-[var(--parchment)] shadow-[0_8px_32px_rgba(0,0,0,0.35)] backdrop-blur-sm",
+            "ui-card min-w-0 rounded-xl border border-[var(--border)] bg-[var(--panel)] text-[var(--parchment)]",
             className,
           )}
           {...props}

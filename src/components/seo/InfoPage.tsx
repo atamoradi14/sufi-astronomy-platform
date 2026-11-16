@@ -125,10 +125,18 @@ export function InfoPage({ kind }: { kind: "about" | "privacy" | "tools" }) {
         </section>
       ))}
       <nav className="flex flex-wrap gap-4 text-sm text-[var(--teal)]">
-        <Link href="/course">{t("درس‌نامهٔ کروی", "Spherical course")}</Link>
-        <Link href="/lab">{t("کرهٔ سه‌بعدی", "3D sphere")}</Link>
-        <Link href="/sensor">{t("حسگر ستاره", "Star sensor")}</Link>
-        <Link href="/atlas">{t("اطلس صوفی", "Sufi atlas")}</Link>
+        <Link prefetch={false} href="/course">
+          {t("درس‌نامهٔ کروی", "Spherical course")}
+        </Link>
+        <Link prefetch={false} href="/lab">
+          {t("کرهٔ سه‌بعدی", "3D sphere")}
+        </Link>
+        <Link prefetch={false} href="/sensor">
+          {t("حسگر ستاره", "Star sensor")}
+        </Link>
+        <Link prefetch={false} href="/atlas">
+          {t("اطلس صوفی", "Sufi atlas")}
+        </Link>
       </nav>
     </article>
   );

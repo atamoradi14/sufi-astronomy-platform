@@ -55,7 +55,7 @@ function Frame({
   return (
     <LocalizedDigits>
       {
-        <figure className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[#091424]">
+        <figure className="observatory-figure overflow-hidden rounded-2xl border border-[var(--border)] bg-[#091424]">
           <svg
             viewBox="0 0 440 360"
             role="img"

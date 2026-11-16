@@ -355,7 +355,7 @@ function Metric({ label, value }: { label: string; value: string }) {
           <div className="text-[10px] text-[var(--muted)] dir-ltr text-left">
             {label}
           </div>
-          <div className="font-mono text-[var(--gold-soft)]">{value}</div>
+          <div className="tabular-nums text-[var(--gold-soft)]">{value}</div>
         </div>
       }
     </LocalizedDigits>

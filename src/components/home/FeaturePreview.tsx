@@ -61,6 +61,7 @@ export function FeaturePreview({
             alt=""
             width={300}
             height={330}
+            sizes="(max-width: 600px) 96px, 160px"
           />
           <Image
             className="atlas-leaf atlas-leaf-front"
@@ -68,6 +69,7 @@ export function FeaturePreview({
             alt=""
             width={300}
             height={330}
+            sizes="(max-width: 600px) 96px, 160px"
           />
           <span className="atlas-spark">✦</span>
         </>
@@ -262,7 +264,7 @@ export function FeaturePreview({
                     y={Number(y) - 9}
                     fill="#efdaa8"
                     fontSize="15"
-                    fontFamily="Georgia"
+                    fontFamily="Vazirmatn Variable, sans-serif"
                   >
                     {l}
                   </text>
@@ -327,7 +329,7 @@ export function FeaturePreview({
                   x="356"
                   y="217"
                   fill="#b8d3d6"
-                  fontFamily="Georgia"
+                  fontFamily="Vazirmatn Variable, sans-serif"
                   fontStyle="italic"
                   fontSize="12"
                 >
@@ -409,7 +411,7 @@ export function FeaturePreview({
               <circle cx="320" cy="180" r="72" stroke="#496678" />
               <g
                 fill="#b1c6cc"
-                fontFamily="Georgia"
+                fontFamily="Vazirmatn Variable, sans-serif"
                 fontSize="16"
                 textAnchor="middle"
               >

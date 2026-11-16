@@ -30,9 +30,10 @@ export function SiteHeader() {
   return (
     <LocalizedDigits>
       {
-        <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--ink)]/85 backdrop-blur-md">
-          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-3">
+        <header className="site-header sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--ink)]">
+          <div className="site-header-inner mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-3">
             <Link
+              prefetch={false}
               href="/"
               className="brand-lockup flex min-w-0 items-center gap-2 group"
             >
@@ -58,9 +59,13 @@ export function SiteHeader() {
               </span>
             </Link>
 
-            <nav className="hidden xl:flex items-center gap-1">
+            <nav
+              className="header-desktop-nav hidden xl:flex items-center gap-1"
+              aria-label={t("ناوبری اصلی", "Main navigation")}
+            >
               {NAV.map((item) => (
                 <Link
+                  prefetch={false}
                   key={item.href}
                   href={item.href}
                   className={cn(
@@ -76,12 +81,12 @@ export function SiteHeader() {
               ))}
             </nav>
 
-            <div className="flex w-full items-center justify-between gap-1 sm:w-auto sm:justify-end sm:gap-2">
+            <div className="header-controls flex w-full items-center justify-between gap-1 sm:w-auto sm:justify-end sm:gap-2">
               <AccountButton />
               <div
                 role="group"
                 aria-label="Content language"
-                className="flex items-center rounded-md border border-[var(--border)] p-0.5"
+                className="header-language flex items-center rounded-md border border-[var(--border)] p-0.5"
                 dir="ltr"
                 data-digit-literal
               >
@@ -109,7 +114,7 @@ export function SiteHeader() {
                 ))}
               </div>
               <div
-                className="flex items-center gap-1 rounded-md border border-[var(--border)] p-0.5"
+                className="header-digits flex items-center gap-1 rounded-md border border-[var(--border)] p-0.5"
                 dir="ltr"
                 role="group"
                 data-digit-literal
@@ -121,7 +126,7 @@ export function SiteHeader() {
                   aria-pressed={digits === "en"}
                   onClick={() => setDigitScript("en")}
                   className={cn(
-                    "rounded px-2 py-1 font-mono text-xs tabular-nums",
+                    "rounded px-2 py-1 tabular-nums text-xs",
                     digits === "en"
                       ? "bg-[var(--gold)]/20 text-[var(--gold-soft)]"
                       : "text-[var(--muted)]",
@@ -150,6 +155,8 @@ export function SiteHeader() {
                 className="xl:hidden rounded-md border border-[var(--border)] p-2 text-[var(--parchment)]"
                 onClick={() => setOpen((v) => !v)}
                 aria-label={t("منو", "Menu")}
+                aria-expanded={open}
+                aria-controls="mobile-navigation"
               >
                 {open ? (
                   <X className="h-5 w-5" />
@@ -161,10 +168,15 @@ export function SiteHeader() {
           </div>
 
           {open && (
-            <nav className="border-t border-[var(--border)] bg-[var(--ink)] px-4 py-3 xl:hidden animate-in-fade">
+            <nav
+              id="mobile-navigation"
+              aria-label={t("ناوبری موبایل", "Mobile navigation")}
+              className="border-t border-[var(--border)] bg-[var(--ink)] px-4 py-3 xl:hidden animate-in-fade"
+            >
               <div className="flex flex-col gap-1">
                 {NAV.map((item) => (
                   <Link
+                    prefetch={false}
                     key={item.href}
                     href={item.href}
                     onClick={() => setOpen(false)}

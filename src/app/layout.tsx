@@ -5,12 +5,10 @@ import type { Metadata, Viewport } from "next";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { DigitRemount } from "@/components/digits/DigitScript";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { SiteFrame } from "@/components/layout/SiteFrame";
 import "./globals.css";
-import "katex/dist/katex.min.css";
+import "./editorial.css";
 import "@fontsource-variable/vazirmatn";
-import "@fontsource/amiri/arabic-400.css";
-import "@fontsource/amiri/arabic-700.css";
-import "@fontsource/amiri/latin-400.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://manderia.daryajan.com"),
@@ -63,7 +61,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0c1424",
+  themeColor: "#f6f3ec",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -80,7 +78,7 @@ export default function RootLayout({
         <LanguageRoot>
           <DigitRemount>
             <AuthProvider>
-              <div className="app-shell flex min-h-dvh flex-col">
+              <SiteFrame>
                 <SiteHeader />
                 <main className="flex-1">{children}</main>
                 <SiteFooter />
@@ -103,7 +101,7 @@ export default function RootLayout({
                     }),
                   }}
                 />
-              </div>
+              </SiteFrame>
             </AuthProvider>
           </DigitRemount>
         </LanguageRoot>

@@ -342,12 +342,12 @@ export function SphereMarker({
   const texture = useMemo(() => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d")!;
-    ctx.font = "600 24px sans-serif";
+    ctx.font = "600 24px Vazirmatn Variable, sans-serif";
     const width = Math.ceil(ctx.measureText(displayLabel).width) + 24;
     canvas.width = width * 2;
     canvas.height = 72;
     ctx.scale(2, 2);
-    ctx.font = "600 24px sans-serif";
+    ctx.font = "600 24px Vazirmatn Variable, sans-serif";
     ctx.fillStyle = "#07121f";
     ctx.beginPath();
     ctx.roundRect(0, 0, width, 36, 7);

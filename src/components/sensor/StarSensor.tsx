@@ -133,7 +133,7 @@ function drawFrame(
     ctx.stroke();
     if (labelNames && star.matched && star.name && (star.mag ?? 9) <= 3.2) {
       ctx.fillStyle = "rgba(244, 236, 216, 0.92)";
-      ctx.font = "12px sans-serif";
+      ctx.font = "14px Vazirmatn Variable, sans-serif";
       ctx.fillText(star.name, star.x + 8, star.y - 6);
     }
   });
@@ -146,7 +146,7 @@ function drawFrame(
     ctx.arc(pix.x, pix.y, 4, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = "rgba(255, 210, 170, 0.95)";
-    ctx.font = "12px sans-serif";
+    ctx.font = "14px Vazirmatn Variable, sans-serif";
     ctx.fillText(planet.name, pix.x + 7, pix.y + 4);
   }
 }
@@ -535,12 +535,12 @@ export function StarSensor() {
             {t("مانند حسگر ماهواره، در مرورگر", "A star tracker, in the browser")}
           </p>
           <h1 className="font-[family-name:var(--font-display)] text-3xl text-[var(--gold-soft)] md:text-4xl">
-            {t("حسگر ستاره (هوش مصنوعی ستاره‌یاب)", "Star sensor (AI star finder)")}
+            {t("حسگر ستاره", "Star sensor")}
           </h1>
           <p className="max-w-3xl text-sm leading-7 text-[var(--muted)]">
             {t(
-              "عکس آسمان را بارگذاری کنید یا با دوربین بگیرید. ستاره‌ها با هندسهٔ مثلث‌ها و فهرست هیپارکوس شناسایی می‌شوند، همان روشی که حسگر ماهواره را به دقت ثانیهٔ قوسی می‌رساند. مرکز تصویر و هر ستاره، بعد و میل هندسی و ارتفاع و سمت ظاهری می‌گیرند.",
-              "Upload a sky photo or take one with the camera. Stars are identified by triangle geometry against a Hipparcos catalog, the same method a satellite star tracker uses when the result has to be arcseconds. The center and every star get a geometric RA/Dec and an apparent altitude and azimuth.",
+              "عکس آسمان را بارگذاری کنید یا با دوربین بگیرید. نقطه‌های ستاره‌مانند با پردازش تصویر پیدا می‌شوند و الگوی مثلث‌ها با فهرست هیپارکوس تطبیق داده می‌شود. در صورت حل موفق، نام ستاره‌های منطبق و مختصات مرکز تصویر را می‌بینید؛ نتیجه به کیفیت عکس و میدان دید وابسته است.",
+              "Upload a sky photo or take one with the camera. Image processing locates star-like points, then triangle patterns are matched against the Hipparcos catalogue. A successful solve shows matched stars and image-centre coordinates. Results depend on image quality and field of view.",
             )}
           </p>
         </header>

@@ -109,7 +109,7 @@ export function GeometryFigure({
   return (
     <LocalizedDigits>
       {
-        <figure className="rounded-2xl border border-[var(--border)] bg-[#091424] overflow-hidden">
+        <figure className="observatory-figure rounded-2xl border border-[var(--border)] bg-[#091424] overflow-hidden">
           <svg
             viewBox="0 0 360 360"
             className="w-full mx-auto max-w-md"
@@ -238,7 +238,7 @@ export function GeometryFigure({
                             y={y - 10}
                             fill={colors[i]}
                             fontSize="16"
-                            fontFamily="Georgia"
+                            fontFamily="Vazirmatn Variable, sans-serif"
                           >
                             {labels[i]}
                           </text>
@@ -352,7 +352,7 @@ export function RefractionFigure() {
   return (
     <LocalizedDigits>
       {
-        <figure className="rounded-2xl border border-[var(--border)] bg-[#091424] p-4">
+        <figure className="observatory-figure rounded-2xl border border-[var(--border)] bg-[#091424] p-4">
           <svg
             viewBox="0 0 440 370"
             role="img"

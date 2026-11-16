@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Hero } from "@/components/home/Hero";
 import { BuilderStory } from "@/components/home/BuilderStory";
+import { Heritage } from "@/components/home/Heritage";
 import {
   FeaturePreview,
   type PreviewKind,
@@ -175,9 +176,10 @@ export default function HomePage() {
           <div className="home-feature-grid">
             {FEATURES.map((f) => (
               <Link
+                prefetch={false}
                 key={f.id}
                 href={f.href}
-                className={`home-feature-card${f.wide ? " feature-wide" : ""}${f.developing ? " feature-developing" : ""}`}
+                className={`home-feature-card feature-card-${f.id}${f.wide ? " feature-wide" : ""}${f.developing ? " feature-developing" : ""}`}
                 aria-labelledby={`feature-${f.id}-title`}
               >
                 <div className="feature-art">
@@ -215,8 +217,9 @@ export default function HomePage() {
             ))}
           </div>
         </section>
+        <Heritage />
         <section
-          className="home-shell phone-section"
+          className="home-shell phone-section dark-surface"
           aria-labelledby="phone-title"
         >
           <div className="phone-art">
@@ -260,7 +263,7 @@ export default function HomePage() {
                 )}
               </li>
             </ul>
-            <Link className="home-text-link" href="/compass">
+            <Link prefetch={false} className="home-text-link" href="/compass">
               {t("رفتن به قطب‌نما و حسگرها", "Open the compass and sensors")}
               <Arrow size={17} />
             </Link>
@@ -297,12 +300,12 @@ export default function HomePage() {
               )}
             </p>
             <div className="home-closing-links">
-              <Link href="/course?tab=proofs">
+              <Link prefetch={false} href="/course?tab=proofs">
                 <BookOpen size={15} />
                 {t("اثبات‌ها و خلاصه‌ها", "Proofs and overviews")}
                 <Arrow size={15} />
               </Link>
-              <Link href="/sky">
+              <Link prefetch={false} href="/sky">
                 <Compass size={15} />
                 {t("یک نگاه به آسمان", "Take a look at the sky")}
                 <Arrow size={15} />

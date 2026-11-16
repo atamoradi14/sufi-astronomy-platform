@@ -29,7 +29,7 @@ function Row({ k, v }: { k: string; v: string }) {
               k,
             )}
           </span>
-          <span className="font-mono text-[var(--gold-soft)]">{v}</span>
+          <span className="tabular-nums text-[var(--gold-soft)]">{v}</span>
         </div>
       }
     </LocalizedDigits>

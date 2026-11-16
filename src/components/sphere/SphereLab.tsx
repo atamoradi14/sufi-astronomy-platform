@@ -677,7 +677,7 @@ function Metric({ label, value }: { label: string; value: string }) {
       {
         <div className="rounded-lg border border-[var(--border)] px-3 py-2">
           <div className="text-[10px] text-[var(--muted)]">{label}</div>
-          <div className="font-mono text-[var(--gold-soft)] dir-ltr text-left">
+          <div className="tabular-nums text-[var(--gold-soft)] dir-ltr text-left">
             {value}
           </div>
         </div>
