@@ -59,3 +59,5 @@ Google sign-in uses NextAuth’s OAuth code flow, state and PKCE, and only `open
 The homepage offers a dismissible login dialog. `/lab`, `/sensor`, and `/atlas` are checked on the server; the embedded course lab checks the validated session too. The public lessons, proofs and informational pages remain available without signing in. `/admin` and `/api/admin/users` check the server session and the configured exact email allowlist, including on each API request. Ordinary users cannot read the account list. The admin page shows real registrations, search and pagination; it does not pre-create or fabricate Google accounts.
 
 SEO uses canonical URLs, `robots.txt`, `sitemap.xml`, social-card metadata, and escaped Website/LearningResource JSON-LD. Protected tools, auth endpoints and admin pages are excluded from the sitemap and marked noindex.
+
+Submit **https://fanous.online/sitemap.xml** in Google Search Console. See [seo.md](seo.md) for the public directory, canonical/indexing policy, structured data and verification procedure.
