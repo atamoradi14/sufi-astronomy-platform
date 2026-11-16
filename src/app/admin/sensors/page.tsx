@@ -6,8 +6,7 @@ import { AccessRequired } from "@/components/auth/AuthProvider";
 import { MobileSensors } from "@/components/mobile-sensors/MobileSensors";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title:
-    "سنسورهای گوشی و دینامیک سه بعدی لایو | Phone sensors & live 3D dynamics",
+  title: "گوشی در نقش ماهواره | Phone as satellite",
   alternates: { canonical: "/admin/sensors" },
   robots: { index: false, follow: false },
 };

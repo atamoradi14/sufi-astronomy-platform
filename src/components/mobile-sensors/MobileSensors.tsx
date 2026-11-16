@@ -170,10 +170,7 @@ export function MobileSensors() {
             )}
           </p>
           <h1 className="text-3xl md:text-4xl text-[var(--gold-soft)]">
-            {t(
-              "سنسورهای گوشی و دینامیک سه بعدی لایو",
-              "Phone sensors & live 3D dynamics",
-            )}
+            {t("گوشی در نقش ماهواره", "Phone as satellite")}
           </h1>
           <p className="text-sm leading-7 text-[var(--muted)]">
             {t(

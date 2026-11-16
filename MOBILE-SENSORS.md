@@ -1,4 +1,4 @@
-# Phone sensors & live 3D dynamics
+# Phone as satellite
 
 URL: `https://fanous.online/admin/sensors`. Only the verified Google account
 `atamoradi8@gmail.com` can open it. The server checks the session identity before
@@ -8,7 +8,7 @@ public sitemap. It is not bound to a particular phone model.
 
 ## On an Android phone
 
-1. Sign in with the authorized account, then choose **Phone sensors & live 3D** in the menu.
+1. Sign in with the authorized account, then choose **Phone as satellite** in the menu.
 2. Press **Start & request permission** and allow motion/orientation and location.
    Each stream reports its own availability. A missing magnetometer API is not
    evidence that the phone has no compass: browser orientation may still work.
@@ -96,7 +96,7 @@ References: [W3C orientation and motion](https://www.w3.org/TR/orientation-event
 ## Quaternion plots, rear optical sky and filter dynamics
 
 All views remain internal tabs of `/admin/sensors`; capture survives tab switches.
-The new Persian name is **سنسورهای گوشی و دینامیک سه بعدی لایو**.
+The new Persian name is **گوشی در نقش ماهواره**.
 
 - Quaternion traces plot all four `[x,y,z,w]` components for reference,
   gyro prediction and corrected estimate. Reference signs align to the current

@@ -34,8 +34,8 @@ export function SiteHeader() {
         ...NAV,
         {
           href: "/admin/sensors",
-          label: "سنسورهای گوشی و دینامیک سه بعدی لایو",
-          en: "Phone sensors & live 3D",
+          label: "گوشی در نقش ماهواره",
+          en: "Phone as satellite",
         },
       ]
     : NAV;
