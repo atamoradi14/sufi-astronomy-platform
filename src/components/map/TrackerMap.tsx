@@ -35,7 +35,8 @@ export function TrackerMap() {
   const [showCircles, setShowCircles] = useState(true);
   const [radiusKm, setRadiusKm] = useState(500);
   const reading = geo.reading;
-  const heading = compass.heading ?? reading?.heading ?? null;
+  // Travel course and a relative orientation are not the phone’s north-referenced heading.
+  const heading = compass.absolute ? compass.heading : null;
   const overlays = useMemo(() => {
     if (!reading) return null;
     const qiblaPath = greatCirclePath(

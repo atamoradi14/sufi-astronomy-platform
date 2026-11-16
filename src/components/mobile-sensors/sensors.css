@@ -1,0 +1,94 @@
+.sensor-lab {
+  color: var(--parchment);
+}
+.sensor-panel {
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--panel);
+  padding: clamp(1rem, 2vw, 1.5rem);
+  min-width: 0;
+}
+.sensor-panel h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--gold-soft);
+  line-height: 1.7;
+}
+.sensor-button,
+.sensor-primary {
+  border: 1px solid var(--border);
+  border-radius: 0.65rem;
+  padding: 0.7rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.sensor-button {
+  background: var(--ink);
+  color: var(--parchment);
+}
+.sensor-primary {
+  background: var(--gold);
+  color: var(--ink-deep);
+  font-weight: 650;
+}
+.sensor-lab button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.sensor-lab :is(button, input, select):focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+}
+.sensor-tabs {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border);
+}
+.sensor-tabs button {
+  padding: 0.8rem 0.9rem;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  border-bottom: 2px solid transparent;
+}
+.sensor-tabs button[aria-selected="true"] {
+  border-color: var(--gold);
+  color: var(--gold-soft);
+}
+.sensor-note {
+  font-size: 0.8rem;
+  line-height: 1.9;
+  color: var(--muted);
+  margin-top: 0.8rem;
+}
+.sensor-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1.8;
+}
+.sensor-label select,
+.sensor-label input {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  background: var(--ink);
+  color: var(--parchment);
+  padding: 0.7rem;
+  font-size: 0.85rem;
+}
+.sensor-lab input[type="checkbox"] {
+  accent-color: var(--teal);
+  width: 1.1rem;
+  height: 1.1rem;
+  flex-shrink: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sensor-lab * {
+    scroll-behavior: auto !important;
+  }
+}

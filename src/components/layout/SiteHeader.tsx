@@ -13,6 +13,8 @@ import {
 import { Menu, X, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/components/layout/Theme";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { canUseMobileSensors } from "@/lib/mobile-sensors/access";
 const NAV = [
   { href: "/", label: "خانه", en: "Home" },
   { href: "/course", label: "درس‌نامهٔ کروی", en: "Spherical course" },
@@ -26,6 +28,13 @@ const NAV = [
 export function SiteHeader() {
   const { language, fa, t } = useLanguage();
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const navigation = canUseMobileSensors(session?.user?.email)
+    ? [
+        ...NAV,
+        { href: "/admin/sensors", label: "حسگرهای گوشی", en: "Phone sensors" },
+      ]
+    : NAV;
   const [open, setOpen] = useState(false);
   const digits = useDigitScript();
   const { theme, toggle } = useTheme();
@@ -65,7 +74,7 @@ export function SiteHeader() {
               className="header-desktop-nav hidden xl:flex items-center gap-1"
               aria-label={t("ناوبری اصلی", "Main navigation")}
             >
-              {NAV.map((item) => (
+              {navigation.map((item) => (
                 <Link
                   prefetch={false}
                   key={item.href}
@@ -193,7 +202,7 @@ export function SiteHeader() {
               className="border-t border-[var(--border)] bg-[var(--ink)] px-4 py-3 xl:hidden animate-in-fade"
             >
               <div className="flex flex-col gap-1">
-                {NAV.map((item) => (
+                {navigation.map((item) => (
                   <Link
                     prefetch={false}
                     key={item.href}
