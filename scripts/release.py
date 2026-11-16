@@ -104,8 +104,8 @@ def auth_settings():
                 values[key.strip()] = value.strip().strip('"').strip("'")
     keys = ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET', 'NEXTAUTH_SECRET', 'NEXTAUTH_URL', 'ADMIN_EMAILS']
     settings = {key: os.getenv(key) or values.get(key, '') for key in keys}
-    if any(not value for value in settings.values()) or len(settings['NEXTAUTH_SECRET']) < 32 or settings['NEXTAUTH_URL'] != 'https://manderia.daryajan.com':
-        raise RuntimeError('Complete the private .env auth settings for https://manderia.daryajan.com before deployment')
+    if any(not value for value in settings.values()) or len(settings['NEXTAUTH_SECRET']) < 32 or settings['NEXTAUTH_URL'] != 'https://fanous.online':
+        raise RuntimeError('Complete the private .env auth settings for https://fanous.online before deployment')
     return settings
 
 def backup_users(before, stamp):

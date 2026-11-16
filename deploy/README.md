@@ -1,8 +1,8 @@
 # Fanous-e Khial deployment
 
-The public brand is **فانوس خیال / Fanous-e Khial**. Existing `manderia` infrastructure identifiers and the current domain are retained; see [brand.md](brand.md) for the identity and asset workflow.
+The public brand is **فانوس خیال / Fanous-e Khial**. Existing `manderia` infrastructure identifiers are retained; see [brand.md](brand.md) for the identity and asset workflow.
 
-Public URL: https://manderia.daryajan.com. This follows the existing Darvazeh/Hamafarin worker pattern: context `ravand`, node `ravand-worker-01`, namespace `astronomy`, Deployment and ClusterIP Service `manderia`. The shared Caddy stays in `hamafarin-apps`; no new Ingress, host port, separate database server or Caddy instance is required.
+Public URL: https://fanous.online. This follows the existing Darvazeh/Hamafarin worker pattern: context `ravand`, node `ravand-worker-01`, namespace `astronomy`, Deployment and ClusterIP Service `manderia`. The shared Caddy stays in `hamafarin-apps`; no new Ingress, host port, separate database server or Caddy instance is required.
 
 ## Release
 
@@ -35,7 +35,7 @@ python scripts/configure-public-endpoint.py --env-file PATH/TO/OPERATOR.env
 python scripts/configure-public-endpoint.py --env-file PATH/TO/OPERATOR.env --apply
 ```
 
-The helper reads only `CLOUDFLARE_API_TOKEN` from the environment or that private env file. No token is copied into this project or the application. It manages only `manderia.daryajan.com`, a proxied A record to worker `2.29.120.138`, and the marked `deploy/caddy/manderia.Caddyfile` block. It requires live ConfigMap, active Caddy configuration, and the owning desired-state files in sibling `hamafarin-cluster` to agree. `--gateway-repo` can select that repository explicitly.
+The helper reads only `CLOUDFLARE_API_TOKEN` from the environment or that private env file. No token is copied into this project or the application. It manages `fanous.online`, a proxied A record to worker `2.29.120.138`, and the marked `deploy/caddy/manderia.Caddyfile` block. The former `manderia.daryajan.com` hostname redirects permanently with the full path/query preserved. Apply the gateway configuration only after the application release and the new Google origin/callback are ready. It requires live ConfigMap, active Caddy configuration, and the owning desired-state files in sibling `hamafarin-cluster` to agree. `--gateway-repo` can select that repository explicitly.
 
 Before DNS/gateway mutation it saves the original Caddyfile, ConfigMap, active JSON, owning source, and DNS record under ignored `.local/gateway-backups/<UTC timestamp>/`, and copies the recovery snapshot to **`ravand-worker-01:/var/backups/manderia/caddy/<UTC timestamp>/`** with directory mode 0700 and files 0600. These snapshots can contain resolved gateway credentials: keep them private and never commit them.
 
@@ -50,7 +50,7 @@ For an application rollback, run deploy with a previously recorded, compatible a
 
 ## Google sign-in and the user administrator
 
-The ignored root `.env` supplies `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, a unique 32+ character `NEXTAUTH_SECRET`, `NEXTAUTH_URL=https://manderia.daryajan.com`, and comma-separated `ADMIN_EMAILS`. See `auth.env.example` for names only. The deployment driver validates these settings and creates `astronomy/manderia-auth` without logging its values. The app never receives the Cloudflare token. When reusing the existing Google client, preserve Darvazeh’s origin/callback and add the Manderia origin plus `https://manderia.daryajan.com/api/auth/callback/google`.
+The ignored root `.env` supplies `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, a unique 32+ character `NEXTAUTH_SECRET`, `NEXTAUTH_URL=https://fanous.online`, and comma-separated `ADMIN_EMAILS`. See `auth.env.example` for names only. The deployment driver validates these settings and creates `astronomy/manderia-auth` without logging its values. The app never receives the Cloudflare token. When reusing the existing Google client, preserve Darvazeh’s origin/callback and add the Fanous origin plus `https://fanous.online/api/auth/callback/google`.
 
 Google sign-in uses NextAuth’s OAuth code flow, state and PKCE, and only `openid email profile`. Unverified email identities are rejected. Google’s subject identifier, rather than email alone, keys account records. Only basic profile information and login timestamps/counts are saved; OAuth access/refresh tokens and Gmail messages are not stored. The session is encrypted/signed by NextAuth and uses secure cookies in HTTPS production.
 

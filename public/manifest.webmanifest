@@ -4,8 +4,8 @@
   "description": "فانوس خیال؛ پنجره‌ای برای شناختن زیبایی‌های آسمان",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f6f3ec",
-  "theme_color": "#f6f3ec",
+  "background_color": "#0b1723",
+  "theme_color": "#0b1723",
   "lang": "fa",
   "dir": "rtl",
   "icons": [

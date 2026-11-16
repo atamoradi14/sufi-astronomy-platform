@@ -64,7 +64,7 @@ test("Unverified Google identities and other providers cannot sign in", async ()
 });
 test("Authentication redirects are restricted to this site", async () => {
   const redirect = authOptions.callbacks!.redirect!;
-  const baseUrl = "https://manderia.daryajan.com";
+  const baseUrl = "https://fanous.online";
   assert.equal(await redirect({ url: "/lab", baseUrl }), baseUrl + "/lab");
   assert.equal(
     await redirect({ url: "//evil.example/steal", baseUrl }),

@@ -1,7 +1,13 @@
 # BEGIN MANDERIA PUBLIC ENDPOINT
-manderia.daryajan.com {
+fanous.online {
     encode zstd gzip
     header -Server
     reverse_proxy manderia.astronomy.svc.cluster.local:80
+}
+
+manderia.daryajan.com {
+    encode zstd gzip
+    header -Server
+    redir https://fanous.online{uri} permanent
 }
 # END MANDERIA PUBLIC ENDPOINT

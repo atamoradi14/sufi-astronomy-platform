@@ -40,7 +40,7 @@ import sharp from "sharp";
   blockquote{border-right:1px solid #965b3588;margin:22px 0;padding-right:22px;font:400 24px/1.9 Vazir,sans-serif;color:#58675f}blockquote p{margin:0}.credit{font:12px Vazir;color:#58675f;margin-top:6px}
   .tag{font-size:24px;color:#243631;margin:25px 0}.logo{position:absolute;left:78px;top:175px;width:230px;height:230px}.logo svg{width:100%;height:100%}
   footer{position:absolute;bottom:47px;left:78px;right:78px;border-top:1px solid #8ccfc52b;padding-top:19px;display:flex;direction:rtl;justify-content:space-between;font-size:16px;color:#58675f}.url{direction:ltr;font:16px Vazir,sans-serif}
-  </style><div class="frame"><div class="arc"></div><div class="arc two"></div><div class="logo">${logo}</div><div class="copy"><h1>فانوس خیال</h1><p class="english">Fanous-e Khial</p><blockquote><p>این چرخِ فلک که ما در او حیرانیم</p><p>فانوس خیال از او مثالی دانیم</p><p class="credit">از رباعی منسوب به خیام</p></blockquote><p class="tag">نجوم، آسمان و میراث ایران</p></div><footer><span>آسمان تعاملی · حسگر ستاره · اطلس صوفی</span><span class="url">manderia.daryajan.com</span></footer></div></html>`,
+  </style><div class="frame"><div class="arc"></div><div class="arc two"></div><div class="logo">${logo}</div><div class="copy"><h1>فانوس خیال</h1><p class="english">Fanous-e Khial</p><blockquote><p>این چرخِ فلک که ما در او حیرانیم</p><p>فانوس خیال از او مثالی دانیم</p><p class="credit">از رباعی منسوب به خیام</p></blockquote><p class="tag">نجوم، آسمان و میراث ایران</p></div><footer><span>آسمان تعاملی · حسگر ستاره · اطلس صوفی</span><span class="url">fanous.online</span></footer></div></html>`,
   );
   console.log(
     "Lantern icons exported; social-card source: .local/fanous-social.html",

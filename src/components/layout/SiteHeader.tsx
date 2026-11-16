@@ -10,7 +10,8 @@ import {
   useDigitScript,
   LocalizedDigits,
 } from "@/components/digits/DigitScript";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/components/layout/Theme";
 import { useState } from "react";
 const NAV = [
   { href: "/", label: "خانه", en: "Home" },
@@ -27,6 +28,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const digits = useDigitScript();
+  const { theme, toggle } = useTheme();
   return (
     <LocalizedDigits>
       {
@@ -83,6 +85,23 @@ export function SiteHeader() {
 
             <div className="header-controls flex w-full items-center justify-between gap-1 sm:w-auto sm:justify-end sm:gap-2">
               <AccountButton />
+              <button
+                type="button"
+                className="theme-toggle rounded-md border border-[var(--border)] p-2 text-[var(--parchment)]"
+                onClick={toggle}
+                aria-label={
+                  theme === "dark"
+                    ? t("تغییر به حالت روشن", "Switch to light mode")
+                    : t("تغییر به حالت تاریک", "Switch to dark mode")
+                }
+                title={
+                  theme === "dark"
+                    ? t("حالت روشن", "Light mode")
+                    : t("حالت تاریک", "Dark mode")
+                }
+              >
+                {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
               <div
                 role="group"
                 aria-label="Content language"

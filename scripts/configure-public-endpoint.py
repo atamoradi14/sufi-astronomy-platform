@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Back up and extend the existing worker Caddy and daryajan DNS for Manderia only."""
+"""Back up the shared gateway and configure the Fanous public endpoint."""
 import argparse
 from datetime import datetime, timezone
 import hashlib
@@ -14,7 +14,7 @@ import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
 KUBE = ['kubectl', '--context', 'ravand', '-n', 'hamafarin-apps']
-HOST = 'manderia.daryajan.com'
+HOST = 'fanous.online'
 WORKER_IP = '2.29.120.138'
 START, END = '# BEGIN MANDERIA PUBLIC ENDPOINT', '# END MANDERIA PUBLIC ENDPOINT'
 
@@ -61,9 +61,9 @@ def main():
         if not value.get('success'):
             raise RuntimeError('Cloudflare operation rejected; private response withheld')
         return value['result']
-    zones = cloudflare('zones?name=daryajan.com')
+    zones = cloudflare('zones?name=fanous.online')
     if len(zones) != 1:
-        raise RuntimeError('Expected one accessible daryajan.com zone')
+        raise RuntimeError('Expected one accessible fanous.online zone')
     zone = zones[0]['id']
     records = cloudflare(f'zones/{zone}/dns_records?name={HOST}')
     if records and not (len(records) == 1 and records[0]['type'] == 'A' and records[0]['content'] == WORKER_IP):
@@ -139,7 +139,7 @@ def main():
     private_write(backup / 'Caddyfile.after', updated.encode())
     report = {'hostname':HOST,'namespace':'astronomy','worker':WORKER_IP,'backupLocal':str(backup),'backupWorker':remote,'originalCaddySha256':hashlib.sha256(original.encode()).hexdigest(),'updatedCaddySha256':hashlib.sha256(updated.encode()).hexdigest(),'activeConfigSha256':hashlib.sha256(after).hexdigest()}
     (ROOT / '.local/public-endpoint.json').write_text(json.dumps(report, indent=2)+'\n',encoding='utf-8')
-    print('Manderia DNS and shared Caddy route applied; owning gateway source files updated.')
+    print('Fanous DNS and shared Caddy route applied; owning gateway source files updated.')
 
 if __name__ == '__main__':
     try:

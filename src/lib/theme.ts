@@ -1,0 +1,1 @@
+export const themeBootScript = `(function(){var t='dark';try{if(localStorage.getItem('fanous-theme')==='light')t='light'}catch(e){}document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==='dark'?'#0b1723':'#f6f3ec'})()`;

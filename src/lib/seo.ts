@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-export const SITE_URL = "https://manderia.daryajan.com";
+export const SITE_URL = "https://fanous.online";
 export const SITE_NAME = "فانوس خیال | Fanous-e Khial";
 export function pageMetadata(
   title: string,

@@ -1,6 +1,6 @@
-# Reading room and observatory
+# Site-wide appearance and spherical sky
 
-The public experience has two intentional environments, selected by `SiteFrame`: Home, About, the course, lessons, proofs, privacy, tool guide and historical atlas use an ivory reading surface; sky, sphere, sensor, charts, map, compass and admin use a dark observing surface. Embedded geometric figures and equations retain a dark local surface inside the reading pages. Theme tokens, type scale and component rules are in `src/app/editorial.css`. Keep product text out of decorative artwork.
+The entire site uses one appearance preference: dark by default, with a header sun/moon control for light mode. The choice is stored in `fanous-theme`, applied in the head before first paint, retained across navigation and reloads, and synchronised between tabs. The root theme also covers dialogs, forms, equations and tool panels. Sky canvases and scientific illustrations keep their dark plotting backgrounds for legibility, like image content; the surrounding interface follows the selected theme. `SiteFrame` never chooses a theme by route. Tokens and component rules are in `src/app/editorial.css`.
 
 Use Vazirmatn Variable for all interface text, Persian and English. Amiri was removed; Georgia and generic sans-serif canvas labels were replaced. Body text is generally 16–18px, navigation 14–16px, and secondary captions 12–14px. Equation glyphs deliberately use KaTeX. Keep the English and Persian numeral preference independent of content language. Native inputs and browser theme colour follow the active surface.
 

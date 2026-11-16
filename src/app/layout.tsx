@@ -6,12 +6,14 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { DigitRemount } from "@/components/digits/DigitScript";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteFrame } from "@/components/layout/SiteFrame";
+import { ThemeProvider } from "@/components/layout/Theme";
+import { themeBootScript } from "@/lib/theme";
 import "./globals.css";
 import "./editorial.css";
 import "@fontsource-variable/vazirmatn";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://manderia.daryajan.com"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "فانوس خیال | نجوم، آسمان و میراث ایران",
     template: "%s | فانوس خیال",
@@ -46,7 +48,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "فانوس خیال | Fanous-e Khial",
     siteName: "Fanous-e Khial",
-    url: "https://manderia.daryajan.com",
+    url: SITE_URL,
     type: "website",
     locale: "fa_IR",
     images: [
@@ -61,7 +63,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f6f3ec",
+  themeColor: "#0b1723",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -73,36 +75,47 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa" dir="rtl" data-scroll-behavior="smooth">
+    <html
+      lang="fa"
+      dir="rtl"
+      data-theme="dark"
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+      </head>
       <body className="antialiased">
         <LanguageRoot>
           <DigitRemount>
-            <AuthProvider>
-              <SiteFrame>
-                <SiteHeader />
-                <main className="flex-1">{children}</main>
-                <SiteFooter />
-                <script
-                  type="application/ld+json"
-                  dangerouslySetInnerHTML={{
-                    __html: safeJsonLd({
-                      "@context": "https://schema.org",
-                      "@type": "WebSite",
-                      name: "فانوس خیال",
-                      alternateName: "Fanous-e Khial",
-                      url: SITE_URL,
-                      inLanguage: ["fa", "en"],
-                      description: "پنجره‌ای برای شناختن زیبایی‌های آسمان",
-                      creator: {
-                        "@type": "Person",
-                        name: "Ata Moradi",
-                        alternateName: "عطا مرادی",
-                      },
-                    }),
-                  }}
-                />
-              </SiteFrame>
-            </AuthProvider>
+            <ThemeProvider>
+              <AuthProvider>
+                <SiteFrame>
+                  <SiteHeader />
+                  <main className="flex-1">{children}</main>
+                  <SiteFooter />
+                  <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{
+                      __html: safeJsonLd({
+                        "@context": "https://schema.org",
+                        "@type": "WebSite",
+                        name: "فانوس خیال",
+                        alternateName: "Fanous-e Khial",
+                        url: SITE_URL,
+                        inLanguage: ["fa", "en"],
+                        description: "پنجره‌ای برای شناختن زیبایی‌های آسمان",
+                        creator: {
+                          "@type": "Person",
+                          name: "Ata Moradi",
+                          alternateName: "عطا مرادی",
+                        },
+                      }),
+                    }}
+                  />
+                </SiteFrame>
+              </AuthProvider>
+            </ThemeProvider>
           </DigitRemount>
         </LanguageRoot>
       </body>

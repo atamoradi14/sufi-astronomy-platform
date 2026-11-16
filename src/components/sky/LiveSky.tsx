@@ -801,7 +801,7 @@ export function LiveSky() {
                     onChange={(e) => setQuery(e.target.value)}
                   />
                   {query && (
-                    <div className="absolute inset-x-0 top-full z-30 mt-2 rounded-xl border border-[var(--border)] bg-[#0d1d31] p-2 shadow-xl">
+                    <div className="absolute inset-x-0 top-full z-30 mt-2 rounded-xl border border-[var(--border)] bg-[var(--panel)] p-2 shadow-xl">
                       {results.map((s) => (
                         <button
                           type="button"
@@ -904,7 +904,7 @@ export function LiveSky() {
                 />
                 {(!loaded || error) && (
                   <div
-                    className="absolute inset-0 flex flex-col gap-4 items-center justify-center bg-[#07121fe6] p-6 text-sm text-center"
+                    className="absolute inset-0 flex flex-col gap-4 items-center justify-center bg-[var(--panel)] p-6 text-sm text-center"
                     role="status"
                   >
                     {error
@@ -971,7 +971,7 @@ export function LiveSky() {
                 </span>
               </div>
             </div>
-            <aside className="space-y-4 rounded-2xl border border-[var(--border)] bg-[#101d30] p-5">
+            <aside className="space-y-4 rounded-2xl border border-[var(--border)] bg-[var(--panel)] p-5">
               <p className="study-kicker">OBSERVER / TIME</p>
               <h2 className="text-lg text-[var(--gold-soft)]">
                 {t("مکان و زمان رصد", "Observer and time")}
@@ -1174,7 +1174,7 @@ export function LiveSky() {
           </div>
           {selected && selectedH && (
             <section
-              className="rounded-2xl border border-[var(--gold)]/35 bg-[#14243a] p-5 space-y-3"
+              className="rounded-2xl border border-[var(--gold)]/35 bg-[var(--panel)] p-5 space-y-3"
               aria-live="polite"
             >
               <div className="flex flex-wrap justify-between gap-3">
