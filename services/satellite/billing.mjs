@@ -194,6 +194,10 @@ export function createBilling(
     let o = db
       .prepare("SELECT * FROM satellite_orders WHERE owner=? AND request_key=?")
       .get(c.sub, p.requestKey);
+    if (o?.status === 'expired') {
+      db.prepare("UPDATE satellite_orders SET request_key=? WHERE id=? AND status='expired'").run('expired-'+o.id,o.id);
+      o=null;
+    }
     if (o) check(o.plan === p.plan && o.currency === p.currency);
     else {
       const plan = db
