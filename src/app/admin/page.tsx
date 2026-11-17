@@ -4,6 +4,7 @@ import { getUserSession } from "@/lib/auth/session";
 import { isAdminEmail } from "@/lib/auth/options";
 import { AccessRequired } from "@/components/auth/AuthProvider";
 import { AdminUsers } from "@/components/auth/AdminUsers";
+import { BillingManagement } from "@/components/satellite/BillingPanel";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "مدیریت کاربران",
@@ -16,15 +17,8 @@ export default async function Page() {
   if (!isAdminEmail(session.user.email)) notFound();
   return (
     <>
-      <div className="mx-auto max-w-7xl px-4 pt-6">
-        <a
-          className="underline text-[var(--gold-soft)]"
-          href="/satellite#satellite-plans"
-        >
-          مدیریت طرح‌ها و قیمت ماهواره · Satellite plans & pricing
-        </a>
-      </div>
       <AdminUsers />
+      <BillingManagement />
     </>
   );
 }

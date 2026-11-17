@@ -177,6 +177,7 @@ export function createSatellite({
         at: 0,
         camera: null,
         absolute: false,
+        billingSession: null,
       });
     return devices.get(id);
   };
@@ -530,8 +531,10 @@ export function createSatellite({
       socket.destroy();
       return;
     }
-    if (role === "device") billing.start(d.owner, d.email);
+    let billingSession = null;
+    if (role === "device") billingSession = billing.start(d.owner, d.email, d.id).sessionId;
     if (!billing.access(d.owner, d.email).allowed) {
+      if (billingSession) billing.stopSession(billingSession);
       // Upgrade then close with a product-specific code: retain the pairing token.
       sockets.handleUpgrade(req, socket, head, (ws) => {
         ws.send(
@@ -563,7 +566,9 @@ export function createSatellite({
         return;
       }
       s.publisher?.close(1000, "New device connection");
+      if (s.billingSession) billing.stopSession(s.billingSession);
       s.publisher = ws;
+      s.billingSession = billingSession;
       s.lastSeq = -1;
       s.at = 0;
       s.filter = new AttitudeKalman();
@@ -684,6 +689,8 @@ export function createSatellite({
       });
       ws.on("close", () => {
         if (s.publisher === ws) {
+          billing.stopSession(s.billingSession);
+          s.billingSession = null;
           s.publisher = null;
           s.camera = null;
           broadcast(s, { type: "connection", connected: false });
@@ -730,6 +737,7 @@ export function createSatellite({
     close: async () => {
       clearInterval(timer);
       clearInterval(accessTimer);
+      for (const state of devices.values()) billing.stopSession(state.billingSession);
       billing.stop();
       for (const ws of sockets.clients) ws.terminate();
       await new Promise((resolve) => server.close(resolve));

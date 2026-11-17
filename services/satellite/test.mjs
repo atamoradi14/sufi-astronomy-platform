@@ -170,8 +170,8 @@ test("Pairing approval, publishing/viewing roles, owner isolation, one-use ticke
     assert.ok((await once(reused, "error"))[0]);
     const closed = once(viewer, "close");
     app.db
-      .prepare("UPDATE satellite_accounts SET trial_started=? WHERE owner=?")
-      .run(Date.now() - 900001, "owner");
+      .prepare("UPDATE satellite_accounts SET trial_used_ms=? WHERE owner=?")
+      .run(600001, "owner");
     assert.equal((await call("/v1/ticket", { id }, owner)).status, 402);
     assert.equal((await closed)[0], 4003);
     assert.equal((await call("/device/unpair", {}, claimed.token)).status, 200);

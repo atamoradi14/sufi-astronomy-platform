@@ -5,7 +5,7 @@ import { createHmac } from "node:crypto";
 import { createBilling } from "./billing.mjs";
 const owner = { sub: "owner", email: "owner@example.com" },
   admin = { sub: "admin", email: "atamoradi8@gmail.com" };
-test("Trial lasts exactly 15 elapsed minutes; reconnect, other devices and restarts cannot reset it; admin is exempt", () => {
+test("Trial meters exactly 10 live minutes; reconnect, restarts and admin are handled safely", () => {
   const db = new DatabaseSync(":memory:");
   let clock = 1000000;
   let b = createBilling(db, {
@@ -15,7 +15,7 @@ test("Trial lasts exactly 15 elapsed minutes; reconnect, other devices and resta
   });
   assert.equal(b.access(owner.sub, owner.email).mode, "not_started");
   b.start(owner.sub, owner.email);
-  clock += 899999;
+  clock += 599999;
   b.start(owner.sub, owner.email);
   assert.equal(b.access(owner.sub, owner.email).allowed, true);
   b.stop();
@@ -24,6 +24,7 @@ test("Trial lasts exactly 15 elapsed minutes; reconnect, other devices and resta
     now: () => clock,
     env: {},
   });
+  b.start(owner.sub, owner.email);
   clock++;
   assert.equal(b.access(owner.sub, owner.email).allowed, false);
   assert.throws(
@@ -102,6 +103,8 @@ test("Stripe snapshots prices, rejects amount mismatches, verifies signatures, f
     assert.equal(session.metadata.app, "fanous");
     assert.equal(session.metadata.product, "satellite");
     b.updatePlan(admin, { ...plan, usd_cents: 999, days: 15 });
+    const managed = b.updatePlan(admin, { ...plan, id: "Gold Plan" });
+    assert.ok(managed.allPlans.some((p) => p.id === "gold-plan"));
     amount = 499;
     await assert.rejects(() => b.reconcile(owner, order.id), /verification/);
     assert.equal(b.access(owner.sub, owner.email).allowed, false);

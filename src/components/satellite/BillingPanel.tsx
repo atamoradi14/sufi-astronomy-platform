@@ -39,6 +39,7 @@ type Catalog = {
   tomanAvailable: boolean;
   stripeTestMode: boolean;
   admin: boolean;
+  metrics?: { totalLiveMs: number; sessions: number; users: number; activeSessions: number };
 };
 async function call(path: string, data?: object) {
   const r = await fetch("/api/satellite/" + path, {
@@ -117,7 +118,7 @@ export function BillingPanel({
               ? Math.max(0, (tick || Date.now()) - received)
               : 0),
         )
-      : 900000;
+      : 600000;
   useEffect(() => {
     if (access?.mode === "trial" && remaining === 0 && !access.paidUntil) onAccess(false);
   }, [remaining, access?.mode,access?.paidUntil, onAccess]);
@@ -179,8 +180,8 @@ export function BillingPanel({
           </h2>
           <p className="sensor-note">
             {t(
-              "۱۵ دقیقه از نخستین اتصال گوشی؛ این زمان پیوسته است و با قطع و وصل از نو شروع نمی‌شود. پس از آن برای استفاده، طرح فعال لازم است.",
-              "15 elapsed minutes from your first phone connection. Reconnecting does not reset it. An active plan is required afterwards.",
+              "همهٔ بخش‌های فانوس پس از ورود آزادند. فقط ماهواره ۱۰ دقیقه زمان اتصال زندهٔ گوشی را آزمایشی می‌شمارد؛ زمان فقط هنگام اتصال واقعی گوشی کم می‌شود.",
+              "All Fanous features remain available after sign-in. Only Satellite has a 10-minute trial, met solely while a native phone is live.",
             )}
           </p>
         </div>
@@ -194,7 +195,7 @@ export function BillingPanel({
               : access.mode === "paid"
                 ? t("طرح فعال", "Plan active")
                 : access.mode === "not_started"
-                  ? t("۱۵ دقیقه آمادهٔ شروع", "15 minutes ready to start")
+                  ? t("۱۰ دقیقه اتصال زنده آمادهٔ شروع", "10 live minutes ready to start")
               : access.paidUntil
                 ? t('طرح خریداری‌شده · آمادهٔ ادامه','Purchased plan · ready to continue')
               : remaining > 0
@@ -325,46 +326,16 @@ export function BillingPanel({
         </details>
       )}
       {catalog?.admin && (
-        <details>
-          <summary>
-            {t("مدیریت طرح‌ها و قیمت‌ها", "Manage plans & pricing")}
-          </summary>
-          <p className="sensor-note">
-            {t(
-              "قیمت دلاری را به سنت وارد کن (۵ دلار = ۵۰۰). تغییر طرح روی سفارش‌ها و خریدهای قبلی اثر ندارد.",
-              "Enter USD prices in cents ($5 = 500). Edits apply to new orders; existing purchases keep their recorded terms.",
-            )}
-          </p>
-          {[
-            ...(catalog.allPlans ?? []),
-            {
-                id: "",
-              name_fa: "طرح تازه",
-              name_en: "New plan",
-              days: 30,
-              toman: 199000,
-              usd_cents: 500,
-              active: false,
-            },
-          ].map((p) => (
-            <PlanEditor
-              key={p.id + JSON.stringify(p)}
-              plan={p}
-              disabled={!!busy}
-              save={(next) =>
-                void action("plan", async () => {
-                  await call("billing/plans", next);
-                  await refresh();
-                })
-              }
-            />
-          ))}
-        </details>
+        <p className="sensor-note">
+          <a className="underline text-[var(--gold-soft)]" href="/admin#billing-management">
+            {t("مدیریت طرح‌ها، قیمت‌ها و متریک اتصال در بخش مدیریت", "Manage plans, pricing and live-session metrics in Admin")}
+          </a>
+        </p>
       )}
     </section>
   );
 }
-function PlanEditor({
+export function PlanEditor({
   plan,
   disabled,
   save,
@@ -425,5 +396,61 @@ function PlanEditor({
         {t("ذخیرهٔ طرح", "Save plan")}
       </button>
     </form>
+  );
+}
+
+export function BillingManagement() {
+  const { t, fa } = useLanguage();
+  const { data: session } = useSession();
+  const [catalog, setCatalog] = useState<Catalog | null>(null);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const refresh = useCallback(async () => {
+    if (!session?.user?.id) return;
+    try {
+      const next = await call("billing");
+      if (!next.admin) throw Error("Administrator required");
+      setCatalog(next);
+      setError("");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Billing unavailable");
+    }
+  }, [session?.user?.id]);
+  useEffect(() => { void refresh(); }, [refresh]);
+  const save = async (plan: Plan) => {
+    setBusy(true);
+    setError("");
+    try {
+      await call("billing/plans", plan);
+      await refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not save plan");
+    } finally { setBusy(false); }
+  };
+  const duration = (ms: number) =>
+    ms < 60000 ? t("کمتر از یک دقیقه", "under one minute") :
+      Math.floor(ms / 60000).toLocaleString(fa ? "fa-IR" : "en-NZ") + t(" دقیقه", " min");
+  return (
+    <section className="mx-auto max-w-6xl space-y-5 px-4 pb-10" id="billing-management">
+      <header className="space-y-2">
+        <p className="study-kicker">FANOUS · BILLING ADMIN</p>
+        <h2 className="text-2xl text-[var(--gold-soft)]">{t("مدیریت طرح‌ها و زمان اتصال ماهواره", "Plans & satellite live-time")}</h2>
+        <p className="text-sm text-[var(--muted)]">{t("همهٔ بخش‌های سایت برای کاربران واردشده آزاد است. فقط اتصال زندهٔ ماهواره، ۱۰ دقیقه آزمایشی و سپس اشتراکی است.", "All signed-in users retain the rest of Fanous. Only live Satellite time is trialled for 10 minutes and then subscription-gated.")}</p>
+      </header>
+      {error && <p role="alert" className="text-sm text-[var(--rose-ink)]">{error} <button className="underline" onClick={() => void refresh()}>{t("تلاش دوباره", "Retry")}</button></p>}
+      {catalog?.metrics && <div className="grid gap-3 sm:grid-cols-4">
+        {[
+          [t("کل زمان زنده", "Total live time"), duration(catalog.metrics.totalLiveMs)],
+          [t("نشست‌ها", "Sessions"), String(catalog.metrics.sessions)],
+          [t("کاربران ماهواره", "Satellite users"), String(catalog.metrics.users)],
+          [t("اتصال زنده اکنون", "Live now"), String(catalog.metrics.activeSessions)],
+        ].map(([label, value]) => <div key={label} className="sensor-panel p-4"><p className="sensor-note">{label}</p><strong className="text-xl text-[var(--gold-soft)]">{value}</strong></div>)}
+      </div>}
+      <div className="sensor-panel space-y-4">
+        <p className="sensor-note">{t("شناسهٔ طرح می‌تواند خوانا نوشته شود؛ هنگام ذخیره خودکار به شناسهٔ کوچک و امن تبدیل می‌شود. قیمت دلار را به سنت وارد کن.", "Plan IDs may be human-readable; they are converted to safe lowercase IDs on save. Enter USD prices in cents.")}</p>
+        {(catalog?.allPlans ?? []).map((plan) => <PlanEditor key={plan.id} plan={plan} disabled={busy} save={(next) => void save(next)} />)}
+        <PlanEditor plan={{ id: "", name_fa: "طرح تازه", name_en: "New plan", days: 30, toman: 199000, usd_cents: 500, active: false }} disabled={busy} save={(next) => void save(next)} />
+      </div>
+    </section>
   );
 }

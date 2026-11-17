@@ -1,6 +1,8 @@
 import { createHmac, timingSafeEqual, randomUUID } from "node:crypto";
 const DAY = 86400000,
-  TRIAL = 900000;
+  // Satellite is the only metered feature. The rest of Fanous remains available
+  // to a signed-in visitor; this counter advances only while a native phone is live.
+  TRIAL = 600000;
 const fail = (status, message) => Object.assign(Error(message), { status });
 const check = (ok) => {
   if (!ok) throw fail(409, "Payment verification failed");
@@ -13,6 +15,7 @@ export function createBilling(
  CREATE TABLE IF NOT EXISTS satellite_plans(id TEXT PRIMARY KEY,name_fa TEXT NOT NULL,name_en TEXT NOT NULL,days INTEGER NOT NULL,toman INTEGER NOT NULL,usd_cents INTEGER NOT NULL,active INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS satellite_orders(id TEXT PRIMARY KEY,owner TEXT NOT NULL,email TEXT NOT NULL,plan TEXT NOT NULL,name_fa TEXT NOT NULL,name_en TEXT NOT NULL,days INTEGER NOT NULL,provider TEXT NOT NULL,currency TEXT NOT NULL,amount INTEGER NOT NULL,request_key TEXT NOT NULL,status TEXT NOT NULL,created INTEGER NOT NULL,session TEXT,unique_id TEXT,receiver TEXT,url TEXT,payment TEXT UNIQUE,paid_at INTEGER,starts INTEGER,ends INTEGER,refunded INTEGER NOT NULL DEFAULT 0,UNIQUE(owner,request_key));
  CREATE TABLE IF NOT EXISTS satellite_payment_events(id TEXT PRIMARY KEY,created INTEGER NOT NULL);
+ CREATE TABLE IF NOT EXISTS satellite_sessions(id TEXT PRIMARY KEY,owner TEXT NOT NULL,device_id TEXT NOT NULL,started INTEGER NOT NULL,ended INTEGER,duration_ms INTEGER NOT NULL DEFAULT 0,mode TEXT NOT NULL);
  CREATE TABLE IF NOT EXISTS satellite_billing_audit(id INTEGER PRIMARY KEY,actor TEXT NOT NULL,at INTEGER NOT NULL,action TEXT NOT NULL,detail TEXT NOT NULL);`);
   db.prepare(
     "INSERT OR IGNORE INTO satellite_plans(id,name_fa,name_en,days,toman,usd_cents,active) VALUES('monthly','یک ماه ماهواره','Satellite monthly',30,199000,500,1)",
@@ -30,6 +33,14 @@ export function createBilling(
     const columns=db.prepare(`PRAGMA table_info(${table})`).all();
     if(!columns.some(c=>c.name==='product'))db.exec(`ALTER TABLE ${table} ADD COLUMN product TEXT NOT NULL DEFAULT 'satellite'`);
     if(!columns.some(c=>c.name==='return_path'))db.exec(`ALTER TABLE ${table} ADD COLUMN return_path TEXT NOT NULL DEFAULT '/satellite'`);
+  }
+  for (const [name, sql] of [
+    ["trial_used_ms", "INTEGER NOT NULL DEFAULT 0"],
+    ["live_started", "INTEGER"],
+    ["live_connections", "INTEGER NOT NULL DEFAULT 0"],
+  ]) {
+    if (!db.prepare("PRAGMA table_info(satellite_accounts)").all().some((c) => c.name === name))
+      db.exec(`ALTER TABLE satellite_accounts ADD COLUMN ${name} ${sql}`);
   }
   // STRIPE_WEBHOOK_SECRET is shared configuration for Fanous products.  Keep the
   // old name as a deployment-safe fallback while existing Pods roll over.
@@ -59,26 +70,24 @@ export function createBilling(
         .prepare("SELECT * FROM satellite_accounts WHERE owner=?")
         .get(owner),
       t = now(),
-      started = row?.trial_started ?? null;
+      started = row?.trial_started ?? null,
+      used = Math.max(0, Number(row?.trial_used_ms || 0)) +
+        (row?.live_started == null ? 0 : Math.max(0, t - row.live_started));
     const paid =
       db
         .prepare(
           "SELECT max(ends) end FROM satellite_orders WHERE owner=? AND status='paid' AND refunded<amount AND product=? AND starts<=? AND ends>?",
         )
         .get(owner, product, t, t)?.end ?? null;
-    const until = started == null ? null : started + TRIAL,
-      isAdmin = admin(email);
+    const remaining = Math.max(0, TRIAL - used), isAdmin = admin(email);
     return {
-      allowed: isAdmin || !!paid || (product === "satellite" && (started == null || t < until)),
+      allowed: isAdmin || !!paid || (product === "satellite" && remaining > 0),
       admin: isAdmin,
       trialStarted: started,
-      trialEnds: until,
-      trialRemainingMs:
-        product !== "satellite"
-          ? 0
-          : started == null
-            ? TRIAL
-            : Math.max(0, until - t),
+      trialEnds: null,
+      trialRemainingMs: product === "satellite" ? remaining : 0,
+      trialUsedMs: product === "satellite" ? used : 0,
+      liveActive: !!row?.live_connections,
       paidUntil:
         db
           .prepare(
@@ -91,24 +100,72 @@ export function createBilling(
           ? "paid"
           : product!=="satellite" ? "expired" : started == null
             ? "not_started"
-            : t < until
+            : remaining > 0
               ? "trial"
               : "expired",
       serverNow: t,
     };
   }
-  function start(owner, email) {
+  function start(owner, email, deviceId = "native") {
     account(owner, email);
-    db.prepare(
-      "UPDATE satellite_accounts SET trial_started=COALESCE(trial_started,?) WHERE owner=?",
-    ).run(now(), owner);
-    return access(owner, email);
+    const existing = db
+      .prepare("SELECT id FROM satellite_sessions WHERE owner=? AND device_id=? AND ended IS NULL")
+      .get(owner, deviceId);
+    if (existing) return { ...access(owner, email), sessionId: existing.id };
+    const t = now(), sessionId = randomUUID();
+    db.exec("BEGIN IMMEDIATE");
+    try {
+      const row = db.prepare("SELECT * FROM satellite_accounts WHERE owner=?").get(owner);
+      if (!row.live_connections)
+        db.prepare("UPDATE satellite_accounts SET trial_started=COALESCE(trial_started,?),live_started=? WHERE owner=?")
+          .run(t, t, owner);
+      db.prepare("UPDATE satellite_accounts SET live_connections=live_connections+1 WHERE owner=?").run(owner);
+      db.prepare("INSERT INTO satellite_sessions(id,owner,device_id,started,mode) VALUES(?,?,?,?,?)")
+        .run(sessionId, owner, deviceId, t, admin(email) ? "admin" : "metered");
+      db.exec("COMMIT");
+    } catch (e) {
+      db.exec("ROLLBACK");
+      throw e;
+    }
+    return { ...access(owner, email), sessionId };
   }
+  function stop(sessionId) {
+    if (!sessionId) return;
+    const session = db.prepare("SELECT * FROM satellite_sessions WHERE id=? AND ended IS NULL").get(sessionId);
+    if (!session) return;
+    const t = now();
+    db.exec("BEGIN IMMEDIATE");
+    try {
+      db.prepare("UPDATE satellite_sessions SET ended=?,duration_ms=? WHERE id=? AND ended IS NULL")
+        .run(t, Math.max(0, t - session.started), sessionId);
+      const row = db.prepare("SELECT * FROM satellite_accounts WHERE owner=?").get(session.owner);
+      const connections = Math.max(0, Number(row.live_connections || 0) - 1);
+      if (!connections) {
+        const elapsed = row.live_started == null ? 0 : Math.max(0, t - row.live_started);
+        db.prepare("UPDATE satellite_accounts SET trial_used_ms=trial_used_ms+?,live_started=NULL,live_connections=0 WHERE owner=?")
+          .run(elapsed, session.owner);
+      } else db.prepare("UPDATE satellite_accounts SET live_connections=? WHERE owner=?").run(connections, session.owner);
+      db.exec("COMMIT");
+    } catch (e) {
+      db.exec("ROLLBACK");
+      throw e;
+    }
+  }
+  // A restarted server cannot keep a WebSocket alive; close the prior interval at restart.
+  function recoverLiveSessions() {
+    const t = now();
+    for (const row of db.prepare("SELECT * FROM satellite_accounts WHERE live_connections>0 AND live_started IS NOT NULL").all()) {
+      const elapsed = Math.max(0, t - row.live_started);
+      db.prepare("UPDATE satellite_accounts SET trial_used_ms=trial_used_ms+?,live_started=NULL,live_connections=0 WHERE owner=?").run(elapsed, row.owner);
+      db.prepare("UPDATE satellite_sessions SET ended=?,duration_ms=? WHERE owner=? AND ended IS NULL").run(t, Math.max(0, t - row.live_started), row.owner);
+    }
+  }
+  recoverLiveSessions();
   function assertAccess(owner, email) {
     if (!access(owner, email).allowed)
       throw fail(
         402,
-        "Your 15-minute trial has ended. Purchase a plan to continue.",
+        "Your 10-minute live satellite trial has ended. Purchase a plan to continue.",
       );
   }
   const plans = (product = "satellite") =>
@@ -127,8 +184,13 @@ export function createBilling(
     stripeTestMode: !live(),
     tomanAvailable: ezReady(),
     admin: admin(c.email),
-    ...(admin(c.email) ? { allPlans: plans(product) } : {}),
+    ...(admin(c.email) ? { allPlans: plans(product), metrics: metrics() } : {}),
   });
+  function metrics() {
+    const total = db.prepare("SELECT coalesce(sum(duration_ms),0) total,count(*) sessions,count(DISTINCT owner) users FROM satellite_sessions").get();
+    const active = db.prepare("SELECT count(*) active FROM satellite_sessions WHERE ended IS NULL").get();
+    return { totalLiveMs: total.total, sessions: total.sessions, users: total.users, activeSessions: active.active };
+  }
   async function stripe(path, form, key) {
     if (!env.SATELLITE_STRIPE_KEY) throw fail(503, "Stripe is not configured");
     const r = await fetcher("https://api.stripe.com/v1/" + path, {
@@ -504,6 +566,16 @@ export function createBilling(
   }
   function updatePlan(c, p) {
     if (!admin(c.email)) throw fail(403, "Administrator required");
+    // The dashboard accepts a human label such as “Gold plan”; store a stable,
+    // lowercase slug so an administrator is never blocked by capitalization.
+    p = {
+      ...p,
+      id: String(p.id || "")
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, ""),
+    };
     if (
       !/^[a-z0-9-]{1,40}$/.test(p.id || "") ||
       typeof p.name_fa !== "string" ||
@@ -583,6 +655,7 @@ export function createBilling(
     updatePlan,
     admin,
     grant,
+    stopSession: stop,
     stop: () => clearInterval(timer),
   };
 }
