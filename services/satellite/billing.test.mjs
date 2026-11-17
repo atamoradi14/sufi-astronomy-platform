@@ -43,7 +43,7 @@ test("Stripe snapshots prices, rejects amount mismatches, verifies signatures, f
     session;
   const env = {
     SATELLITE_STRIPE_KEY: "rk_test_fixture",
-    SATELLITE_STRIPE_WEBHOOK_SECRET: "whsec_fixture",
+    STRIPE_WEBHOOK_SECRET: "whsec_fixture",
   };
   const fetcher = async (url, options) => {
     if (url.endsWith("checkout/sessions")) {
@@ -57,7 +57,8 @@ test("Stripe snapshots prices, rejects amount mismatches, verifies signatures, f
         amount_total: 500,
         client_reference_id: owner.sub,
         metadata: {
-          app: "fanous-satellite",
+          app: f.get("metadata[app]"),
+          product: f.get("metadata[product]"),
           order_id: f.get("metadata[order_id]"),
           user_id: owner.sub,
         },
@@ -98,6 +99,8 @@ test("Stripe snapshots prices, rejects amount mismatches, verifies signatures, f
       currency: "USD",
       requestKey: "unique-request-key-12345",
     });
+    assert.equal(session.metadata.app, "fanous");
+    assert.equal(session.metadata.product, "satellite");
     b.updatePlan(admin, { ...plan, usd_cents: 999, days: 15 });
     amount = 499;
     await assert.rejects(() => b.reconcile(owner, order.id), /verification/);
@@ -118,7 +121,7 @@ test("Stripe snapshots prices, rejects amount mismatches, verifies signatures, f
         "t=" +
         t +
         ",v1=" +
-        createHmac("sha256", env.SATELLITE_STRIPE_WEBHOOK_SECRET)
+        createHmac("sha256", env.STRIPE_WEBHOOK_SECRET)
           .update(t + "." + event)
           .digest("hex");
     await assert.rejects(

@@ -205,9 +205,12 @@ Plan changes are audit logged. Full refunds revoke their order's entitlement;
 partial refunds do not revoke the remainder of that order's access.
 
 Darvazeh's restricted Stripe key and Iran Ezpay broker credentials/wallet are reused
-privately, without modifying Darvazeh or the relay. Fanous orders use dedicated
-metadata `app=fanous-satellite`, factor prefix `fanous-satellite-` and isolated
-receipts; unrelated Stripe events never activate Fanous. Stripe amounts, currency,
+privately, without modifying Darvazeh or the relay. The Fanous billing boundary is
+product-aware: new Fanous products can have their own plan rows, return paths and
+Stripe metadata while their entitlements remain isolated. Satellite uses product
+`satellite`, metadata `app=fanous` / `product=satellite`, factor prefix
+`fanous-satellite-` and isolated receipts; unrelated Stripe events never activate
+Fanous. Stripe amounts, currency,
 user/order metadata, payment status, line items and mode are checked from Stripe's
 API. Webhook signatures are verified against the raw body and timestamp before
 processing. Ezpay converts toman to rial (x10), probes the verified receiving
@@ -218,8 +221,11 @@ Reconciliation polls open orders fairly every minute and also runs on request.
 Private reuse inputs: `.local/darvazeh-billing-reuse.json`; deployment configuration:
 `.local/satellite-billing-config.json`. Both are ignored and contain merchant
 credentials: keep private. `scripts/bootstrap-satellite-payments.py` imports the
-approved config and optional `SATELLITE_STRIPE_WEBHOOK_SECRET` from `.env` and
-checks wallet readiness without charging anyone. The service release helper
+approved configuration into the local `.env` as `SATELLITE_STRIPE_KEY`,
+`SATELLITE_RELAY_URL`, `SATELLITE_RELAY_KEY`, `SATELLITE_WALLET_PHONE` and
+`SATELLITE_BILLING_ADMIN`; it also imports the shared Fanous
+`STRIPE_WEBHOOK_SECRET` and checks wallet readiness without charging anyone. The
+service release helper
 loads the settings into `fanous-satellite-config`; the web server never receives
 provider secrets. Existing worker/gateway routes already cover the endpoints.
 
@@ -228,8 +234,8 @@ Stripe requires a separate endpoint:
 Events: `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
 `checkout.session.async_payment_failed`, `checkout.session.expired`, `charge.refunded`.
 The reused restricted key cannot create/list webhooks (HTTP 403). An operator must
-create it in Stripe, save its signing secret locally as
-`SATELLITE_STRIPE_WEBHOOK_SECRET` in `.env`, run the private bootstrap script,
+create it in Stripe, save its signing secret locally as `STRIPE_WEBHOOK_SECRET`
+in `.env`, run the private bootstrap script,
 and redeploy the existing satellite image with updated config. Darvazeh's webhook
 signing secret is endpoint-specific and is not reused. Stripe checkout remains
 disabled until the Fanous signing secret is configured. Ezpay is independent.
@@ -250,4 +256,7 @@ No real customer payment or real card charge is generated for testing.
 - Public HTTPS/WSS trial smoke used a uniquely identified synthetic phone: first connection starts the trial, expiry closes socket with 4003 and blocks viewer tickets with 402; admin exemption and configured toman method verified. Test-only records removed afterwards.
 - Live merchant wallet is connected, merchant-enabled, active and identity verified. No real customer order, card charge or real payment was generated during verification. Provider settlement behavior was checked with isolated fixtures.
 - All pre-existing Google account IDs preserved; SQLite backups taken before deployments. Main website and satellite workloads both ready on the worker.
-- Outstanding external setup: Fanous Stripe webhook and its signing secret. The reused restricted Stripe key cannot manage webhooks (403); the implemented Stripe purchase option stays disabled until the separate Fanous webhook is configured. Iranian purchase flow is enabled independently.
+- The shared Fanous webhook secret is loaded from `.env`; the next satellite-service
+  rollout carries it only in the isolated service Secret. The reused restricted key
+  cannot manage webhooks (403), so future Fanous products should reuse the shared
+  webhook endpoint only after their product metadata and fulfillment checks exist.

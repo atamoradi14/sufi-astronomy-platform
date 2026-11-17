@@ -15,7 +15,7 @@ export function createBilling(
  CREATE TABLE IF NOT EXISTS satellite_payment_events(id TEXT PRIMARY KEY,created INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS satellite_billing_audit(id INTEGER PRIMARY KEY,actor TEXT NOT NULL,at INTEGER NOT NULL,action TEXT NOT NULL,detail TEXT NOT NULL);`);
   db.prepare(
-    "INSERT OR IGNORE INTO satellite_plans VALUES('monthly','یک ماه ماهواره','Satellite monthly',30,199000,500,1)",
+    "INSERT OR IGNORE INTO satellite_plans(id,name_fa,name_en,days,toman,usd_cents,active) VALUES('monthly','یک ماه ماهواره','Satellite monthly',30,199000,500,1)",
   ).run();
   if (
     !db
@@ -26,11 +26,22 @@ export function createBilling(
     db.exec(
       "ALTER TABLE satellite_orders ADD COLUMN checked_at INTEGER NOT NULL DEFAULT 0",
     );
+  for(const table of ['satellite_plans','satellite_orders']) {
+    const columns=db.prepare(`PRAGMA table_info(${table})`).all();
+    if(!columns.some(c=>c.name==='product'))db.exec(`ALTER TABLE ${table} ADD COLUMN product TEXT NOT NULL DEFAULT 'satellite'`);
+    if(!columns.some(c=>c.name==='return_path'))db.exec(`ALTER TABLE ${table} ADD COLUMN return_path TEXT NOT NULL DEFAULT '/satellite'`);
+  }
+  // STRIPE_WEBHOOK_SECRET is shared configuration for Fanous products.  Keep the
+  // old name as a deployment-safe fallback while existing Pods roll over.
+  const webhookSecret =
+    env.STRIPE_WEBHOOK_SECRET || env.SATELLITE_STRIPE_WEBHOOK_SECRET;
+  const isFanous=metadata=>metadata?.app==='fanous'||metadata?.app==='fanous-satellite';
+  const matchesProduct=(metadata,order)=>metadata?.app==='fanous'?metadata.product===order.product:order.product==='satellite';
   const admin = (email) =>
     String(email).toLowerCase() ===
     (env.SATELLITE_BILLING_ADMIN || "atamoradi8@gmail.com").toLowerCase();
   const stripeReady = () =>
-    !!(env.SATELLITE_STRIPE_KEY && env.SATELLITE_STRIPE_WEBHOOK_SECRET);
+    !!(env.SATELLITE_STRIPE_KEY && webhookSecret);
   const ezReady = () =>
     !!(
       env.SATELLITE_RELAY_URL &&
@@ -43,7 +54,7 @@ export function createBilling(
       "INSERT INTO satellite_accounts(owner,email) VALUES(?,?) ON CONFLICT(owner) DO UPDATE SET email=excluded.email",
     ).run(owner, email);
   }
-  function access(owner, email) {
+  function access(owner, email, product = "satellite") {
     const row = db
         .prepare("SELECT * FROM satellite_accounts WHERE owner=?")
         .get(owner),
@@ -52,28 +63,33 @@ export function createBilling(
     const paid =
       db
         .prepare(
-          "SELECT max(ends) end FROM satellite_orders WHERE owner=? AND status='paid' AND refunded<amount AND starts<=? AND ends>?",
+          "SELECT max(ends) end FROM satellite_orders WHERE owner=? AND status='paid' AND refunded<amount AND product=? AND starts<=? AND ends>?",
         )
-        .get(owner, t, t)?.end ?? null;
+        .get(owner, product, t, t)?.end ?? null;
     const until = started == null ? null : started + TRIAL,
       isAdmin = admin(email);
     return {
-      allowed: isAdmin || !!paid || started == null || t < until,
+      allowed: isAdmin || !!paid || (product === "satellite" && (started == null || t < until)),
       admin: isAdmin,
       trialStarted: started,
       trialEnds: until,
-      trialRemainingMs: started == null ? TRIAL : Math.max(0, until - t),
+      trialRemainingMs:
+        product !== "satellite"
+          ? 0
+          : started == null
+            ? TRIAL
+            : Math.max(0, until - t),
       paidUntil:
         db
           .prepare(
-            "SELECT max(ends) end FROM satellite_orders WHERE owner=? AND status='paid' AND refunded<amount AND ends>?",
+            "SELECT max(ends) end FROM satellite_orders WHERE owner=? AND status='paid' AND refunded<amount AND product=? AND ends>?",
           )
-          .get(owner, t)?.end ?? null,
+          .get(owner, product, t)?.end ?? null,
       mode: isAdmin
         ? "admin"
         : paid
           ? "paid"
-          : started == null
+          : product!=="satellite" ? "expired" : started == null
             ? "not_started"
             : t < until
               ? "trial"
@@ -95,23 +111,23 @@ export function createBilling(
         "Your 15-minute trial has ended. Purchase a plan to continue.",
       );
   }
-  const plans = () =>
-    db.prepare("SELECT * FROM satellite_plans ORDER BY days,id").all();
-  const orders = (owner) =>
+  const plans = (product = "satellite") =>
+    db.prepare("SELECT * FROM satellite_plans WHERE product=? ORDER BY days,id").all(product);
+  const orders = (owner, product = "satellite") =>
     db
       .prepare(
-        "SELECT id,name_fa,name_en,days,currency,amount,status,created,paid_at,starts,ends,url,refunded FROM satellite_orders WHERE owner=? ORDER BY created DESC LIMIT 30",
+        "SELECT id,name_fa,name_en,days,currency,amount,status,created,paid_at,starts,ends,url,refunded FROM satellite_orders WHERE owner=? AND product=? ORDER BY created DESC LIMIT 30",
       )
-      .all(owner);
-  const catalog = (c) => ({
-    access: access(c.sub, c.email),
-    plans: plans().filter((p) => p.active),
-    orders: orders(c.sub),
+      .all(owner, product);
+  const catalog = (c, product = "satellite") => ({
+    access: access(c.sub, c.email,product),
+    plans: plans(product).filter((p) => p.active),
+    orders: orders(c.sub, product),
     stripeAvailable: stripeReady(),
     stripeTestMode: !live(),
     tomanAvailable: ezReady(),
     admin: admin(c.email),
-    ...(admin(c.email) ? { allPlans: plans() } : {}),
+    ...(admin(c.email) ? { allPlans: plans(product) } : {}),
   });
   async function stripe(path, form, key) {
     if (!env.SATELLITE_STRIPE_KEY) throw fail(503, "Stripe is not configured");
@@ -163,9 +179,13 @@ export function createBilling(
       const o = db.prepare("SELECT * FROM satellite_orders WHERE id=?").get(id);
       check(o);
       if (o.paid_at == null && o.status !== "refunded") {
-        const a = access(o.owner, o.email),
+        const a = access(o.owner, o.email,o.product),
           t = now(),
-          starts = Math.max(t, a.paidUntil ?? 0, a.trialEnds ?? 0),
+          starts = Math.max(
+            t,
+            a.paidUntil ?? 0,
+            o.product === "satellite" ? a.trialEnds ?? 0 : 0,
+          ),
           ends = starts + o.days * DAY;
         db.prepare(
           "UPDATE satellite_orders SET status='paid',payment=?,paid_at=?,starts=?,ends=? WHERE id=? AND paid_at IS NULL",
@@ -185,7 +205,7 @@ export function createBilling(
     return o;
   };
   const pending = new Map();
-  async function checkout(c, p, country) {
+  async function checkout(c, p, country, product = "satellite") {
     if (!/^[a-zA-Z0-9-]{16,80}$/.test(p.requestKey || ""))
       throw fail(400, "Invalid checkout request");
     if (!["USD", "IRT"].includes(p.currency))
@@ -198,11 +218,14 @@ export function createBilling(
       db.prepare("UPDATE satellite_orders SET request_key=? WHERE id=? AND status='expired'").run('expired-'+o.id,o.id);
       o=null;
     }
-    if (o) check(o.plan === p.plan && o.currency === p.currency);
+    if (o)
+      check(
+        o.plan === p.plan && o.currency === p.currency && o.product === product,
+      );
     else {
       const plan = db
-        .prepare("SELECT * FROM satellite_plans WHERE id=? AND active=1")
-        .get(p.plan);
+        .prepare("SELECT * FROM satellite_plans WHERE id=? AND product=? AND active=1")
+        .get(p.plan, product);
       if (!plan) throw fail(404, "Plan unavailable");
       if (
         db
@@ -224,7 +247,7 @@ export function createBilling(
         );
       const id = randomUUID();
       db.prepare(
-        "INSERT INTO satellite_orders(id,owner,email,plan,name_fa,name_en,days,provider,currency,amount,request_key,status,created,receiver) VALUES(?,?,?,?,?,?,?,?,?,?,?,'created',?,?)",
+        "INSERT INTO satellite_orders(id,owner,email,plan,name_fa,name_en,days,provider,currency,amount,request_key,status,created,receiver,product,return_path) VALUES(?,?,?,?,?,?,?,?,?,?,?,'created',?,?,?,?)",
       ).run(
         id,
         c.sub,
@@ -239,6 +262,8 @@ export function createBilling(
         p.requestKey,
         now(),
         p.currency === "IRT" ? env.SATELLITE_WALLET_PHONE : null,
+        plan.product,
+        plan.return_path,
       );
       o = safeOrder(id, c.sub);
     }
@@ -252,10 +277,12 @@ export function createBilling(
         unique = null;
       if (o.provider === "stripe") {
         const metadata = {
-          "metadata[app]": "fanous-satellite",
+          "metadata[app]": "fanous",
+          "metadata[product]": o.product,
           "metadata[order_id]": o.id,
           "metadata[user_id]": o.owner,
-          "payment_intent_data[metadata][app]": "fanous-satellite",
+          "payment_intent_data[metadata][app]": "fanous",
+          "payment_intent_data[metadata][product]": o.product,
           "payment_intent_data[metadata][order_id]": o.id,
           "payment_intent_data[metadata][user_id]": o.owner,
         };
@@ -265,8 +292,8 @@ export function createBilling(
             mode: "payment",
             customer_email: c.email,
             client_reference_id: o.owner,
-            success_url: origin + "/satellite?payment=success&order=" + o.id,
-            cancel_url: origin + "/satellite?payment=cancelled&order=" + o.id,
+            success_url: origin + o.return_path + "?payment=success&order=" + o.id,
+            cancel_url: origin + o.return_path + "?payment=cancelled&order=" + o.id,
             expires_at: String(Math.floor(o.created / 1000) + 3600),
             "line_items[0][quantity]": "1",
             "line_items[0][price_data][currency]": "usd",
@@ -329,7 +356,7 @@ export function createBilling(
     }
   }
   async function applyStripe(s) {
-    if (s.metadata?.app !== "fanous-satellite") return;
+    if (!isFanous(s.metadata)) return;
     const o = db
       .prepare(
         "SELECT * FROM satellite_orders WHERE id=? AND provider='stripe'",
@@ -337,7 +364,8 @@ export function createBilling(
       .get(s.metadata.order_id);
     if (!o) return;
     check(
-      (!o.session || o.session === s.id) &&
+      matchesProduct(s.metadata, o) &&
+        (!o.session || o.session === s.id) &&
         s.metadata.user_id === o.owner &&
         s.client_reference_id === o.owner &&
         s.currency === "usd" &&
@@ -398,14 +426,14 @@ export function createBilling(
     }
     return {
       status: safeOrder(id, c.sub).status,
-      access: access(c.sub, c.email),
+      access: access(c.sub, c.email, o.product),
     };
   }
   async function webhook(raw, signature) {
     if (!stripeReady()) throw fail(503, "Stripe webhook is not configured");
     const parts = String(signature || "").split(","),
       t = parts.find((p) => p.startsWith("t="))?.slice(2),
-      expected = createHmac("sha256", env.SATELLITE_STRIPE_WEBHOOK_SECRET)
+      expected = createHmac("sha256", webhookSecret)
         .update(t + "." + raw)
         .digest();
     if (
@@ -431,7 +459,7 @@ export function createBilling(
     const object = event.data?.object;
     if (
       event.type.startsWith("checkout.session.") &&
-      object?.metadata?.app === "fanous-satellite"
+      isFanous(object?.metadata)
     )
       await applyStripe(
         await stripe(
@@ -447,7 +475,7 @@ export function createBilling(
         const payment = await stripe(
           "payment_intents/" + encodeURIComponent(intent),
         );
-        if (payment.metadata?.app === "fanous-satellite") {
+        if (isFanous(payment.metadata)) {
           const o = db
             .prepare(
               "SELECT * FROM satellite_orders WHERE id=? AND provider='stripe'",
@@ -455,7 +483,8 @@ export function createBilling(
             .get(payment.metadata.order_id);
           if (o) {
             check(
-              payment.metadata.user_id === o.owner &&
+              matchesProduct(payment.metadata, o) &&
+                payment.metadata.user_id === o.owner &&
                 charge.amount === o.amount &&
                 charge.currency === "usd" &&
                 charge.livemode === live() &&
@@ -492,14 +521,16 @@ export function createBilling(
       !Number.isInteger(p.usd_cents) ||
       p.usd_cents < 50 ||
       p.usd_cents > 99999999 ||
-      typeof p.active !== "boolean"
+      typeof p.active !== "boolean" ||
+      !/^[a-z0-9-]{1,40}$/.test(p.product || "satellite") ||
+      !/^\/(?!\/)[a-zA-Z0-9/_-]*$/.test(p.return_path || "/satellite")
     )
       throw fail(
         400,
         "Invalid plan. Use positive days, toman ≥ 1,000 and USD cents ≥ 50.",
       );
     db.prepare(
-      "INSERT INTO satellite_plans VALUES(?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET name_fa=excluded.name_fa,name_en=excluded.name_en,days=excluded.days,toman=excluded.toman,usd_cents=excluded.usd_cents,active=excluded.active",
+      "INSERT INTO satellite_plans(id,name_fa,name_en,days,toman,usd_cents,active,product,return_path) VALUES(?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET name_fa=excluded.name_fa,name_en=excluded.name_en,days=excluded.days,toman=excluded.toman,usd_cents=excluded.usd_cents,active=excluded.active,product=excluded.product,return_path=excluded.return_path",
     ).run(
       p.id,
       p.name_fa.trim(),
@@ -508,6 +539,8 @@ export function createBilling(
       p.toman,
       p.usd_cents,
       p.active ? 1 : 0,
+      p.product || "satellite",
+      p.return_path || "/satellite",
     );
     db.prepare(
       "INSERT INTO satellite_billing_audit(actor,at,action,detail) VALUES(?,?,?,?)",
