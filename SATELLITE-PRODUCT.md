@@ -256,7 +256,9 @@ No real customer payment or real card charge is generated for testing.
 - Public HTTPS/WSS trial smoke used a uniquely identified synthetic phone: first connection starts the trial, expiry closes socket with 4003 and blocks viewer tickets with 402; admin exemption and configured toman method verified. Test-only records removed afterwards.
 - Live merchant wallet is connected, merchant-enabled, active and identity verified. No real customer order, card charge or real payment was generated during verification. Provider settlement behavior was checked with isolated fixtures.
 - All pre-existing Google account IDs preserved; SQLite backups taken before deployments. Main website and satellite workloads both ready on the worker.
-- The shared Fanous webhook secret is loaded from `.env`; the next satellite-service
-  rollout carries it only in the isolated service Secret. The reused restricted key
-  cannot manage webhooks (403), so future Fanous products should reuse the shared
+- Satellite `release-20261117-05` is deployed with the shared Fanous webhook
+  secret only in the isolated service Secret. Its public webhook accepted a
+  freshly signed non-financial test event (then its test receipt was removed),
+  and the public plan catalog is available. The reused restricted key cannot
+  manage webhooks (403), so future Fanous products should reuse the shared
   webhook endpoint only after their product metadata and fulfillment checks exist.
