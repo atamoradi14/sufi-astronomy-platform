@@ -21,7 +21,9 @@ export function middleware(request: NextRequest) {
   res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   res.headers.set(
     "Permissions-Policy",
-    `camera=${request.nextUrl.pathname === "/admin/sensors" ? "(self)" : "()"}, microphone=(), geolocation=(self), accelerometer=(self), gyroscope=(self), magnetometer=(self)`,
+    request.nextUrl.pathname === "/satellite" || request.nextUrl.pathname.startsWith("/satellite/")
+      ? "camera=(), microphone=(), geolocation=(), accelerometer=(), gyroscope=(), magnetometer=()"
+      : "camera=(), microphone=(), geolocation=(self), accelerometer=(self), gyroscope=(self), magnetometer=(self)",
   );
   res.headers.set("Content-Security-Policy", CSP);
   return res;

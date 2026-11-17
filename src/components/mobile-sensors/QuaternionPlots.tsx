@@ -34,7 +34,7 @@ export function QuaternionPlots({ samples }: { samples: QuaternionSample[] }) {
         </p>
         <div className="flex flex-wrap gap-4 text-xs my-3">
           <span className="text-[var(--muted)]">
-            {t("خط‌چین: مرجع مرورگر/TRIAD", "Dashed: browser/TRIAD reference")}
+            {t("خط‌چین: مرجع جهت‌گیری دستگاه", "Dashed: device attitude reference")}
           </span>
           <span className="text-[var(--gold)]">
             {t("نقطه‌چین: پیش‌بینی ژیروسکوپ", "Dotted: gyro prediction")}

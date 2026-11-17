@@ -2,8 +2,9 @@
 fanous.online {
     encode zstd gzip
     header -Server
-    @satelliteControl path /satellite-api/v1/*
-    respond @satelliteControl 404
+    handle /satellite-api/v1/* {
+        respond 404
+    }
     handle /satellite-api/* {
         reverse_proxy fanous-satellite.astronomy.svc.cluster.local:3860
     }

@@ -29,8 +29,8 @@ export default function FilterDynamics({
           </h2>
           <p className="sensor-note">
             {t(
-              "این نمودارها از همان به‌روزرسانی‌هایی ثبت می‌شوند که وضعیت گوشی را می‌سازند؛ شبیه‌سازی جداگانه نیستند. عدم‌قطعیت داخلیِ مدل، خطای مطلق جهت‌گیری را تضمین نمی‌کند؛ خروجی ترکیبی مرورگر هم‌بستگی زمانی دارد.",
-              "These traces come from the updates that produce the phone pose, not a separate simulation. Internal covariance is not an absolute attitude-accuracy guarantee; browser-fused measurements are temporally correlated.",
+              "این نمودارها از همان به‌روزرسانی‌هایی ثبت می‌شوند که وضعیت گوشی را می‌سازند؛ شبیه‌سازی جداگانه نیستند. عدم‌قطعیت داخلیِ مدل، خطای مطلق جهت‌گیری را تضمین نمی‌کند؛ خروجی ترکیبی دستگاه هم‌بستگی زمانی دارد.",
+              "These traces come from the updates that produce the phone pose, not a separate simulation. Internal covariance is not an absolute attitude-accuracy guarantee; platform-fused measurements are temporally correlated.",
             )}
           </p>
         </section>
@@ -110,8 +110,8 @@ export default function FilterDynamics({
           <h2>{t("اعداد مدل اجراشده", "Running model constants")}</h2>
           <p className="sensor-note">
             {t(
-              "نویز فرایند ژیروسکوپ: ۱٫۵ درجه بر ریشهٔ ثانیه. نویز مرجع: ۵ درجه در حالت مرورگر و ۷ درجه در TRIAD. بدون ژیروسکوپ تازه، حرکتِ تصادفی مدل با ۱۲ درجه بر ریشهٔ ثانیه افزوده می‌شود. این اعداد محافظه‌کارانه‌اند و از کالیبراسیون کارخانهٔ گوشی به دست نیامده‌اند.",
-              "Gyro process noise: 1.5 degrees/√s. Reference noise: 5 degrees in browser mode, 7 in TRIAD. Without fresh gyro, a 12 degrees/√s model random walk is added. These conservative settings are not phone factory calibration values.",
+              "نویز فرایند ژیروسکوپ: ۱٫۵ درجه بر ریشهٔ ثانیه. نویز مرجع: ۵ درجه در مرجع ترکیبی دستگاه و ۷ درجه در TRIAD. بدون ژیروسکوپ تازه، حرکتِ تصادفی مدل با ۱۲ درجه بر ریشهٔ ثانیه افزوده می‌شود. این اعداد محافظه‌کارانه‌اند و از کالیبراسیون کارخانهٔ گوشی به دست نیامده‌اند.",
+              "Gyro process noise: 1.5 degrees/√s. Reference noise: 5 degrees in platform-fused mode, 7 in TRIAD. Without fresh gyro, a 12 degrees/√s model random walk is added. These conservative settings are not phone factory calibration values.",
             )}
           </p>
           <p className="sensor-note">
@@ -164,8 +164,8 @@ const Equations = memo(function Equations() {
       <MathBlock>{String.raw`\mathbf m_c=\operatorname{diag}(\mathbf s)(\mathbf m-\mathbf o),\quad \hat{\mathbf u}=\frac{\mathbf f}{\|\mathbf f\|},\quad \hat{\mathbf e}=\frac{\mathbf m_c\times\hat{\mathbf u}}{\|\mathbf m_c\times\hat{\mathbf u}\|},\quad \hat{\mathbf n}=\hat{\mathbf u}\times\hat{\mathbf e},\quad R_{b\to ENU}=\begin{bmatrix}\hat{\mathbf e}^{\mathsf T}\\\hat{\mathbf n}^{\mathsf T}\\\hat{\mathbf u}^{\mathsf T}\end{bmatrix}`}</MathBlock>
       <p className="sensor-note">
         {t(
-          "رابطهٔ TRIAD تنها در حالت خام و با شتاب نزدیک سکون به کار می‌رود؛ مرورگر و TRIAD هم‌زمان به‌عنوان دو مرجع مستقل وارد فیلتر نمی‌شوند.",
-          "TRIAD is used only in raw mode near static acceleration; browser orientation and TRIAD are never double-counted as independent references.",
+          "رابطهٔ TRIAD تنها در حالت خام و با شتاب نزدیک سکون به کار می‌رود؛ مرجع ترکیبی دستگاه و TRIAD هم‌زمان به‌عنوان دو مرجع مستقل وارد فیلتر نمی‌شوند.",
+          "TRIAD is used only in raw mode near static acceleration; Platform-fused orientation and TRIAD are never double-counted as independent references.",
         )}
       </p>
       <MathBlock>{String.raw`\dot{\mathbf r}=\mathbf v,\qquad\dot{\mathbf v}=R(q)\mathbf f-g\hat{\mathbf U},\qquad\mathbf b=\frac1N\sum_{i=1}^N\boldsymbol\omega_i\quad(\text{stationary})`}</MathBlock>
