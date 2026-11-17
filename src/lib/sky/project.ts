@@ -19,6 +19,8 @@ export type Look = {
   alt: number;
   /** Camera roll, degrees; retained during spherical dragging across the zenith. */
   roll?: number;
+  /** Keep local vertical upright while panning; this is the default for observing. */
+  horizonLocked?: boolean;
   projection?: "stereographic" | "dome";
   /** Vertical field of view in degrees. */
   fov: number;
@@ -194,6 +196,18 @@ export function dragLook(
     const angle = (Math.atan2(toY, toX) - Math.atan2(fromY, fromX)) / DEG;
     return { ...look, az: (look.az - angle + 720) % 360 };
   }
+  // Chart applications conventionally keep the local horizon level while the
+  // observer pans. The former trackball behaviour changed roll around zenith,
+  // which made east/west drags unexpectedly tip the horizon.
+  if (look.horizonLocked === true) {
+    const sensitivity = Math.max(0.15, Math.min(1.2, look.fov / 110));
+    return {
+      ...look,
+      az: (look.az - (toX - fromX) * 85 * sensitivity + 720) % 360,
+      alt: Math.max(-85, Math.min(85, look.alt + (toY - fromY) * 85 * sensitivity)),
+      roll: 0,
+    };
+  }
   const target = createSkyProjector(look).unproject(fromX, fromY);
   return target ? anchorLook(look, target, toX, toY) : look;
 }
@@ -255,7 +269,8 @@ export function zoomLook(
     projection: "stereographic" as const,
     fov: Math.max(8, Math.min(175, look.fov * factor)),
   };
-  return target ? anchorLook(next, target, nextX, nextY) : next;
+  const anchored = target ? anchorLook(next, target, nextX, nextY) : next;
+  return look.horizonLocked === true ? { ...anchored, roll: 0 } : anchored;
 }
 
 export function bvToColor(bv: number | null): string {

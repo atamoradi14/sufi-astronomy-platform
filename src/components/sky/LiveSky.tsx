@@ -22,6 +22,7 @@ import { equatorialToHorizontal } from "@/lib/astronomy/sphere";
 import { lstHours } from "@/lib/astronomy/time";
 import { greatArc, sphToCart, cartToLonLat } from "@/lib/astronomy/sphereGeom";
 import { Button } from "@/components/ui/button";
+import { drawSkyArt, type SkyArt } from "@/lib/sky/art";
 import {
   Search,
   LocateFixed,
@@ -49,6 +50,23 @@ export function LiveSky() {
   const script = useDigitScript();
   const { fa, t } = useLanguage();
   const [visible, setVisible] = useState(true);
+  const [showArt,setShowArt]=useState(false);
+  const [artOpacity,setArtOpacity]=useState(0.35);
+  const [artRevision,setArtRevision]=useState(0);
+  const artCache=useRef<{art:SkyArt;image:HTMLImageElement}[]>([]);
+  useEffect(()=>{
+    if(!showArt)return;
+    let active=true;
+    fetch('/sky/sufi/catalog.json').then(r=>{if(!r.ok)throw Error();return r.json();}).then(async (items:SkyArt[])=>{
+      for(const art of items){
+        if(!active)break;
+        if(artCache.current.some(c=>c.art.id===art.id))continue;
+        const image=new Image();image.src=art.file;
+        try{await image.decode();if(active){artCache.current.push({art,image});setArtRevision(v=>v+1);}}catch{}
+      }
+    }).catch(()=>setError('Artwork could not be loaded.'));
+    return ()=>{active=false;};
+  },[showArt]);
   const groundCache = useRef<{ key: string; canvas: HTMLCanvasElement } | null>(
     null,
   );
@@ -80,7 +98,7 @@ export function LiveSky() {
     [loaded, setLoaded] = useState(false);
   const [selected, setSelected] = useState<SkyStar | null>(null),
     [query, setQuery] = useState("");
-  const [look, setLook] = useState<Look>({ az: 180, alt: 35, fov: 75 });
+  const [look, setLook] = useState<Look>({ az: 180, alt: 35, fov: 75, horizonLocked: true });
   const canvasRef = useRef<HTMLCanvasElement>(null),
     stageRef = useRef<HTMLDivElement>(null);
   const pickRef = useRef<
@@ -270,6 +288,10 @@ export function LiveSky() {
       }
       ctx.stroke();
     };
+    if(showArt) for(const {art,image} of artCache.current) drawSkyArt(ctx,art,image,(ra,dec)=>{
+      const p=equatorialToHorizontal(ra,dec,lat,localSidereal);
+      return {...screen(p.az,p.alt),visible:p.alt>=0 && screen(p.az,p.alt).visible};
+    },artOpacity);
     if (showHorizon)
       path(
         Array.from({ length: 721 }, (_, i) => ({ az: i / 2, alt: 0 })),
@@ -446,6 +468,7 @@ export function LiveSky() {
     ctx.lineTo(cx, cy + 7);
     ctx.stroke();
   }, [
+    showArt,artOpacity,artRevision,lat,localSidereal,
     look,
     horizontal,
     constellationPaths,
@@ -680,6 +703,7 @@ export function LiveSky() {
                     aria-pressed={look.projection !== "dome"}
                     onClick={() =>
                       setLook({
+                        horizonLocked: true,
                         az: 180,
                         alt: 35,
                         fov: 100,
@@ -695,6 +719,7 @@ export function LiveSky() {
                     aria-pressed={look.projection === "dome"}
                     onClick={() =>
                       setLook({
+                        horizonLocked: true,
                         az: 180,
                         alt: 90,
                         fov: 180,
@@ -1007,6 +1032,7 @@ export function LiveSky() {
                     t("خطوط صورت‌های فلکی", "Constellation lines"),
                   ],
                   [showNames, setShowNames, t("نام ستاره‌ها", "Star names")],
+                  [showArt,setShowArt,t("نگاره‌های صوفی", "Al-Sufi artwork")],
                   [
                     showGrid,
                     setShowGrid,
@@ -1033,6 +1059,7 @@ export function LiveSky() {
                     />
                   </label>
                 ))}
+                {showArt && <div className="space-y-2 text-xs"><label>{t("شفافیت نگاره‌ها", "Artwork opacity")}<input aria-label="Artwork opacity" className="w-full" type="range" min="0.1" max="0.8" step="0.05" value={artOpacity} onChange={e=>setArtOpacity(Number(e.target.value))}/></label><a className="underline text-[var(--muted)]" href="/sky/sufi/ATTRIBUTION.md" target="_blank" rel="noreferrer">Stellarium · Khalid Al-Ajaji / Kutaibaa Akraa · CC BY-ND 4.0</a></div>}
                 <label className="block text-xs">
                   {t("حد قدر", "Limiting magnitude")} · {magLimit.toFixed(1)}
                   <input

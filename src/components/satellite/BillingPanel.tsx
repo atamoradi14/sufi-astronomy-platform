@@ -13,6 +13,7 @@ type Plan = {
   active: number | boolean;
 };
 type Access = {
+  liveActive?: boolean;
   allowed: boolean;
   mode: string;
   trialEnds: number | null;
@@ -114,7 +115,7 @@ export function BillingPanel({
       ? Math.max(
           0,
           access.trialRemainingMs -
-            (access.mode === "trial"
+            (access.mode === "trial" && access.liveActive
               ? Math.max(0, (tick || Date.now()) - received)
               : 0),
         )
@@ -172,7 +173,11 @@ export function BillingPanel({
       refunded: t("بازپرداخت‌شده", "Refunded"),
     })[s] || s;
   return (
-    <section className="sensor-panel space-y-4" id="satellite-plans">
+    <details className="sensor-panel space-y-4" id="satellite-plans">
+      <summary className="cursor-pointer flex flex-wrap items-center justify-between gap-3">
+        <span className="text-sm text-[var(--gold-soft)]">{t("وضعیت دسترسی ماهواره", "Satellite access")}</span>
+        <span className="text-xs text-[var(--muted)]">{access?.mode === "admin" ? t("مدیر · نامحدود", "Admin · unlimited") : access?.mode === "paid" ? t("طرح فعال", "Plan active") : t("۱۰ دقیقه اتصال زندهٔ رایگان", "10 free live minutes")} · {t("نمایش طرح‌ها و خریدها", "View plans & purchases")}</span>
+      </summary>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h2>
@@ -332,7 +337,7 @@ export function BillingPanel({
           </a>
         </p>
       )}
-    </section>
+    </details>
   );
 }
 export function PlanEditor({

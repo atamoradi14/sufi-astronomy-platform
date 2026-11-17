@@ -17,6 +17,8 @@ import {
   angularDistanceDeg,
   lonLatToCart,
   sphericalAngleDeg,
+  placeTriangleFromSides,
+  cartToLonLat,
 } from "@/lib/astronomy/sphereGeom";
 import { deg as trig } from "@/lib/astronomy/sphericalTrig";
 import { MathBlock } from "@/components/ui/MathBlock";
@@ -349,6 +351,11 @@ function SphereLabInner() {
               </p>
             </div>
             <aside className="space-y-4">
+              <TriangleDimensions onApply={(a, b, c) => {
+                const tri = placeTriangleFromSides(a, b, c);
+                set({ pointA: cartToLonLat(tri.A), pointB: cartToLonLat(tri.B), pointC: cartToLonLat(tri.C), showTriangle: true });
+                setActive("triangle");
+              }} />
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">
@@ -563,6 +570,38 @@ function SphereLabInner() {
       }
     </LocalizedDigits>
   );
+}
+function TriangleDimensions({ onApply }: { onApply: (a: number, b: number, c: number) => void }) {
+  const { t } = useLanguage();
+  const [mode, setMode] = useState("sides");
+  const [values, setValues] = useState([60, 60, 60]);
+  const [error, setError] = useState("");
+  const apply = () => {
+    const rad = Math.PI / 180;
+    let sides = values;
+    if (mode === "angles") {
+      sides = values.map((angle, i) => {
+        const j = (i + 1) % 3, k = (i + 2) % 3;
+        const cosine = (Math.cos(angle * rad) + Math.cos(values[j] * rad) * Math.cos(values[k] * rad)) / (Math.sin(values[j] * rad) * Math.sin(values[k] * rad));
+        return Math.abs(cosine) <= 1 ? Math.acos(cosine) / rad : NaN;
+      });
+    }
+    const [a, b, c] = sides;
+    if (!sides.every((v) => Number.isFinite(v) && v > 0 && v < 180) || a + b <= c || a + c <= b || b + c <= a || a + b + c >= 360) {
+      setError(t("این اندازه‌ها مثلث کروی غیرمنحط نمی‌سازند.", "These values do not define a nondegenerate spherical triangle.")); return;
+    }
+    setError(""); onApply(a, b, c);
+  };
+  return <details className="rounded-xl border border-[var(--border)] bg-[var(--panel)] p-4" open>
+    <summary className="text-[var(--gold-soft)]">{t("ساخت مثلث با اندازه‌ها", "Build a triangle by dimensions")}</summary>
+    <p className="my-3 text-xs leading-6 text-[var(--muted)]">{t("سه ضلع یا سه زاویهٔ مستقل را وارد کنید؛ شش اندازه هم‌زمان مستقل نیستند. کنترل مختصات در پایین همچنان در دسترس است.", "Enter three sides or three angles. All six dimensions cannot vary independently. Vertex coordinates remain available below.")}</p>
+    <select className="control-input" value={mode} onChange={(e) => {setMode(e.target.value); setValues(e.target.value === "angles" ? [90,90,90] : [60,60,60]);}}>
+      <option value="sides">{t("سه ضلع a, b, c", "Three sides a, b, c")}</option><option value="angles">{t("سه زاویه A, B, C", "Three angles A, B, C")}</option>
+    </select>
+    <div className="my-3 grid grid-cols-3 gap-2" dir="ltr">{values.map((v,i) => <label key={i} className="text-xs">{(mode === "sides" ? "abc" : "ABC")[i]} °<input className="control-input" type="number" min="0.01" max="179.99" step="0.1" value={v} onChange={(e) => setValues(values.map((x,j) => j === i ? Number(e.target.value) : x))} /></label>)}</div>
+    {error && <p role="alert" className="text-xs text-[var(--rose-ink)]">{error}</p>}
+    <Button size="sm" onClick={apply}>{t("رسم روی کره", "Draw on sphere")}</Button>
+  </details>;
 }
 function Toggle({
   label,
