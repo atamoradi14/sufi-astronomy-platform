@@ -99,6 +99,29 @@ export function createSatellite({
   const devices = new Map(),
     tickets = new Map(),
     limits = new Map();
+  for (const table of ["devices", "pairing"]) {
+    if (
+      !db
+        .prepare(`PRAGMA table_info(${table})`)
+        .all()
+        .some((c) => c.name === "installation")
+    )
+      db.exec(`ALTER TABLE ${table} ADD COLUMN installation TEXT`);
+  }
+  db.exec(
+    "CREATE UNIQUE INDEX IF NOT EXISTS device_installation_active ON devices(installation) WHERE installation IS NOT NULL AND revoked=0",
+  );
+  const revoke = (id) => {
+    db.prepare(
+      "UPDATE devices SET revoked=1,version=version+1 WHERE id=? AND revoked=0",
+    ).run(id);
+    const state = devices.get(id);
+    if (state) {
+      state.publisher?.close(1008, "Device revoked");
+      for (const viewer of state.viewers) viewer.close(1008, "Device revoked");
+      devices.delete(id);
+    }
+  };
   const control = (req) => {
     const c = verifyClaims(
       (req.headers.authorization || "").replace(/^Bearer /, ""),
@@ -203,6 +226,28 @@ export function createSatellite({
         limits.set(key, limit);
         const p = await body(req),
           address = email(p.email);
+        const installation = text(p.installationId, 64);
+        if (!/^[a-f0-9]{64}$/.test(installation))
+          throw fail(400, "Update the Android app before pairing");
+        if (
+          db
+            .prepare(
+              "SELECT id FROM devices WHERE installation=? AND revoked=0",
+            )
+            .get(installation)
+        )
+          throw fail(
+            409,
+            "This phone is already paired. Cancel its connection first in the app or revoke it in the dashboard.",
+          );
+        if (
+          db
+            .prepare(
+              "SELECT id FROM pairing WHERE installation=? AND status='pending' AND expires>?",
+            )
+            .get(installation, Date.now())
+        )
+          throw fail(409, "Cancel the pending request before requesting again");
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address))
           throw fail(400, "Enter a valid Google email address");
         if (
@@ -217,7 +262,9 @@ export function createSatellite({
           pairSecret = randomBytes(32).toString("base64url"),
           code = String(randomInt(10000000, 100000000)),
           expires = Date.now() + 600000;
-        db.prepare("INSERT INTO pairing VALUES(?,?,?,?,?,?,?,?,NULL)").run(
+        db.prepare(
+          "INSERT INTO pairing(id,email,name,model,code,secret_hash,status,expires,device_id,installation) VALUES(?,?,?,?,?,?,?,?,NULL,?)",
+        ).run(
           id,
           address,
           text(p.name) || "Android phone",
@@ -226,6 +273,7 @@ export function createSatellite({
           hash(pairSecret),
           "pending",
           expires,
+          installation,
         );
         return json(res, 201, {
           id,
@@ -235,6 +283,42 @@ export function createSatellite({
           verificationUrl:
             origin + "/satellite?pair=" + encodeURIComponent(code),
         });
+      }
+      if (req.method === "POST" && path === "/pair/cancel") {
+        const p = await body(req),
+          r = db.prepare("SELECT * FROM pairing WHERE id=?").get(text(p.id));
+        if (!r || hash(text(p.secret, 200)) !== r.secret_hash)
+          throw fail(401, "Invalid pairing secret");
+        if (r.device_id) revoke(r.device_id);
+        db.prepare("UPDATE pairing SET status='rejected' WHERE id=?").run(r.id);
+        return json(res, 200, { cancelled: true });
+      }
+      if (
+        req.method === "POST" &&
+        (path === "/device/register" || path === "/device/unpair")
+      ) {
+        const d = deviceAuth(req);
+        if (!d) throw fail(401, "Device credential required");
+        if (path === "/device/unpair") {
+          revoke(d.id);
+          return json(res, 200, { cancelled: true });
+        }
+        const p = await body(req),
+          installation = text(p.installationId, 64);
+        if (!/^[a-f0-9]{64}$/.test(installation))
+          throw fail(400, "Invalid phone identifier");
+        if (d.installation && d.installation !== installation)
+          throw fail(409, "Phone identity cannot change");
+        const existing = db
+          .prepare("SELECT id FROM devices WHERE installation=? AND revoked=0")
+          .get(installation);
+        if (existing && existing.id !== d.id)
+          throw fail(409, "Cancel the previous phone connection first");
+        db.prepare("UPDATE devices SET installation=? WHERE id=?").run(
+          installation,
+          d.id,
+        );
+        return json(res, 200, { registered: true });
       }
       if (req.method === "POST" && path === "/pair/claim") {
         const p = await body(req),
@@ -311,11 +395,27 @@ export function createSatellite({
           )
             throw fail(409, "Maximum ten devices per account");
           const id = randomBytes(18).toString("hex");
+          if (
+            db
+              .prepare(
+                "SELECT id FROM devices WHERE installation=? AND revoked=0",
+              )
+              .get(r.installation)
+          )
+            throw fail(409, "This phone is already paired; cancel it first");
           db.exec("BEGIN IMMEDIATE");
           try {
             db.prepare(
-              "INSERT INTO devices(id,owner,email,name,model,created) VALUES(?,?,?,?,?,?)",
-            ).run(id, c.sub, email(c.email), r.name, r.model, Date.now());
+              "INSERT INTO devices(id,owner,email,name,model,created,installation) VALUES(?,?,?,?,?,?,?)",
+            ).run(
+              id,
+              c.sub,
+              email(c.email),
+              r.name,
+              r.model,
+              Date.now(),
+              r.installation,
+            );
             db.prepare(
               "UPDATE pairing SET status='approved',device_id=? WHERE id=?",
             ).run(id, r.id);

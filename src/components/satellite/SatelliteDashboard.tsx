@@ -538,9 +538,24 @@ export function SatelliteDashboard() {
                         "Telemetry & connection quality",
                       )}
                     </h2>
-                    <p className="sensor-note mb-4">{t("پیش از رصد، گوشی را دور از فلز و آهنربا به شکل ۸ حرکت بده تا کالیبراسیون قطب‌نمای اندروید بهتر شود. برای اندازه‌گیری آرام، چند ثانیه ثابت نگه دار. حسگرهای غایب جایگزین ساختگی ندارند.", "Before observing, move the phone in a figure-eight away from metal and magnets to help Android compass calibration. Hold it still for a few seconds for stable readings. Missing sensors are never replaced with invented values.")}</p>
-                    <div className="flex flex-wrap gap-2 mb-4 text-xs" dir="ltr">
-                      {Object.entries(snapshot.status).map(([name,status])=><span key={name} className="rounded border border-[var(--border)] px-2 py-1">{name}: {status}</span>)}
+                    <p className="sensor-note mb-4">
+                      {t(
+                        "پیش از رصد، گوشی را دور از فلز و آهنربا به شکل ۸ حرکت بده تا کالیبراسیون قطب‌نمای اندروید بهتر شود. برای اندازه‌گیری آرام، چند ثانیه ثابت نگه دار. حسگرهای غایب جایگزین ساختگی ندارند.",
+                        "Before observing, move the phone in a figure-eight away from metal and magnets to help Android compass calibration. Hold it still for a few seconds for stable readings. Missing sensors are never replaced with invented values.",
+                      )}
+                    </p>
+                    <div
+                      className="flex flex-wrap gap-2 mb-4 text-xs"
+                      dir="ltr"
+                    >
+                      {Object.entries(snapshot.status).map(([name, status]) => (
+                        <span
+                          key={name}
+                          className="rounded border border-[var(--border)] px-2 py-1"
+                        >
+                          {name}: {status}
+                        </span>
+                      ))}
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <Metric
@@ -811,6 +826,8 @@ export function SatelliteDashboard() {
                           elements={orbit}
                           date={simDate}
                           phone={q ?? [0, 0, 0, 1]}
+                          screenAngle={remote.screenAngle}
+                          shortFov={frame?.shortFovDegrees ?? 50}
                         />
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
                           <Metric

@@ -168,3 +168,11 @@ Not hardware-verified: APK installation on a physical phone, actual sensor/lens
 alignment, low-light camera quality, and OEM-specific background/battery behavior.
 No physical Android device was connected during this release. Protocol tests and
 synthetic streams are not evidence of real handset attitude accuracy.
+
+## Version 1.1 update
+
+- Android remembers one approved phone registration. Its paired screen hides email/request controls, shows actual socket connection status with a large green/red transmission toggle (amber while reconnecting), one camera toggle, dashboard and relay controls. Cancellation revokes the server credential before local pairing is cleared. Pending challenges survive app restarts.
+- SHA-256 of Android scoped ANDROID_ID identifies a phone within this signing key/package/Android user; it is not a global hardware serial or an attestation mechanism. Server active-registration uniqueness prevents duplicate pairings; existing clients register their identity after upgrading. Older clients must upgrade before making new requests. A factory reset or Android-user change can create a new scoped identity. Existing paired credentials remain usable.
+- The stale SM-G781B entry that never published was backed up and revoked; the working registration was preserved.
+- Orbit graphics use attributed Solar System Scope Earth/cloud textures, simulated sunlight, a spacecraft with solar panels and rear camera along body minus-Z, a ray/FOV guide, Earth overview, follow mode and camera mode. Imagery is static; spacecraft size is exaggerated for legibility.
+- Focused checks only for this release: Android assemble/lint/signature, TypeScript/build checks, two service tests including duplicate rejection and device unpair, and one browser orbit/interaction smoke check. No full test-suite rerun.

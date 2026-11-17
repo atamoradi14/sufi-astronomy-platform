@@ -42,6 +42,7 @@ test("Pairing approval, publishing/viewing roles, owner isolation, one-use ticke
       email: "owner@example.com",
       name: "Phone",
       model: "Android",
+      installationId: "a".repeat(64),
     });
     assert.equal(request.status, 201);
     const pair = request.data;
@@ -83,6 +84,17 @@ test("Pairing approval, publishing/viewing roles, owner isolation, one-use ticke
     ).data;
     assert.ok(claimed.token);
     const id = claimed.deviceId;
+    assert.equal(
+      (
+        await call("/pair/request", {
+          email: "owner@example.com",
+          name: "Duplicate phone",
+          model: "Android",
+          installationId: "a".repeat(64),
+        })
+      ).status,
+      409,
+    );
     assert.equal(
       (await call("/v1/devices", null, other)).data.devices.length,
       0,
@@ -157,14 +169,26 @@ test("Pairing approval, publishing/viewing roles, owner isolation, one-use ticke
     );
     assert.ok((await once(reused, "error"))[0]);
     const closed = once(viewer, "close");
-    assert.equal((await call("/v1/revoke", { id }, owner)).status, 200);
+    assert.equal((await call("/device/unpair", {}, claimed.token)).status, 200);
     await closed;
     assert.equal((await call("/v1/ticket", { id }, owner)).status, 404);
+    assert.equal(
+      (
+        await call("/pair/request", {
+          email: "owner@example.com",
+          name: "Repaired phone",
+          model: "Android",
+          installationId: "a".repeat(64),
+        })
+      ).status,
+      201,
+    );
     const expired = (
       await call("/pair/request", {
         email: "owner@example.com",
         name: "Expired",
         model: "Test",
+        installationId: "b".repeat(64),
       })
     ).data;
     app.db
