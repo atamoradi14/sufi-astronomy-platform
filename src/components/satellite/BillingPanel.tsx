@@ -119,8 +119,8 @@ export function BillingPanel({
         )
       : 900000;
   useEffect(() => {
-    if (access?.mode === "trial" && remaining === 0) onAccess(false);
-  }, [remaining, access?.mode, onAccess]);
+    if (access?.mode === "trial" && remaining === 0 && !access.paidUntil) onAccess(false);
+  }, [remaining, access?.mode,access?.paidUntil, onAccess]);
   const action = async (key: string, fn: () => Promise<void>) => {
     setBusy(key);
     setError("");
@@ -195,7 +195,9 @@ export function BillingPanel({
                 ? t("طرح فعال", "Plan active")
                 : access.mode === "not_started"
                   ? t("۱۵ دقیقه آمادهٔ شروع", "15 minutes ready to start")
-                  : remaining > 0
+              : access.paidUntil
+                ? t('طرح خریداری‌شده · آمادهٔ ادامه','Purchased plan · ready to continue')
+              : remaining > 0
                     ? t("زمان باقی‌مانده: ", "Remaining: ") +
                       Math.floor(remaining / 60000) +
                       ":" +
@@ -336,7 +338,7 @@ export function BillingPanel({
           {[
             ...(catalog.allPlans ?? []),
             {
-              id: "new-plan",
+                id: "",
               name_fa: "طرح تازه",
               name_en: "New plan",
               days: 30,
