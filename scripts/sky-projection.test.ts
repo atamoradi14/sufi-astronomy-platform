@@ -11,6 +11,13 @@ import {
 } from "../src/lib/sky/project";
 const close = (a: number, b: number, tolerance = 1e-8) =>
   assert.ok(Math.abs(a - b) < tolerance, `${a} != ${b}`);
+test("Horizon-locked exploration keeps roll and altitude stable during horizontal drags", () => {
+  let look: Look = { az: 180, alt: 35, fov: 75, horizonLocked: true };
+  for (let i = 0; i < 100; i++) look = dragLook(look, 0.6, 0.4, 0.65, 0.4);
+  close(look.alt, 35);
+  close(look.roll ?? 0, 0);
+  close(zoomLook(look, 0.8, 0.4, 0.3).roll ?? 0, 0);
+});
 const distance = (a: number[], b: number[]) =>
   Math.hypot(...a.map((v, i) => v - b[i]));
 
