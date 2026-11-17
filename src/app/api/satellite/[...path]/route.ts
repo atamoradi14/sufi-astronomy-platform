@@ -4,6 +4,10 @@ import { signClaims } from "@/lib/satellite/auth";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 const allowed = new Map([
+  ["GET/billing", "/v1/billing"],
+  ["POST/billing/checkout", "/v1/billing/checkout"],
+  ["POST/billing/reconcile", "/v1/billing/reconcile"],
+  ["POST/billing/plans", "/v1/billing/plans"],
   ["GET/requests", "/v1/requests"],
   ["GET/devices", "/v1/devices"],
   ["POST/approve", "/v1/approve"],
@@ -55,10 +59,11 @@ async function handle(
         headers: {
           Authorization: "Bearer " + token,
           "Content-Type": "application/json",
+          "X-Fanous-Country": request.headers.get("cf-ipcountry") || "",
         },
         body: payload,
         cache: "no-store",
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(55000),
       },
     );
     return new NextResponse(await response.text(), {

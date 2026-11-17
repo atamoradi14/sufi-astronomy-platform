@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "test": "node --import tsx --test test.mjs"
+    "test": "node --import tsx --test test.mjs billing.test.mjs"
   },
   "dependencies": {
     "ws": "8.23.0"

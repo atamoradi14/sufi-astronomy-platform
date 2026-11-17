@@ -53,6 +53,13 @@ export function InfoPage({ kind }: { kind: "about" | "privacy" | "tools" }) {
       ),
       sections: [
         [
+          t("خرید و زمان آزمایشی ماهواره", "Satellite purchases and trial"),
+          t(
+            "زمان نخستین اتصال برای دورهٔ آزمایشی، طرح‌ها، مبلغ و وضعیت سفارش و شناسهٔ تأیید پرداخت در سرویس ماهواره نگهداری می‌شود. اطلاعات کارت را در فانوس دریافت یا ذخیره نمی‌کنیم؛ پرداخت در صفحهٔ Stripe یا ایزی‌پی انجام می‌شود. جزئیات خریدهای قبلی با تغییر قیمت طرح عوض نمی‌شوند. برای پیگیری خرید با atamoradi8@gmail.com تماس بگیرید.",
+            "The satellite service stores the first-connection trial timestamp, plan, order amount/status and verified payment reference. Fanous does not collect or store card details; payment takes place on Stripe or Ezpay. Later price edits do not change existing order terms. Contact atamoradi8@gmail.com for purchase support.",
+          ),
+        ],
+        [
           t("گوشی به‌عنوان ماهواره", "Phone satellite relay"),
           t(
             "برنامهٔ اندروید فقط پس از شروع شما حسگرها و موقعیت را به سرویس ماهواره می‌فرستد. دوربین اختیاری است و فقط روی گوشی روشن می‌شود. داده‌ها و فریم‌های دوربین برای نمایش زنده از سرور عبور می‌کنند و ذخیرهٔ تاریخی ندارند؛ حافظهٔ موقت تا ۶۰۰ نمونهٔ آخر را نگه می‌دارد. نام و مدل گوشی، مالک، زمان اتصال و وضعیت ابطال در پایگاه دادهٔ جدا ذخیره می‌شود. فقط نشست‌های همان حساب تأییدشده دسترسی دارند. ارسال را از اعلان اندروید متوقف و دسترسی گوشی را از اتاق کنترل باطل کنید.",

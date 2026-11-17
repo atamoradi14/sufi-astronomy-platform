@@ -32,6 +32,6 @@ $download=Join-Path $root 'services/satellite/downloads'
 New-Item -ItemType Directory -Force $download | Out-Null
 Copy-Item -LiteralPath $apk -Destination (Join-Path $download 'fanous-satellite.apk')
 $hash=(Get-FileHash -LiteralPath $apk -Algorithm SHA256).Hash.ToLowerInvariant()
-$manifest=@{version='1.1.0';versionCode=2;package='online.fanous.satellite';minSdk=26;targetSdk=35;sha256=$hash;bytes=(Get-Item -LiteralPath $apk).Length;url='/satellite-api/download/fanous-satellite.apk'}
+$manifest=@{version='1.2.0';versionCode=3;package='online.fanous.satellite';minSdk=26;targetSdk=35;sha256=$hash;bytes=(Get-Item -LiteralPath $apk).Length;url='/satellite-api/download/fanous-satellite.apk'}
 [IO.File]::WriteAllText((Join-Path $download 'manifest.json'), (($manifest | ConvertTo-Json) -replace "`r`n","`n") + "`n", [Text.UTF8Encoding]::new($false))
 Write-Output "Verified Android APK SHA-256: $hash"

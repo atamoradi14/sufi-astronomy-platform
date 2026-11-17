@@ -73,7 +73,7 @@ public final class MainActivity extends Activity {
             connection.setText(online?l("● متصل · خاموش کن","● CONNECTED · tap to stop"):running?l("◌ در حال اتصال · توقف","◌ CONNECTING · tap to stop"):l("○ خاموش · روشن کن","○ OFF · tap to connect"));
             connection.setBackground(background(online?0xff216e4a:running?0xff855a20:0xff8e343e));connection.setTextColor(Color.WHITE);}
         if(cameraButton!=null)cameraButton.setText(TelemetryService.cameraActive?l("دوربین روشن · خاموش کن","Camera ON · turn off"):l("دوربین خاموش · فعال‌سازی با مجوز","Camera OFF · enable with permission"));
-        if(status!=null)status.setText(notice.isEmpty()?(pairedView?l("اتصال ذخیره شده؛ نیازی به درخواست دوباره نیست.","Pairing saved; no new request is needed."):l("اتصال امن با تأیید حساب گوگل","Secure pairing with Google approval")):notice);
+        if(status!=null)status.setText(notice.isEmpty()?(TelemetryService.planRequired?l("زمان آزمایش تمام شد؛ برای خرید طرح اتاق کنترل را باز کن. اتصال گوشی محفوظ است.","Trial ended. Open the control room to purchase a plan; your pairing is saved."):pairedView?l("اتصال ذخیره شده؛ نیازی به درخواست دوباره نیست.","Pairing saved; no new request is needed."):l("اتصال امن با تأیید حساب گوگل","Secure pairing with Google approval")):notice);
     }
     private int dp(int n){return Math.round(n*getResources().getDisplayMetrics().density);}
     private GradientDrawable background(int color){GradientDrawable d=new GradientDrawable();d.setColor(color);d.setCornerRadius(dp(16));return d;}

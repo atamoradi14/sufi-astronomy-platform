@@ -178,3 +178,64 @@ synthetic streams are not evidence of real handset attitude accuracy.
 - Focused checks only for this release: Android assemble/lint/signature, TypeScript/build checks, two service tests including duplicate rejection and device unpair, and one browser orbit/interaction smoke check. No full test-suite rerun.
 
 Version 1.1 production delivery: web `release-20261117-08`, satellite service `release-20261117-02`, source `108a55c`. Signed APK versionCode 2 / 1.1.0, SHA-256 `2be15481b51f1ca18c8902d4ad2beb06f90756b182043abe98fd989619c13638`. Public download matches the signed bytes. Live duplicate request returns 409; cancelled pending requests return rejected (403 when claimed). One working device remains after revoking only the stale never-published duplicate. Database backup precedes migration and web account backups precede rollout.
+
+## Trial and paid access
+
+The public satellite page, APK download and prices remain accessible to everyone.
+A verified Google user has one persistent 15-minute elapsed-time trial, starting
+at the first authenticated Android WebSocket connection after billing is released.
+Disconnects, another phone, unpair/re-pair and service restarts do not reset it.
+At expiry the service rejects viewer tickets and closes active publishers/viewers
+with code 4003; no more sensor/camera packets are accepted. Android 1.2 stops its
+foreground relay, retains its pairing and links the user to the control room.
+`atamoradi8@gmail.com` is the billing administrator and is exempt from this limit.
+
+Initial editable plan: 30 days, 199,000 toman or US$5, manual renewal. The admin
+can create plans and edit bilingual names, days, toman/USD-cent prices and whether
+they are for sale, under “Manage plans & pricing” on the satellite page. `/admin`
+links to it. Existing orders retain their original price/duration snapshots;
+changing a plan never rewrites a purchased period. New paid periods extend after
+any current trial/paid period. No automatic charges or recurring subscription.
+
+Billing tables live in the separate satellite SQLite database: `satellite_accounts`,
+`satellite_plans`, `satellite_orders`, `satellite_payment_events`, and
+`satellite_billing_audit`. Keep the PVC and database backups on all deployments.
+The trial timestamp and payment records must never be cleared to reset access.
+Plan changes are audit logged. Full refunds revoke their order's entitlement;
+partial refunds do not revoke the remainder of that order's access.
+
+Darvazeh's restricted Stripe key and Iran Ezpay broker credentials/wallet are reused
+privately, without modifying Darvazeh or the relay. Fanous orders use dedicated
+metadata `app=fanous-satellite`, factor prefix `fanous-satellite-` and isolated
+receipts; unrelated Stripe events never activate Fanous. Stripe amounts, currency,
+user/order metadata, payment status, line items and mode are checked from Stripe's
+API. Webhook signatures are verified against the raw body and timestamp before
+processing. Ezpay converts toman to rial (x10), probes the verified receiving
+wallet, and verifies exact request id, factor/receiver lookup, rial amount and
+transaction reference. The browser return URL cannot mark an order paid.
+Reconciliation polls open orders fairly every minute and also runs on request.
+
+Private reuse inputs: `.local/darvazeh-billing-reuse.json`; deployment configuration:
+`.local/satellite-billing-config.json`. Both are ignored and contain merchant
+credentials: keep private. `scripts/bootstrap-satellite-payments.py` imports the
+approved config and optional `SATELLITE_STRIPE_WEBHOOK_SECRET` from `.env` and
+checks wallet readiness without charging anyone. The service release helper
+loads the settings into `fanous-satellite-config`; the web server never receives
+provider secrets. Existing worker/gateway routes already cover the endpoints.
+
+Stripe requires a separate endpoint:
+`https://fanous.online/satellite-api/billing/stripe/webhook`.
+Events: `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
+`checkout.session.async_payment_failed`, `checkout.session.expired`, `charge.refunded`.
+The reused restricted key cannot create/list webhooks (HTTP 403). An operator must
+create it in Stripe, save its signing secret locally as
+`SATELLITE_STRIPE_WEBHOOK_SECRET` in `.env`, run the private bootstrap script,
+and redeploy the existing satellite image with updated config. Darvazeh's webhook
+signing secret is endpoint-specific and is not reused. Stripe checkout remains
+disabled until the Fanous signing secret is configured. Ezpay is independent.
+
+Focused checks: exact trial boundary and persistence, WebSocket shutdown and 402
+tickets after expiry, admin/owner isolation, historical price snapshots, forged
+webhook signatures, mismatched amounts, duplicate settlement, and rial conversion.
+Mobile browser checks cover visible prices/admin editors and the expired paywall.
+No real customer payment or real card charge is generated for testing.

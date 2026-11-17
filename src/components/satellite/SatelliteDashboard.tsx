@@ -1,4 +1,5 @@
 "use client";
+import { BillingPanel } from "./BillingPanel";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
@@ -72,6 +73,7 @@ export function SatelliteDashboard() {
     [apk, setApk] = useState<Apk | null>(null),
     [tab, setTab] = useState("overview"),
     [now, setNow] = useState(Date.now());
+  const [billingAllowed, setBillingAllowed] = useState<boolean>(true);
   const frameUrl = useRef("");
   const [draft, setDraft] = useState<Elements>(() => ({
       ...DEFAULT_ORBIT,
@@ -117,7 +119,7 @@ export function SatelliteDashboard() {
     return () => clearInterval(timer);
   }, []);
   useEffect(() => {
-    if (!selected || !session?.user?.id) return;
+    if (!selected || !session?.user?.id || !billingAllowed) return;
     let active = true,
       ws: WebSocket | null = null,
       timer: ReturnType<typeof setTimeout> | undefined;
@@ -201,7 +203,7 @@ export function SatelliteDashboard() {
         frameUrl.current = "";
       }
     };
-  }, [selected, session?.user?.id]);
+  }, [selected, session?.user?.id, billingAllowed]);
   const snapshot = useMemo(
       () => remoteSnapshot(history, connected, now),
       [history, connected, now],
@@ -321,6 +323,7 @@ export function SatelliteDashboard() {
             )}
           </div>
         </section>
+        <BillingPanel onAccess={setBillingAllowed} />
         {sessionStatus === "loading" ? (
           <p>{t("بررسی حساب…", "Checking account…")}</p>
         ) : !session?.user?.id ? (
@@ -455,432 +458,463 @@ export function SatelliteDashboard() {
                 </div>
               )}
             </section>
-            <div
-              role="tablist"
-              aria-label={t("نمای کنترل ماهواره", "Satellite control view")}
-              className="sensor-tabs"
-            >
-              {[
-                ["overview", t("وضعیت و سه‌بعدی", "Attitude & 3D")],
-                ["plots", t("نمودارهای زنده", "Live charts")],
-                ["sky", t("آسمان و دوربین گوشی", "Phone sky & camera")],
-                ["orbit", t("شبیه‌سازی مدار", "Orbit simulation")],
-                ["filter", t("فیلتر و معادلات", "Filter & equations")],
-              ].map(([id, label]) => (
-                <button
-                  key={id}
-                  role="tab"
-                  aria-selected={tab === id}
-                  aria-controls={"satellite-" + id}
-                  id={"satellite-tab-" + id}
-                  onClick={() => setTab(id)}
+            {billingAllowed && (
+              <>
+                <div
+                  role="tablist"
+                  aria-label={t("نمای کنترل ماهواره", "Satellite control view")}
+                  className="sensor-tabs"
                 >
-                  {label}
-                </button>
-              ))}
-            </div>
-            <section
-              role="tabpanel"
-              id={"satellite-" + tab}
-              aria-labelledby={"satellite-tab-" + tab}
-            >
-              {tab === "overview" && (
-                <div className="grid lg:grid-cols-2 gap-5">
-                  <section className="sensor-panel">
-                    <h2>
-                      {t(
-                        "گوشیِ متصل در فضای سه‌بعدی",
-                        "Connected phone attitude in 3D",
-                      )}
-                    </h2>
-                    {corrected ? (
-                      <PhoneScene
-                        q={corrected}
-                        axis={[0, 0, -1]}
-                        northKnown={snapshot.absolute}
-                      />
-                    ) : (
-                      <div className="h-72 grid place-items-center text-center text-[var(--muted)]">
-                        {t(
-                          "ارسال را روی گوشی شروع کن؛ این مرورگر فقط دادهٔ دریافتی را نمایش می‌دهد.",
-                          "Start publishing on the phone; this browser only displays received data.",
-                        )}
-                      </div>
-                    )}
-                    <div className="grid grid-cols-3 gap-2 mt-4">
-                      <Metric
-                        label="Yaw"
-                        value={format(angles?.yaw)}
-                        unit="°"
-                      />
-                      <Metric
-                        label="Pitch"
-                        value={format(angles?.pitch)}
-                        unit="°"
-                      />
-                      <Metric
-                        label="Roll"
-                        value={format(angles?.roll)}
-                        unit="°"
-                      />
-                    </div>
-                    <p className="sensor-note">
-                      {t(
-                        "جهت‌گیری واقعی از گوشی می‌آید؛ مکان سه‌بعدی از انتگرال شتاب ساخته نمی‌شود.",
-                        "Actual attitude comes from the phone; no 3D displacement is invented from accelerometer integration.",
-                      )}
-                    </p>
-                  </section>
-                  <section className="sensor-panel">
-                    <h2>
-                      {t(
-                        "تله‌متری و کیفیت اتصال",
-                        "Telemetry & connection quality",
-                      )}
-                    </h2>
-                    <p className="sensor-note mb-4">
-                      {t(
-                        "پیش از رصد، گوشی را دور از فلز و آهنربا به شکل ۸ حرکت بده تا کالیبراسیون قطب‌نمای اندروید بهتر شود. برای اندازه‌گیری آرام، چند ثانیه ثابت نگه دار. حسگرهای غایب جایگزین ساختگی ندارند.",
-                        "Before observing, move the phone in a figure-eight away from metal and magnets to help Android compass calibration. Hold it still for a few seconds for stable readings. Missing sensors are never replaced with invented values.",
-                      )}
-                    </p>
-                    <div
-                      className="flex flex-wrap gap-2 mb-4 text-xs"
-                      dir="ltr"
-                    >
-                      {Object.entries(snapshot.status).map(([name, status]) => (
-                        <span
-                          key={name}
-                          className="rounded border border-[var(--border)] px-2 py-1"
-                        >
-                          {name}: {status}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <Metric
-                        label={t("باتری گوشی", "Phone battery")}
-                        value={
-                          latest?.battery == null
-                            ? "—"
-                            : format(latest.battery * 100, 0)
-                        }
-                        unit="%"
-                      />
-                      <Metric
-                        label={t("سن بستهٔ سرور", "Server packet age")}
-                        value={
-                          latest
-                            ? format(Math.max(0, now - latest.receivedAt), 0)
-                            : "—"
-                        }
-                        unit="ms"
-                      />
-                      <Metric
-                        label={t("عرض گوشی", "Phone latitude")}
-                        value={format(snapshot.gps?.lat, 6)}
-                        unit="°"
-                      />
-                      <Metric
-                        label={t("طول گوشی", "Phone longitude")}
-                        value={format(snapshot.gps?.lon, 6)}
-                        unit="°"
-                      />
-                      <Metric
-                        label={t("ارتفاع GPS", "GPS altitude")}
-                        value={format(snapshot.gps?.altitude)}
-                        unit="m"
-                      />
-                      <Metric
-                        label={t("دقت GPS", "GPS accuracy")}
-                        value={format(snapshot.gps?.accuracy)}
-                        unit="m"
-                      />
-                      <Metric
-                        label={t("اندازهٔ میدان خام", "Raw magnetic magnitude")}
-                        value={format(snapshot.magneticNorm)}
-                        unit="µT"
-                      />
-                      <Metric
-                        label={t("نرخ زاویه‌ای بدنی", "Body angular speed")}
-                        value={
-                          latest?.gyro
-                            ? format(Math.hypot(...latest.gyro), 3)
-                            : "—"
-                        }
-                        unit="rad/s"
-                      />
-                    </div>
-                    <p className="sensor-note">
-                      {latest?.relay
-                        ? t(
-                            "گوشی در حالت رله و ذخیرهٔ نمایشگر است.",
-                            "Phone is in relay/display-saving mode.",
-                          )
-                        : t(
-                            "برای ذخیرهٔ باتری می‌توانی در برنامهٔ گوشی حالت رله را انتخاب کنی.",
-                            "Choose relay mode in the Android app to save display power.",
-                          )}{" "}
-                      {north.declination !== null
-                        ? t(
-                            `تصحیح خودکار شمال: ${north.declination.toFixed(2)}°.`,
-                            `Automatic north correction: ${north.declination.toFixed(2)}°.`,
-                          )
-                        : ""}
-                    </p>
-                  </section>
-                </div>
-              )}
-              {tab === "plots" && (
-                <div className="grid lg:grid-cols-2 gap-5">
-                  {(["accel", "gyro", "mag", "attitude"] as const).map(
-                    (key) => (
-                      <section key={key} className="sensor-panel">
-                        <h2>
-                          {key === "accel"
-                            ? t("شتاب‌سنج بومی", "Native accelerometer")
-                            : key === "gyro"
-                              ? t("ژیروسکوپ بومی", "Native gyroscope")
-                              : key === "mag"
-                                ? t("مغناطیس‌سنج بومی", "Native magnetometer")
-                                : t(
-                                    "جهت‌گیری پیش و پس از فیلتر",
-                                    "Reference & filtered attitude",
-                                  )}
-                        </h2>
-                        <SensorPlot
-                          samples={snapshot.samples[key]}
-                          unit={
-                            key === "accel"
-                              ? "m/s²"
-                              : key === "gyro"
-                                ? "rad/s"
-                                : key === "mag"
-                                  ? "µT"
-                                  : "°"
-                          }
-                          labels={
-                            key === "attitude"
-                              ? ["Yaw", "Pitch", "Roll"]
-                              : undefined
-                          }
-                        />
-                      </section>
-                    ),
-                  )}
-                  <QuaternionPlots samples={snapshot.quaternions} />
-                  <section className="sensor-panel lg:col-span-2">
-                    <h2>GPS</h2>
-                    <GpsPlots fixes={snapshot.gpsHistory} />
-                  </section>
-                </div>
-              )}
-              {tab === "sky" && (
-                <CameraSky
-                  snapshot={snapshot}
-                  declination={north.declination ?? 0}
-                  northConfirmed={north.declination !== null}
-                  onReference={() => setTab("overview")}
-                  onStart={() => {}}
-                  remote={remote}
-                />
-              )}
-              {tab === "filter" && <FilterDynamics snapshot={snapshot} />}
-              {tab === "orbit" && (
-                <div className="space-y-5">
-                  <section className="sensor-panel">
-                    <h2>
-                      {t(
-                        "مدار را با شش عنصر کپلری بساز",
-                        "Set six Keplerian orbital elements",
-                      )}
-                    </h2>
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {(
-                        [
-                          ["a", t("نیم‌قطر بزرگ (km)", "Semi-major axis (km)")],
-                          ["e", t("خروج از مرکز", "Eccentricity")],
-                          ["i", t("میل مدار (°)", "Inclination (°)")],
-                          [
-                            "raan",
-                            t("بعد گره صعودی Ω (°)", "Ascending node Ω (°)"),
-                          ],
-                          [
-                            "argp",
-                            t(
-                              "آرگومان حضیض ω (°)",
-                              "Argument of periapsis ω (°)",
-                            ),
-                          ],
-                          [
-                            "meanAnomaly",
-                            t("آنومالی میانگین M₀ (°)", "Mean anomaly M₀ (°)"),
-                          ],
-                        ] as const
-                      ).map(([key, label]) => (
-                        <label className="sensor-label" key={key}>
-                          {label}
-                          <input
-                            type="number"
-                            step="any"
-                            value={draft[key]}
-                            onChange={(e) =>
-                              setDraft((o) => ({
-                                ...o,
-                                [key]: Number(e.target.value),
-                              }))
-                            }
-                          />
-                        </label>
-                      ))}
-                    </div>
-                    <label className="sensor-label mt-4">
-                      {t("زمان مبدأ مدار (UTC ISO)", "Orbit epoch (UTC ISO)")}
-                      <input
-                        dir="ltr"
-                        value={draft.epoch}
-                        onChange={(e) =>
-                          setDraft((o) => ({ ...o, epoch: e.target.value }))
-                        }
-                      />
-                    </label>
+                  {[
+                    ["overview", t("وضعیت و سه‌بعدی", "Attitude & 3D")],
+                    ["plots", t("نمودارهای زنده", "Live charts")],
+                    ["sky", t("آسمان و دوربین گوشی", "Phone sky & camera")],
+                    ["orbit", t("شبیه‌سازی مدار", "Orbit simulation")],
+                    ["filter", t("فیلتر و معادلات", "Filter & equations")],
+                  ].map(([id, label]) => (
                     <button
-                      className="sensor-primary mt-4"
-                      onClick={() => {
-                        const error = validateElements(draft);
-                        setOrbitError(error ?? "");
-                        if (!error) {
-                          setOrbit({ ...draft });
-                          setOrbitStart(Date.now());
-                          setElapsed(0);
-                          setPlaying(true);
-                        }
-                      }}
+                      key={id}
+                      role="tab"
+                      aria-selected={tab === id}
+                      aria-controls={"satellite-" + id}
+                      id={"satellite-tab-" + id}
+                      onClick={() => setTab(id)}
                     >
-                      {t(
-                        "شبیه‌سازی ماهواره در مدار",
-                        "Simulate satellite in orbit",
-                      )}
+                      {label}
                     </button>
-                    {orbitError && (
-                      <p role="alert" className="sensor-note">
-                        {orbitError}
-                      </p>
-                    )}
-                    <p className="sensor-note">
-                      {t(
-                        "مدل آموزشی دوجسمی است؛ کشش جو و J₂ و مانور ندارد. حرکت مداری از عناصر می‌آید و وضعیت بدنی با گوشی کنترل می‌شود. بدون گوشی، جهت بدنی ثابتِ پیش‌نمایش استفاده می‌شود.",
-                        "Educational two-body model: no drag, J₂ or maneuvers. Elements drive translation; the phone commands body attitude. Without a phone, preview attitude is fixed.",
-                      )}
-                    </p>
-                  </section>
-                  {orbit && state && (
-                    <>
+                  ))}
+                </div>
+                <section
+                  role="tabpanel"
+                  id={"satellite-" + tab}
+                  aria-labelledby={"satellite-tab-" + tab}
+                >
+                  {tab === "overview" && (
+                    <div className="grid lg:grid-cols-2 gap-5">
                       <section className="sensor-panel">
-                        <div className="flex flex-wrap gap-3 items-center mb-4">
-                          <button
-                            className="sensor-button"
-                            onClick={() => {
-                              if (playing) {
-                                setElapsed(
-                                  (v) =>
-                                    v + ((now - orbitStart) * speed) / 1000,
-                                );
-                                setPlaying(false);
-                              } else {
-                                setOrbitStart(Date.now());
-                                setPlaying(true);
-                              }
-                            }}
-                          >
-                            {playing
-                              ? t("توقف زمان مدار", "Pause orbital time")
-                              : t("ادامهٔ مدار", "Resume orbit")}
-                          </button>
-                          <label className="sensor-label">
-                            {t("سرعت زمان", "Time scale")}
-                            <select
-                              value={speed}
-                              onChange={(e) => {
-                                if (playing)
-                                  setElapsed(
-                                    (v) =>
-                                      v + ((now - orbitStart) * speed) / 1000,
-                                  );
-                                setOrbitStart(Date.now());
-                                setSpeed(Number(e.target.value));
-                              }}
-                            >
-                              {[1, 10, 30, 100].map((v) => (
-                                <option key={v} value={v}>
-                                  {v}×
-                                </option>
-                              ))}
-                            </select>
-                          </label>
-                          <p className="text-xs" data-digit-literal>
-                            {simDate.toISOString()}
-                          </p>
-                        </div>
-                        <OrbitScene
-                          elements={orbit}
-                          date={simDate}
-                          phone={q ?? [0, 0, 0, 1]}
-                          screenAngle={remote.screenAngle}
-                          shortFov={frame?.shortFovDegrees ?? 50}
-                        />
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+                        <h2>
+                          {t(
+                            "گوشیِ متصل در فضای سه‌بعدی",
+                            "Connected phone attitude in 3D",
+                          )}
+                        </h2>
+                        {corrected ? (
+                          <PhoneScene
+                            q={corrected}
+                            axis={[0, 0, -1]}
+                            northKnown={snapshot.absolute}
+                          />
+                        ) : (
+                          <div className="h-72 grid place-items-center text-center text-[var(--muted)]">
+                            {t(
+                              "ارسال را روی گوشی شروع کن؛ این مرورگر فقط دادهٔ دریافتی را نمایش می‌دهد.",
+                              "Start publishing on the phone; this browser only displays received data.",
+                            )}
+                          </div>
+                        )}
+                        <div className="grid grid-cols-3 gap-2 mt-4">
                           <Metric
-                            label={t("ارتفاع شبیه‌سازی", "Simulated altitude")}
-                            value={format(state.altitude)}
-                            unit="km"
+                            label="Yaw"
+                            value={format(angles?.yaw)}
+                            unit="°"
                           />
                           <Metric
-                            label={t("دوره", "Period")}
-                            value={format(state.period / 60)}
-                            unit="min"
+                            label="Pitch"
+                            value={format(angles?.pitch)}
+                            unit="°"
                           />
                           <Metric
-                            label={t("سرعت مداری", "Orbital speed")}
-                            value={format(Math.hypot(...state.v), 3)}
-                            unit="km/s"
-                          />
-                          <Metric
-                            label={t("حضیض / اوج", "Perigee / apogee")}
-                            value={
-                              format(state.perigee) +
-                              " / " +
-                              format(state.apogee)
-                            }
-                            unit="km"
+                            label="Roll"
+                            value={format(angles?.roll)}
+                            unit="°"
                           />
                         </div>
                         <p className="sensor-note">
-                          {q
-                            ? t(
-                                "جهت و سرعت زاویه‌ای از گوشی زنده است. قاب LVLH: X در راستای حرکت، Y خلاف عمود مدار، Z رو به زمین.",
-                                "Live phone attitude/rates command the body. LVLH: X along-track, Y opposite orbit normal, Z nadir.",
-                              )
-                            : t(
-                                "گوشی زنده‌ای متصل نیست؛ مدار با جهت بدنی ثابت پیش‌نمایش می‌شود.",
-                                "No live phone is connected; orbit uses a fixed preview attitude.",
-                              )}
+                          {t(
+                            "جهت‌گیری واقعی از گوشی می‌آید؛ مکان سه‌بعدی از انتگرال شتاب ساخته نمی‌شود.",
+                            "Actual attitude comes from the phone; no 3D displacement is invented from accelerometer integration.",
+                          )}
                         </p>
                       </section>
-                      <CameraSky
-                        snapshot={snapshot}
-                        declination={0}
-                        northConfirmed
-                        onReference={() => {}}
-                        onStart={() => {}}
-                        remote={remote}
-                        spaceView={space}
-                      />
-                    </>
+                      <section className="sensor-panel">
+                        <h2>
+                          {t(
+                            "تله‌متری و کیفیت اتصال",
+                            "Telemetry & connection quality",
+                          )}
+                        </h2>
+                        <p className="sensor-note mb-4">
+                          {t(
+                            "پیش از رصد، گوشی را دور از فلز و آهنربا به شکل ۸ حرکت بده تا کالیبراسیون قطب‌نمای اندروید بهتر شود. برای اندازه‌گیری آرام، چند ثانیه ثابت نگه دار. حسگرهای غایب جایگزین ساختگی ندارند.",
+                            "Before observing, move the phone in a figure-eight away from metal and magnets to help Android compass calibration. Hold it still for a few seconds for stable readings. Missing sensors are never replaced with invented values.",
+                          )}
+                        </p>
+                        <div
+                          className="flex flex-wrap gap-2 mb-4 text-xs"
+                          dir="ltr"
+                        >
+                          {Object.entries(snapshot.status).map(
+                            ([name, status]) => (
+                              <span
+                                key={name}
+                                className="rounded border border-[var(--border)] px-2 py-1"
+                              >
+                                {name}: {status}
+                              </span>
+                            ),
+                          )}
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <Metric
+                            label={t("باتری گوشی", "Phone battery")}
+                            value={
+                              latest?.battery == null
+                                ? "—"
+                                : format(latest.battery * 100, 0)
+                            }
+                            unit="%"
+                          />
+                          <Metric
+                            label={t("سن بستهٔ سرور", "Server packet age")}
+                            value={
+                              latest
+                                ? format(
+                                    Math.max(0, now - latest.receivedAt),
+                                    0,
+                                  )
+                                : "—"
+                            }
+                            unit="ms"
+                          />
+                          <Metric
+                            label={t("عرض گوشی", "Phone latitude")}
+                            value={format(snapshot.gps?.lat, 6)}
+                            unit="°"
+                          />
+                          <Metric
+                            label={t("طول گوشی", "Phone longitude")}
+                            value={format(snapshot.gps?.lon, 6)}
+                            unit="°"
+                          />
+                          <Metric
+                            label={t("ارتفاع GPS", "GPS altitude")}
+                            value={format(snapshot.gps?.altitude)}
+                            unit="m"
+                          />
+                          <Metric
+                            label={t("دقت GPS", "GPS accuracy")}
+                            value={format(snapshot.gps?.accuracy)}
+                            unit="m"
+                          />
+                          <Metric
+                            label={t(
+                              "اندازهٔ میدان خام",
+                              "Raw magnetic magnitude",
+                            )}
+                            value={format(snapshot.magneticNorm)}
+                            unit="µT"
+                          />
+                          <Metric
+                            label={t("نرخ زاویه‌ای بدنی", "Body angular speed")}
+                            value={
+                              latest?.gyro
+                                ? format(Math.hypot(...latest.gyro), 3)
+                                : "—"
+                            }
+                            unit="rad/s"
+                          />
+                        </div>
+                        <p className="sensor-note">
+                          {latest?.relay
+                            ? t(
+                                "گوشی در حالت رله و ذخیرهٔ نمایشگر است.",
+                                "Phone is in relay/display-saving mode.",
+                              )
+                            : t(
+                                "برای ذخیرهٔ باتری می‌توانی در برنامهٔ گوشی حالت رله را انتخاب کنی.",
+                                "Choose relay mode in the Android app to save display power.",
+                              )}{" "}
+                          {north.declination !== null
+                            ? t(
+                                `تصحیح خودکار شمال: ${north.declination.toFixed(2)}°.`,
+                                `Automatic north correction: ${north.declination.toFixed(2)}°.`,
+                              )
+                            : ""}
+                        </p>
+                      </section>
+                    </div>
                   )}
-                </div>
-              )}
-            </section>
+                  {tab === "plots" && (
+                    <div className="grid lg:grid-cols-2 gap-5">
+                      {(["accel", "gyro", "mag", "attitude"] as const).map(
+                        (key) => (
+                          <section key={key} className="sensor-panel">
+                            <h2>
+                              {key === "accel"
+                                ? t("شتاب‌سنج بومی", "Native accelerometer")
+                                : key === "gyro"
+                                  ? t("ژیروسکوپ بومی", "Native gyroscope")
+                                  : key === "mag"
+                                    ? t(
+                                        "مغناطیس‌سنج بومی",
+                                        "Native magnetometer",
+                                      )
+                                    : t(
+                                        "جهت‌گیری پیش و پس از فیلتر",
+                                        "Reference & filtered attitude",
+                                      )}
+                            </h2>
+                            <SensorPlot
+                              samples={snapshot.samples[key]}
+                              unit={
+                                key === "accel"
+                                  ? "m/s²"
+                                  : key === "gyro"
+                                    ? "rad/s"
+                                    : key === "mag"
+                                      ? "µT"
+                                      : "°"
+                              }
+                              labels={
+                                key === "attitude"
+                                  ? ["Yaw", "Pitch", "Roll"]
+                                  : undefined
+                              }
+                            />
+                          </section>
+                        ),
+                      )}
+                      <QuaternionPlots samples={snapshot.quaternions} />
+                      <section className="sensor-panel lg:col-span-2">
+                        <h2>GPS</h2>
+                        <GpsPlots fixes={snapshot.gpsHistory} />
+                      </section>
+                    </div>
+                  )}
+                  {tab === "sky" && (
+                    <CameraSky
+                      snapshot={snapshot}
+                      declination={north.declination ?? 0}
+                      northConfirmed={north.declination !== null}
+                      onReference={() => setTab("overview")}
+                      onStart={() => {}}
+                      remote={remote}
+                    />
+                  )}
+                  {tab === "filter" && <FilterDynamics snapshot={snapshot} />}
+                  {tab === "orbit" && (
+                    <div className="space-y-5">
+                      <section className="sensor-panel">
+                        <h2>
+                          {t(
+                            "مدار را با شش عنصر کپلری بساز",
+                            "Set six Keplerian orbital elements",
+                          )}
+                        </h2>
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {(
+                            [
+                              [
+                                "a",
+                                t("نیم‌قطر بزرگ (km)", "Semi-major axis (km)"),
+                              ],
+                              ["e", t("خروج از مرکز", "Eccentricity")],
+                              ["i", t("میل مدار (°)", "Inclination (°)")],
+                              [
+                                "raan",
+                                t(
+                                  "بعد گره صعودی Ω (°)",
+                                  "Ascending node Ω (°)",
+                                ),
+                              ],
+                              [
+                                "argp",
+                                t(
+                                  "آرگومان حضیض ω (°)",
+                                  "Argument of periapsis ω (°)",
+                                ),
+                              ],
+                              [
+                                "meanAnomaly",
+                                t(
+                                  "آنومالی میانگین M₀ (°)",
+                                  "Mean anomaly M₀ (°)",
+                                ),
+                              ],
+                            ] as const
+                          ).map(([key, label]) => (
+                            <label className="sensor-label" key={key}>
+                              {label}
+                              <input
+                                type="number"
+                                step="any"
+                                value={draft[key]}
+                                onChange={(e) =>
+                                  setDraft((o) => ({
+                                    ...o,
+                                    [key]: Number(e.target.value),
+                                  }))
+                                }
+                              />
+                            </label>
+                          ))}
+                        </div>
+                        <label className="sensor-label mt-4">
+                          {t(
+                            "زمان مبدأ مدار (UTC ISO)",
+                            "Orbit epoch (UTC ISO)",
+                          )}
+                          <input
+                            dir="ltr"
+                            value={draft.epoch}
+                            onChange={(e) =>
+                              setDraft((o) => ({ ...o, epoch: e.target.value }))
+                            }
+                          />
+                        </label>
+                        <button
+                          className="sensor-primary mt-4"
+                          onClick={() => {
+                            const error = validateElements(draft);
+                            setOrbitError(error ?? "");
+                            if (!error) {
+                              setOrbit({ ...draft });
+                              setOrbitStart(Date.now());
+                              setElapsed(0);
+                              setPlaying(true);
+                            }
+                          }}
+                        >
+                          {t(
+                            "شبیه‌سازی ماهواره در مدار",
+                            "Simulate satellite in orbit",
+                          )}
+                        </button>
+                        {orbitError && (
+                          <p role="alert" className="sensor-note">
+                            {orbitError}
+                          </p>
+                        )}
+                        <p className="sensor-note">
+                          {t(
+                            "مدل آموزشی دوجسمی است؛ کشش جو و J₂ و مانور ندارد. حرکت مداری از عناصر می‌آید و وضعیت بدنی با گوشی کنترل می‌شود. بدون گوشی، جهت بدنی ثابتِ پیش‌نمایش استفاده می‌شود.",
+                            "Educational two-body model: no drag, J₂ or maneuvers. Elements drive translation; the phone commands body attitude. Without a phone, preview attitude is fixed.",
+                          )}
+                        </p>
+                      </section>
+                      {orbit && state && (
+                        <>
+                          <section className="sensor-panel">
+                            <div className="flex flex-wrap gap-3 items-center mb-4">
+                              <button
+                                className="sensor-button"
+                                onClick={() => {
+                                  if (playing) {
+                                    setElapsed(
+                                      (v) =>
+                                        v + ((now - orbitStart) * speed) / 1000,
+                                    );
+                                    setPlaying(false);
+                                  } else {
+                                    setOrbitStart(Date.now());
+                                    setPlaying(true);
+                                  }
+                                }}
+                              >
+                                {playing
+                                  ? t("توقف زمان مدار", "Pause orbital time")
+                                  : t("ادامهٔ مدار", "Resume orbit")}
+                              </button>
+                              <label className="sensor-label">
+                                {t("سرعت زمان", "Time scale")}
+                                <select
+                                  value={speed}
+                                  onChange={(e) => {
+                                    if (playing)
+                                      setElapsed(
+                                        (v) =>
+                                          v +
+                                          ((now - orbitStart) * speed) / 1000,
+                                      );
+                                    setOrbitStart(Date.now());
+                                    setSpeed(Number(e.target.value));
+                                  }}
+                                >
+                                  {[1, 10, 30, 100].map((v) => (
+                                    <option key={v} value={v}>
+                                      {v}×
+                                    </option>
+                                  ))}
+                                </select>
+                              </label>
+                              <p className="text-xs" data-digit-literal>
+                                {simDate.toISOString()}
+                              </p>
+                            </div>
+                            <OrbitScene
+                              elements={orbit}
+                              date={simDate}
+                              phone={q ?? [0, 0, 0, 1]}
+                              screenAngle={remote.screenAngle}
+                              shortFov={frame?.shortFovDegrees ?? 50}
+                            />
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+                              <Metric
+                                label={t(
+                                  "ارتفاع شبیه‌سازی",
+                                  "Simulated altitude",
+                                )}
+                                value={format(state.altitude)}
+                                unit="km"
+                              />
+                              <Metric
+                                label={t("دوره", "Period")}
+                                value={format(state.period / 60)}
+                                unit="min"
+                              />
+                              <Metric
+                                label={t("سرعت مداری", "Orbital speed")}
+                                value={format(Math.hypot(...state.v), 3)}
+                                unit="km/s"
+                              />
+                              <Metric
+                                label={t("حضیض / اوج", "Perigee / apogee")}
+                                value={
+                                  format(state.perigee) +
+                                  " / " +
+                                  format(state.apogee)
+                                }
+                                unit="km"
+                              />
+                            </div>
+                            <p className="sensor-note">
+                              {q
+                                ? t(
+                                    "جهت و سرعت زاویه‌ای از گوشی زنده است. قاب LVLH: X در راستای حرکت، Y خلاف عمود مدار، Z رو به زمین.",
+                                    "Live phone attitude/rates command the body. LVLH: X along-track, Y opposite orbit normal, Z nadir.",
+                                  )
+                                : t(
+                                    "گوشی زنده‌ای متصل نیست؛ مدار با جهت بدنی ثابت پیش‌نمایش می‌شود.",
+                                    "No live phone is connected; orbit uses a fixed preview attitude.",
+                                  )}
+                            </p>
+                          </section>
+                          <CameraSky
+                            snapshot={snapshot}
+                            declination={0}
+                            northConfirmed
+                            onReference={() => {}}
+                            onStart={() => {}}
+                            remote={remote}
+                            spaceView={space}
+                          />
+                        </>
+                      )}
+                    </div>
+                  )}
+                </section>
+              </>
+            )}
           </>
         )}
       </div>

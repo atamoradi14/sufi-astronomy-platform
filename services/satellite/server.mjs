@@ -1,4 +1,5 @@
 import http from "node:http";
+import { createBilling } from "./billing.mjs";
 import { createHash, randomBytes, randomInt } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
 import { mkdirSync, existsSync, readFileSync, createReadStream } from "node:fs";
@@ -99,6 +100,7 @@ export function createSatellite({
   const devices = new Map(),
     tickets = new Map(),
     limits = new Map();
+  const billing = createBilling(db, { origin });
   for (const table of ["devices", "pairing"]) {
     if (
       !db
@@ -197,6 +199,26 @@ export function createSatellite({
         db.prepare("SELECT 1").get();
         return json(res, 200, { status: "ok", service: "fanous-satellite" });
       }
+      if (req.method === "POST" && path === "/billing/stripe/webhook") {
+        const chunks = [];
+        let bytes = 0;
+        for await (const chunk of req) {
+          chunks.push(chunk);
+          bytes += chunk.length;
+          if (bytes > 262144) throw fail(413, "Webhook too large");
+        }
+        await billing.webhook(
+          Buffer.concat(chunks).toString("utf8"),
+          req.headers["stripe-signature"],
+        );
+        return json(res, 200, { received: true });
+      }
+      if (req.method === "GET" && path === "/billing/plans")
+        return json(
+          res,
+          200,
+          billing.catalog({ sub: "anonymous", email: "" }).plans,
+        );
       if (req.method === "GET" && path === "/download/manifest.json") {
         const f = join(apkDir, "manifest.json");
         if (!existsSync(f)) throw fail(503, "Android release not ready");
@@ -354,6 +376,26 @@ export function createSatellite({
       }
       if (path.startsWith("/v1/")) {
         const c = control(req);
+        if (req.method === "GET" && path === "/v1/billing")
+          return json(res, 200, billing.catalog(c));
+        if (req.method === "POST" && path === "/v1/billing/checkout")
+          return json(
+            res,
+            200,
+            await billing.checkout(
+              c,
+              await body(req),
+              req.headers["x-fanous-country"],
+            ),
+          );
+        if (req.method === "POST" && path === "/v1/billing/reconcile")
+          return json(
+            res,
+            200,
+            await billing.reconcile(c, (await body(req)).id),
+          );
+        if (req.method === "POST" && path === "/v1/billing/plans")
+          return json(res, 200, billing.updatePlan(c, await body(req)));
         if (req.method === "GET" && path === "/v1/requests")
           return json(res, 200, {
             requests: db
@@ -442,6 +484,7 @@ export function createSatellite({
         if (req.method === "POST" && path === "/v1/ticket") {
           const d = owned(text(p.id), c),
             ticket = randomBytes(32).toString("base64url");
+          billing.assertAccess(c.sub, c.email);
           tickets.set(hash(ticket), {
             id: d.id,
             owner: c.sub,
@@ -487,10 +530,26 @@ export function createSatellite({
       socket.destroy();
       return;
     }
+    if (role === "device") billing.start(d.owner, d.email);
+    if (!billing.access(d.owner, d.email).allowed) {
+      // Upgrade then close with a product-specific code: retain the pairing token.
+      sockets.handleUpgrade(req, socket, head, (ws) => {
+        ws.send(
+          JSON.stringify({
+            type: "access_expired",
+            url: origin + "/satellite",
+          }),
+        );
+        ws.close(4003, "Plan required: open fanous.online/satellite");
+      });
+      return;
+    }
     sockets.handleUpgrade(req, socket, head, (ws) => {
       ws.alive = true;
       ws.on("pong", () => (ws.alive = true));
       const s = ensureState(d.id);
+      s.owner = d.owner;
+      s.email = d.email;
       if (role === "view") {
         s.viewers.add(ws);
         send(ws, {
@@ -514,6 +573,10 @@ export function createSatellite({
         lastCamera = 0;
       ws.on("message", (data, binary) => {
         if (s.publisher !== ws) return;
+        if (!billing.access(d.owner, d.email).allowed) {
+          ws.close(4003, "Plan required");
+          return;
+        }
         if (Date.now() - windowStart >= 1000) {
           windowStart = Date.now();
           count = 0;
@@ -651,11 +714,23 @@ export function createSatellite({
     );
   }, 15000);
   timer.unref();
+  const accessTimer = setInterval(() => {
+    for (const s of devices.values())
+      if (s.owner && !billing.access(s.owner, s.email).allowed) {
+        s.publisher?.close(4003, "Plan required");
+        for (const ws of s.viewers) ws.close(4003, "Plan required");
+        s.history = [];
+        s.camera = null;
+      }
+  }, 1000);
+  accessTimer.unref();
   return {
     server,
     db,
     close: async () => {
       clearInterval(timer);
+      clearInterval(accessTimer);
+      billing.stop();
       for (const ws of sockets.clients) ws.terminate();
       await new Promise((resolve) => server.close(resolve));
       db.close();

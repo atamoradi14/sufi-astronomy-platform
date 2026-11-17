@@ -3,7 +3,7 @@ WORKDIR /build/services/satellite
 COPY tsconfig.json /build/tsconfig.json
 COPY services/satellite/package*.json ./
 RUN npm ci
-COPY services/satellite/server.mjs services/satellite/build.mjs ./
+COPY services/satellite/server.mjs services/satellite/billing.mjs services/satellite/build.mjs ./
 COPY src/lib/satellite/auth.ts /build/src/lib/satellite/auth.ts
 COPY src/lib/mobile-sensors/math.ts /build/src/lib/mobile-sensors/math.ts
 COPY src/lib/astronomy /build/src/lib/astronomy

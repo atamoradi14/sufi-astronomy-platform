@@ -14,5 +14,17 @@ export default async function Page() {
   const session = await getUserSession();
   if (!session?.user?.id) return <AccessRequired feature="admin" />;
   if (!isAdminEmail(session.user.email)) notFound();
-  return <AdminUsers />;
+  return (
+    <>
+      <div className="mx-auto max-w-7xl px-4 pt-6">
+        <a
+          className="underline text-[var(--gold-soft)]"
+          href="/satellite#satellite-plans"
+        >
+          مدیریت طرح‌ها و قیمت ماهواره · Satellite plans & pricing
+        </a>
+      </div>
+      <AdminUsers />
+    </>
+  );
 }

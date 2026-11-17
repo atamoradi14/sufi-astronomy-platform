@@ -44,6 +44,13 @@ def main():
     value = json.loads(record.read_text(encoding='utf-8'))
     settings = release.auth_settings()
     config = {'SATELLITE_SHARED_SECRET': settings['SATELLITE_SHARED_SECRET'], 'PUBLIC_ORIGIN': 'https://fanous.online'}
+    billing_path=ROOT/'.local/satellite-billing-config.json'
+    if billing_path.exists():
+        billing=json.loads(billing_path.read_text(encoding='utf-8'))
+        keys=['SATELLITE_STRIPE_KEY','SATELLITE_RELAY_URL','SATELLITE_RELAY_KEY','SATELLITE_WALLET_PHONE','SATELLITE_BILLING_ADMIN']
+        if any(not billing.get(k) for k in keys):raise RuntimeError('Satellite billing configuration is incomplete')
+        config.update({k:billing[k] for k in keys})
+        if billing.get('SATELLITE_STRIPE_WEBHOOK_SECRET'):config['SATELLITE_STRIPE_WEBHOOK_SECRET']=billing['SATELLITE_STRIPE_WEBHOOK_SECRET']
     manifest = (ROOT / 'deploy/k8s/satellite.yaml').read_text(encoding='utf-8').replace('IMAGE_REF', value['digest']).replace('SOURCE_REVISION', value['sourceRevision']).replace('CONFIG_SHA', hashlib.sha256(json.dumps(config, sort_keys=True).encode()).hexdigest()).encode()
     stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
     before = run(KUBE + ['get', 'deployment', 'fanous-satellite', '--ignore-not-found', '-o', 'json'])
