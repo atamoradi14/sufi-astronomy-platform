@@ -82,8 +82,6 @@ observer horizon. Live ground sky uses actual device GPS and automatic WMM north
 correction. Camera frames use their capture-time attitude, not an unrelated newer
 telemetry sample.
 
-## Acceptance evidence
-
 ## Operator runbook
 
 - Public entry: `https://fanous.online/satellite`; legacy `/admin/sensors` redirects here.
@@ -131,10 +129,42 @@ telemetry sample.
   GPS availability and OEM background limits depend on hardware. Missing sensors
   remain missing; no fabricated raw magnetometer channels are provided.
 
-Required checks: cross-owner rejection; pairing-secret and code expiry; no device
-publishing via viewer credentials; revoke/disconnect behavior; telemetry bounds
-and reconnect; camera opt-in/stop; quaternion axes and sky centre/roll; orbital
-period/energy and element validation; APK signature/package/permissions; two web
-viewers receiving the same device; no desktop sensor acquisition; production
-health/readiness, account preservation and APK SHA-256. Physical phone installation,
-OEM background behavior and actual lens/IMU alignment are recorded separately.
+## Verified release: 17 November 2026
+
+- Web release `release-20261117-07`, source `f0b7c24`, image
+  `docker.io/atamoradi/manderia@sha256:a662338e05551768004413fea47521a66aa4ccc71a23215fedfd167f7889c113`.
+- Satellite release `release-20261117-01`, source `cd3b33b`, image
+  `docker.io/atamoradi/fanous-satellite@sha256:760be044a77161e66f394819ed1b47744e4b31bbfc246029d7857753f2de8cf4`.
+- Both workloads ready on `ravand-worker-01`, zero restarts at release verification.
+- Android release build and lint succeeded; APK signature verified. Public APK is
+  1,036,370 bytes, SHA-256
+  `a79d8d5761b290dff90ab4eb785deb5c541d47d85494a733c42b1224eb83b9fd`.
+  Downloaded production bytes match the locally verified signed file exactly.
+- Main suite: 54 passing tests, including Kepler energy/period, LVLH axes and
+  Earth occultation. Service suite: 2 passing integration/validation tests covering
+  matching-email approval, expiry, cross-owner rejection, role separation,
+  one-use viewer tickets, wrong-Origin rejection, telemetry, binary camera and revoke.
+- Production protocol verified over public HTTPS/WSS with a synthetic native
+  publisher using Android's OkHttp user-agent: pairing, two simultaneous viewers,
+  telemetry/Kalman diagnostics, camera frames, publishing reconnect and revocation.
+  Only the uniquely named test records were removed afterwards.
+- Browser checks: two viewers received live telemetry and camera; no local
+  sensor/GPS/camera reads; a different Google fixture account saw zero devices
+  and could not revoke the owner's device; cross-Origin writes rejected.
+  Phone/tablet/desktop layouts, Persian/English, charts, equations and orbit preview
+  exercised without page errors or horizontal document overflow.
+- Public production page returns 200, shows the anonymous Google gate and APK
+  link, and denies camera/GPS/IMU acquisition through Permissions-Policy. Internal
+  control routes return 404 publicly. Google auth remains available, core public
+  pages are healthy, the sitemap includes `/satellite`, and the old route redirects.
+- All pre-existing account IDs were preserved across both web rollouts. The users
+  SQLite database was integrity-checked and backed up before each deployment.
+- Shared gateway config/runtime and owning desired-state backed up locally under
+  `.local/gateway-backups/satellite-20261117T012232Z` and on the worker under
+  `/var/backups/manderia/caddy/satellite-20261117T012232Z`; the later route-order
+  correction has an additional `satellite-20261117T012522Z` backup.
+
+Not hardware-verified: APK installation on a physical phone, actual sensor/lens
+alignment, low-light camera quality, and OEM-specific background/battery behavior.
+No physical Android device was connected during this release. Protocol tests and
+synthetic streams are not evidence of real handset attitude accuracy.
