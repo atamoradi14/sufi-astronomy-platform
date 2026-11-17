@@ -239,3 +239,15 @@ tickets after expiry, admin/owner isolation, historical price snapshots, forged
 webhook signatures, mismatched amounts, duplicate settlement, and rial conversion.
 Mobile browser checks cover visible prices/admin editors and the expired paywall.
 No real customer payment or real card charge is generated for testing.
+
+## Billing release evidence
+
+- Web `release-20261117-10`: `docker.io/atamoradi/manderia@sha256:b92c122dad218997d6e22a30a6dbc06694c3d789543ddac62e97ec69e2cfb25c`.
+- Satellite `release-20261117-04`: `docker.io/atamoradi/fanous-satellite@sha256:eb860babff4afd154276e0adb8fc14649b3854a793f031e609c5dfb771444ad0`.
+- Android 1.2.0/versionCode 3 SHA-256: `e347f64904f6093d593617315909044981ae69b3c38be3b0c6ab206a5c353785`. Install over the existing APK to preserve pairing.
+- Five focused tests passed in under two seconds of test execution, plus Android release build/lint/signature and web build/type checks. No full science-suite rerun.
+- Local browser: admin editor visible, ordinary user cannot edit plans (403), expired account sees no simulation tabs, public prices and Google gate visible, English/Persian mobile layouts without document overflow.
+- Public HTTPS/WSS trial smoke used a uniquely identified synthetic phone: first connection starts the trial, expiry closes socket with 4003 and blocks viewer tickets with 402; admin exemption and configured toman method verified. Test-only records removed afterwards.
+- Live merchant wallet is connected, merchant-enabled, active and identity verified. No real customer order, card charge or real payment was generated during verification. Provider settlement behavior was checked with isolated fixtures.
+- All pre-existing Google account IDs preserved; SQLite backups taken before deployments. Main website and satellite workloads both ready on the worker.
+- Outstanding external setup: Fanous Stripe webhook and its signing secret. The reused restricted Stripe key cannot manage webhooks (403); the implemented Stripe purchase option stays disabled until the separate Fanous webhook is configured. Iranian purchase flow is enabled independently.
