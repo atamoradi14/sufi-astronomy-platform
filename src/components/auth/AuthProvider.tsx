@@ -29,6 +29,9 @@ function AuthShell({ children }: { children: ReactNode }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [next, setNext] = useState("/");
   const [available, setAvailable] = useState<boolean | null>(null);
+  // A small, non-modal sign-in nudge on the homepage. It never covers the
+  // main content, so it doesn't count as an intrusive interstitial for search.
+  const [nudge, setNudge] = useState(false);
   useEffect(() => {
     fetch("/api/auth/config")
       .then((r) => r.json())
@@ -38,23 +41,30 @@ function AuthShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (status === "authenticated") {
       dialog.current?.close();
+      setNudge(false);
       return;
     }
-    if (status !== "unauthenticated" || pathname !== "/") return;
+    if (status !== "unauthenticated" || pathname !== "/") {
+      setNudge(false);
+      return;
+    }
     let dismissed = false;
     try {
       dismissed = sessionStorage.getItem("manderia-login-dismissed") === "1";
     } catch {}
-    if (!dismissed && !dialog.current?.open) {
-      setNext("/");
-      dialog.current?.showModal();
-    }
+    if (dismissed) return;
+    const timer = window.setTimeout(() => setNudge(true), 4000);
+    return () => window.clearTimeout(timer);
   }, [status, pathname]);
-  const close = () => {
-    dialog.current?.close();
+  const dismiss = () => {
+    setNudge(false);
     try {
       sessionStorage.setItem("manderia-login-dismissed", "1");
     } catch {}
+  };
+  const close = () => {
+    dialog.current?.close();
+    dismiss();
   };
   const open = useCallback(
     (target?: string) => {
@@ -66,6 +76,39 @@ function AuthShell({ children }: { children: ReactNode }) {
   return (
     <AuthDialog.Provider value={open}>
       {children}
+      {nudge && (
+        <aside
+          aria-label={t("ورود به فانوس خیال", "Sign in to Fanous-e Khial")}
+          data-signin-nudge
+          className="fixed bottom-4 end-4 z-40 flex max-w-[calc(100vw-2rem)] items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--panel)] px-4 py-3 text-sm text-[var(--parchment)] shadow-xl sm:max-w-sm"
+        >
+          <ShieldCheck size={20} className="shrink-0 text-[var(--teal)]" />
+          <p className="text-xs leading-6 text-[var(--muted)]">
+            {t(
+              "برای کره، حسگر ستاره و اطلس صوفی وارد شوید.",
+              "Sign in for the sphere, star sensor and Sufi atlas.",
+            )}
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setNudge(false);
+              open("/");
+            }}
+            className="shrink-0 rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-[#142238]"
+          >
+            {t("ورود", "Sign in")}
+          </button>
+          <button
+            type="button"
+            aria-label={t("بستن", "Dismiss")}
+            onClick={dismiss}
+            className="shrink-0 rounded-full p-1 text-[var(--muted)] hover:bg-white/5"
+          >
+            <X size={16} />
+          </button>
+        </aside>
+      )}
       <dialog
         ref={dialog}
         aria-labelledby="signin-title"
