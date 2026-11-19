@@ -52,8 +52,9 @@ def main():
     parser.add_argument('--apply', action='store_true')
     parser.add_argument('--env-file', type=Path)
     parser.add_argument('--gateway-repo', type=Path, default=ROOT.parent / 'hamafarin-cluster')
+    parser.add_argument('--gateway-only', action='store_true', help='Update only the shared Caddy block; leave DNS untouched (no Cloudflare token needed)')
     args = parser.parse_args()
-    token = env_token(args.env_file)
+    token = None if args.gateway_only else env_token(args.env_file)
     def cloudflare(path, method='GET', data=None):
         request = urllib.request.Request('https://api.cloudflare.com/client/v4/' + path, method=method, data=json.dumps(data).encode() if data is not None else None, headers={'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'})
         with urllib.request.urlopen(request, timeout=40) as response:
@@ -61,13 +62,15 @@ def main():
         if not value.get('success'):
             raise RuntimeError('Cloudflare operation rejected; private response withheld')
         return value['result']
-    zones = cloudflare('zones?name=fanous.online')
-    if len(zones) != 1:
-        raise RuntimeError('Expected one accessible fanous.online zone')
-    zone = zones[0]['id']
-    records = cloudflare(f'zones/{zone}/dns_records?name={HOST}')
-    if records and not (len(records) == 1 and records[0]['type'] == 'A' and records[0]['content'] == WORKER_IP):
-        raise RuntimeError('Target hostname already has an unexpected DNS record')
+    records = []
+    if not args.gateway_only:
+        zones = cloudflare('zones?name=fanous.online')
+        if len(zones) != 1:
+            raise RuntimeError('Expected one accessible fanous.online zone')
+        zone = zones[0]['id']
+        records = cloudflare(f'zones/{zone}/dns_records?name={HOST}')
+        if records and not (len(records) == 1 and records[0]['type'] == 'A' and records[0]['content'] == WORKER_IP):
+            raise RuntimeError('Target hostname already has an unexpected DNS record')
     before = json.loads(command(KUBE + ['get', 'configmap', 'caddy-config', '-o', 'json']))
     original = before['data']['Caddyfile']
     snippet = (ROOT / 'deploy/caddy/manderia.Caddyfile').read_text(encoding='utf-8-sig').strip() + '\n'
@@ -92,7 +95,7 @@ def main():
     gateway_cli('validate', updated.encode())
     print('Validated combined Caddyfile. Existing route blocks are preserved.')
     if not args.apply:
-        print('Plan: private local + worker backups, one DNS A record, guarded ConfigMap patch, in-place reload, owning-source update.')
+        print('Plan: private local + worker backups,' + ('' if args.gateway_only else ' one DNS A record,') + ' guarded ConfigMap patch, in-place reload, owning-source update.')
         return
     stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
     backup = ROOT / '.local' / 'gateway-backups' / stamp
@@ -112,14 +115,17 @@ def main():
     print('Caddy backups:', backup, 'and ravand-worker-01:' + remote)
     if json.loads(active_config()) != json.loads(runtime):
         raise RuntimeError('Active gateway changed during backup; no gateway changes applied')
-    data = {'type': 'A', 'name': HOST, 'content': WORKER_IP, 'proxied': True, 'ttl': 1}
-    if not records:
-        record = cloudflare(f'zones/{zone}/dns_records', 'POST', data)
-    elif not records[0].get('proxied'):
-        record = cloudflare(f'zones/{zone}/dns_records/{records[0]["id"]}', 'PATCH', {'proxied': True})
-    else:
-        record = records[0]
-    private_write(backup / 'dns.after.json', json.dumps(record).encode())
+    # DNS-only (not proxied): Cloudflare edges are throttled or filtered on many Iranian networks,
+    # which made the site hang for Iranian visitors while it was proxied (Nov 2026).
+    if not args.gateway_only:
+        data = {'type': 'A', 'name': HOST, 'content': WORKER_IP, 'proxied': False, 'ttl': 300}
+        if not records:
+            record = cloudflare(f'zones/{zone}/dns_records', 'POST', data)
+        elif records[0].get('proxied'):
+            record = cloudflare(f'zones/{zone}/dns_records/{records[0]["id"]}', 'PATCH', {'proxied': False, 'ttl': 300})
+        else:
+            record = records[0]
+        private_write(backup / 'dns.after.json', json.dumps(record).encode())
     patch = [{'op':'test','path':'/metadata/resourceVersion','value':before['metadata']['resourceVersion']}, {'op':'replace','path':'/data/Caddyfile','value':updated}]
     command(KUBE + ['patch', 'configmap', 'caddy-config', '--type=json', '--patch', json.dumps(patch)])
     try:

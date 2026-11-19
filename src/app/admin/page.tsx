@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getUserSession } from "@/lib/auth/session";
-import { isAdminEmail } from "@/lib/auth/options";
 import { AccessRequired } from "@/components/auth/AuthProvider";
 import { AdminUsers } from "@/components/auth/AdminUsers";
 import { BillingManagement } from "@/components/satellite/BillingPanel";
@@ -14,7 +13,7 @@ export const metadata: Metadata = {
 export default async function Page() {
   const session = await getUserSession();
   if (!session?.user?.id) return <AccessRequired feature="admin" />;
-  if (!isAdminEmail(session.user.email)) notFound();
+  if (!session.user.isAdmin) notFound();
   return (
     <>
       <AdminUsers />

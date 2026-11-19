@@ -106,6 +106,13 @@ def auth_settings():
     settings = {key: os.getenv(key) or values.get(key, '') for key in keys}
     if any(not value for value in settings.values()) or len(settings['NEXTAUTH_SECRET']) < 32 or settings['NEXTAUTH_URL'] != 'https://fanous.online':
         raise RuntimeError('Complete the private .env auth settings for https://fanous.online before deployment')
+    # Optional one-time-code sign-in. Phone codes use Ravand's SMS relay (in-cluster, approved OTP
+    # pattern); email codes use the Azure Communication Services resource Darvazeh already uses.
+    # Each channel is enabled only when its complete settings are present.
+    for group in (('OTP_SMS_URL', 'OTP_SMS_API_KEY'), ('ACS_CONNECTION_STRING', 'ACS_SENDER_ADDRESS')):
+        optional = {key: os.getenv(key) or values.get(key, '') for key in group}
+        if all(optional.values()):
+            settings.update(optional)
     return settings
 
 def backup_users(before, stamp):

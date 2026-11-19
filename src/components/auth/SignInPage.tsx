@@ -18,8 +18,8 @@ export function SignInPage() {
         className="mx-auto max-w-xl text-center text-sm text-[var(--muted)]"
       >
         {t(
-          "اگر ورود انجام نشد، دوباره تلاش کنید یا حساب گوگل دیگری انتخاب کنید.",
-          "If sign-in was unsuccessful, try again or choose another Google account.",
+          "اگر ورود انجام نشد، دوباره تلاش کنید یا روش دیگری (موبایل، ایمیل یا گوگل) را انتخاب کنید.",
+          "If sign-in was unsuccessful, try again or choose another method (mobile, email or Google).",
         )}
       </p>
     </>

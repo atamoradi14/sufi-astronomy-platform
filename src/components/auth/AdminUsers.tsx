@@ -5,6 +5,7 @@ import { LocalizedDigits } from "@/components/digits/DigitScript";
 type User = {
   id: string;
   email: string;
+  phone?: string | null;
   name: string;
   created_at: string;
   last_login_at: string;
@@ -71,7 +72,7 @@ export function AdminUsers() {
             aria-label={t("جست‌وجوی کاربران", "Search users")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={t("نام یا ایمیل", "Name or email")}
+            placeholder={t("نام، ایمیل یا موبایل", "Name, email or mobile")}
             className="control-input max-w-sm"
           />
           <button className="rounded-lg bg-[var(--gold)] px-4 py-2 text-[var(--ink)]">
@@ -88,7 +89,7 @@ export function AdminUsers() {
               <tr>
                 {[
                   t("نام", "Name"),
-                  t("ایمیل گوگل", "Google email"),
+                  t("ایمیل یا موبایل", "Email or mobile"),
                   t("اولین ورود", "First sign-in"),
                   t("آخرین ورود", "Last sign-in"),
                   t("تعداد ورود", "Sign-ins"),
@@ -104,7 +105,7 @@ export function AdminUsers() {
                 <tr key={u.id} className="border-t border-[var(--border)]">
                   <td className="p-4">{u.name}</td>
                   <td className="p-4" dir="ltr">
-                    {u.email}
+                    {u.email || u.phone}
                   </td>
                   <td className="p-4 whitespace-nowrap" dir="ltr">
                     {u.created_at.replace("T", " ").slice(0, 16)} UTC

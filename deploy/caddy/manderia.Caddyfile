@@ -1,6 +1,10 @@
 # BEGIN MANDERIA PUBLIC ENDPOINT
 fanous.online {
     encode zstd gzip
+    # Access log (stderr -> kubectl logs). Caddy redacts Cookie/Authorization by default.
+    log {
+        format json
+    }
     header -Server
     handle /satellite-api/v1/* {
         respond 404

@@ -13,6 +13,8 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { X, LogIn, ShieldCheck } from "lucide-react";
 import { useLanguage } from "@/components/language/Language";
+import { OtpSignIn } from "./OtpSignIn";
+type AuthConfig = { available: boolean; google: boolean; email: boolean; phone: boolean };
 const AuthDialog = createContext<(next?: string) => void>(() => {});
 export const useSignInDialog = () => useContext(AuthDialog);
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -28,15 +30,23 @@ function AuthShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const dialog = useRef<HTMLDialogElement>(null);
   const [next, setNext] = useState("/");
-  const [available, setAvailable] = useState<boolean | null>(null);
+  const [config, setConfig] = useState<AuthConfig | null>(null);
+  const available = config === null ? null : config.available;
   // A small, non-modal sign-in nudge on the homepage. It never covers the
   // main content, so it doesn't count as an intrusive interstitial for search.
   const [nudge, setNudge] = useState(false);
   useEffect(() => {
     fetch("/api/auth/config")
       .then((r) => r.json())
-      .then((d) => setAvailable(d.available === true))
-      .catch(() => setAvailable(false));
+      .then((d) =>
+        setConfig({
+          available: d.available === true,
+          google: d.google === true || (d.google === undefined && d.available === true),
+          email: d.email === true,
+          phone: d.phone === true,
+        }),
+      )
+      .catch(() => setConfig({ available: false, google: false, email: false, phone: false }));
   }, []);
   useEffect(() => {
     if (status === "authenticated") {
@@ -137,13 +147,28 @@ function AuthShell({ children }: { children: ReactNode }) {
           </h2>
           <p className="text-sm leading-7 text-[var(--muted)]">
             {t(
-              "برای کار با کرهٔ سه‌بعدی، حسگر ستاره و اطلس صوفی، با حساب گوگل خود وارد شوید. درس‌نامهٔ کروی بدون ورود هم در دسترس است.",
-              "Sign in with Google to use the 3D sphere, star sensor, and Sufi atlas. The spherical course stays open to everyone.",
+              "برای کار با کرهٔ سه‌بعدی، حسگر ستاره و اطلس صوفی، با شمارهٔ موبایل، ایمیل یا حساب گوگل وارد شوید. درس‌نامهٔ کروی بدون ورود هم در دسترس است.",
+              "Sign in with your mobile number, email or Google to use the 3D sphere, star sensor, and Sufi atlas. The spherical course stays open to everyone.",
             )}
           </p>
+          {config && (
+            <OtpSignIn
+              key={next}
+              channels={{ email: config.email, phone: config.phone }}
+              callbackUrl={next}
+            />
+          )}
+          {config && (config.email || config.phone) && config.google && (
+            <div className="flex items-center gap-3 text-xs text-[var(--muted)]">
+              <span className="h-px flex-1 bg-[var(--border)]" />
+              {t("یا", "or")}
+              <span className="h-px flex-1 bg-[var(--border)]" />
+            </div>
+          )}
+          {config?.google !== false && (
           <button
             type="button"
-            disabled={available !== true}
+            disabled={config?.google !== true}
             onClick={() => void signIn("google", { callbackUrl: next })}
             className="flex w-full items-center justify-center gap-3 rounded-xl bg-white px-5 py-3 font-semibold text-[#142238] disabled:opacity-40"
           >
@@ -155,6 +180,7 @@ function AuthShell({ children }: { children: ReactNode }) {
             </span>
             {t("ادامه با گوگل", "Continue with Google")}
           </button>
+          )}
           {available === false && (
             <p role="status" className="text-xs text-[var(--muted)]">
               {t(
@@ -165,8 +191,8 @@ function AuthShell({ children }: { children: ReactNode }) {
           )}
           <p className="text-xs leading-6 text-[var(--muted)]">
             {t(
-              "فقط مشخصات پایهٔ حساب و ایمیل تأییدشده ذخیره می‌شود؛ به صندوق Gmail شما دسترسی نداریم.",
-              "We save your basic profile and verified email. We do not access your Gmail inbox.",
+              "فقط مشخصات پایهٔ حساب و ایمیل یا شمارهٔ تأییدشده ذخیره می‌شود؛ به صندوق Gmail شما دسترسی نداریم.",
+              "We save your basic profile and verified email or phone number. We do not access your Gmail inbox.",
             )}{" "}
             <Link
               className="text-[var(--teal)] underline"
@@ -206,7 +232,7 @@ export function AccountButton() {
           type="button"
           onClick={() => void signOut({ callbackUrl: "/" })}
           className="rounded-md border border-[var(--border)] px-2 py-1.5"
-          title={data.user.email || ""}
+          title={data.user.email || data.user.phone || ""}
         >
           {t("خروج", "Sign out")}
         </button>
@@ -237,8 +263,8 @@ export function AccessRequired({ feature }: { feature: string }) {
       </h1>
       <p className="text-sm leading-7 text-[var(--muted)]">
         {t(
-          "برای دسترسی به این ابزار فانوس خیال، با حساب گوگل خود وارد شوید.",
-          "Use your Google account to access this Fanous-e Khial tool.",
+          "برای دسترسی به این ابزار فانوس خیال، با شمارهٔ موبایل، ایمیل یا حساب گوگل وارد شوید.",
+          "Sign in with your mobile number, email or Google account to use this Fanous-e Khial tool.",
         )}{" "}
         <span className="sr-only">{feature}</span>
       </p>
@@ -247,7 +273,7 @@ export function AccessRequired({ feature }: { feature: string }) {
         onClick={() => open()}
         className="rounded-xl bg-[var(--gold)] px-5 py-3 font-semibold text-[var(--ink)]"
       >
-        {t("ادامه با گوگل", "Continue with Google")}
+        {t("ورود یا ثبت‌نام", "Sign in or sign up")}
       </button>
       <p>
         <Link className="text-sm text-[var(--teal)]" href="/course">
