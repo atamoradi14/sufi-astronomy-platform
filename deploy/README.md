@@ -61,3 +61,17 @@ The homepage offers a dismissible login dialog. `/lab`, `/sensor`, and `/atlas` 
 SEO uses canonical URLs, `robots.txt`, `sitemap.xml`, social-card metadata, and escaped Website/LearningResource JSON-LD. Protected tools, auth endpoints and admin pages are excluded from the sitemap and marked noindex.
 
 Submit **https://fanous.online/sitemap.xml** in Google Search Console. See [seo.md](seo.md) for the public directory, canonical/indexing policy, structured data and verification procedure.
+
+## Iranian connectivity (November 2026)
+
+Visitors in Iran reported the site hanging while `fanous.online` was proxied through Cloudflare (16–18 November 2026). Cloudflare edges are throttled or challenged on many Iranian networks. The record is now **DNS-only** to the worker, as `ravands.app` has always been, and `configure-public-endpoint.py` keeps it that way. Use `--gateway-only` to change only the Caddy block without a Cloudflare token.
+
+Both shared gateways (`hamafarin-apps` and `ravand`) serve **HTTP/1.1 and HTTP/2 over TCP only**: their global Caddy options contain `servers { protocols h1 h2 }`, so they no longer advertise HTTP/3. UDP 443 was never reachable on either worker, and QUIC is unreliable from Iran. Cloudflare-proxied hosts on other projects still advertise HTTP/3 from Cloudflare's edge until it is turned off in each zone.
+
+The `fanous.online` block writes a JSON access log to the Caddy container's stderr (`kubectl --context ravand -n hamafarin-apps logs deploy/caddy | grep http.log.access`); Caddy redacts cookies and authorization headers.
+
+Check from Iran with `ssh tehran-server` (a Tehran data-centre host): `curl -4 -I --http2 https://fanous.online` and the same with `--resolve fanous.online:443:2.29.120.138`. Data-centre results do not prove reachability on Iranian mobile and home networks; confirm with testers on MCI and Irancell.
+
+## One-time-code sign-in
+
+Besides Google, visitors can sign in with a 6-digit code by SMS or email. Phone codes go through Ravand's in-cluster SMS relay (`http://sms.ravand.svc.cluster.local:8000`, approved Melipayamak OTP pattern); email codes go through the Azure Communication Services resource and sender Darvazeh uses. Neither service is changed. Set `OTP_SMS_URL`/`OTP_SMS_API_KEY` and `ACS_CONNECTION_STRING`/`ACS_SENDER_ADDRESS` in the private `.env` (see `auth.env.example`); each channel is enabled only when both of its values are present. Codes are single use, expire in 10 minutes, allow 5 attempts, and are rate limited per target and IP. Email sign-in reuses an existing account with that email. Administrator access still requires a Google sign-in.
