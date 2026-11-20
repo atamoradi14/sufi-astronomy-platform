@@ -156,7 +156,7 @@ def reels():
         ]},
       "reel2-mosalas-koravi": {
         "cover": dict(series="نجوم کروی · قسمت ۲", title='جمع زوایای مثلث<br><span class="g">۱۸۰° نیست!</span>',
-                      still=("triangle", 0), badge="A + B + C > ۱۸۰°"),
+                      still=("triangle", 0), badge='<span style="direction:ltr;unicode-bidi:isolate">A + B + C > ۱۸۰°</span>'),
         "scenes": [
           dict(frames=rng("triangle", 0, 75), hook=True, html=scene_html(None,
                'جمع زوایای مثلث همیشه ۱۸۰°؟ <span class="g">روی کره نه!</span>', "این مثلث را در آزمایشگاه کره بساز و اندازه بگیر…", hook=True)),
