@@ -4,7 +4,7 @@ Persian-first web app for **spherical trigonometry**, olympiad astronomy, and ob
 
 Runs in the browser (including Android Chrome). Device **GPS** and **compass** are used where available; no APK install is required.
 
-**Live demo:** [https://manderia.daryajan.com](https://manderia.daryajan.com)
+**Live site:** [https://fanous.online](https://fanous.online) (the former `manderia.daryajan.com` address redirects here)
 **Public GitHub:** [https://github.com/atamoradi14/sufi-astronomy-platform](https://github.com/atamoradi14/sufi-astronomy-platform)
 
 ---
@@ -28,6 +28,7 @@ Runs in the browser (including Android Chrome). Device **GPS** and **compass** a
 15. [Scripts](#scripts)
 16. [Environment](#environment)
 17. [License & credits](#license--credits)
+18. [Instagram reels](#instagram-reels)
 
 ---
 
@@ -183,7 +184,7 @@ The three-stage root `Dockerfile` builds a non-root Node.js standalone image on 
 
 ## Kubernetes deploy
 
-Production: **https://manderia.daryajan.com**. Context **ravand**, namespace **astronomy**, deployment/service **manderia**, node **ravand-worker-01**. One Next.js image provides both the UI and APIs; the future service extraction stubs are not deployed.
+Production: **https://fanous.online** (`manderia.daryajan.com` redirects permanently). Context **ravand**, namespace **astronomy**, deployment/service **manderia**, node **ravand-worker-01**. One Next.js image provides both the UI and APIs; the future service extraction stubs are not deployed.
 
 The shared Caddy in **hamafarin-apps** serves this hostname and proxies to `manderia.astronomy.svc.cluster.local:80`. It also serves Hamafarin and Darvazeh. A gateway update validates the complete configuration, saves private snapshots locally and on the worker, checks for concurrent changes, and reloads Caddy without restarting it. The gateway's owning `hamafarin-cluster/manifests/Caddyfile` and `apps.json` are updated together.
 
@@ -472,3 +473,10 @@ Use **فارسی / English** in the header to choose one content language. Persi
 The header calls the learning section **درس‌نامهٔ کروی**. Google sign-in is offered in a homepage dialog and is required for the main 3D sphere, star sensor, and Sufi atlas; lessons remain public. The user account store lives on the namespace-local SQLite PVC, and the allowlisted administrator can review verified Google registrations at `/admin`. Secrets belong only in ignored `.env` / Kubernetes Secret settings. See [deployment and account configuration](deploy/README.md).
 
 Public pages have canonical metadata and a social preview; `/robots.txt` points to `/sitemap.xml`, which includes the reviewed lesson pages and excludes protected/account pages. `/about`, `/tools`, and `/privacy` explain the teaching approach, tool limitations, and account data use.
+
+
+## Instagram reels
+
+Marketing reels for the Instagram page **@fanoussky** live in [`marketing/`](marketing/). The first series, «نجوم کروی رو تعاملی یاد بگیر», is in [`marketing/reels-interactive-sphere/`](marketing/reels-interactive-sphere/README.md). It has three Persian reels built from real footage of the `/lab` sphere, with covers, captions and the build scripts.
+
+**Rule for every reel: the cover must appear within the first 0.5 seconds of the video.** Reels are published through the Ravands MCP, which can't attach a separate cover, so Instagram uses the opening frame as the thumbnail. The project skill [`.claude/skills/fanous-instagram-reels`](.claude/skills/fanous-instagram-reels/SKILL.md) records this rule and includes `scripts/prepend_cover.sh`, which puts the cover at frame 0. It also covers the publishing checklist: always link `fanous.online`, and after a timeout check `list_publish_jobs` before resending.

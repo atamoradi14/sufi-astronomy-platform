@@ -11,5 +11,19 @@ All sphere footage is real: recorded frame by frame from the app's own Three.js 
 
 Each has a matching `*-cover.png`. Persian captions and hashtags are in `captions-fa.md`.
 
+## Published versions: `with-cover/`
+
+**Every reel must open on its cover within the first 0.5 seconds** (see the [`fanous-instagram-reels` skill](../../.claude/skills/fanous-instagram-reels/SKILL.md)). Ravands can't attach a cover, so Instagram uses the first frame as the thumbnail.
+
+The files in `with-cover/` are the versions published on @fanoussky. Each shows its cover from frame 0 until 1.0 s, then crossfades into the reel. They were made with `.claude/skills/fanous-instagram-reels/scripts/prepend_cover.sh`.
+
+| Episode | Publish date (Tehran) |
+|---------|-----------------------|
+| ۱ · عظیمه یا صغیره؟ | 20 Nov 2026 |
+| ۲ · جمع زوایای مثلث ۱۸۰° نیست! | 21 Nov 2026, 20:00 (scheduled) |
+| ۳ · مثلث نجومی PZX | 22 Nov 2026, 20:00 (scheduled) |
+
+The files in the top folder have no cover frame. Don't publish them.
+
 ## Rebuild
 `source/capture.cjs` records frames from a running dev server (needs a signed-in session cookie, because `/lab` is protected). `source/build.py overlays|video` renders the Persian overlays with Chromium and assembles the reels with ffmpeg. The paths in the scripts point at the original working folders, so adjust them before re-running.
