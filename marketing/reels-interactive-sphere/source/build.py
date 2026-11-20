@@ -115,7 +115,7 @@ def outro_html():
     return (f'<div class="dim"></div><div class="stars"></div><div class="cta"><img class="logo" src="{LOGO}">'
             f'<h1>نجوم کروی رو<br><span class="g">تعاملی</span> یاد بگیر</h1>'
             f'<p>کره را بچرخان، رأس‌ها را جابه‌جا کن<br>و اندازه‌ها را زنده ببین.</p>'
-            f'<div class="url">manderia.daryajan.com/lab</div>'
+            f'<div class="url">fanous.online/lab</div>'
             f'<div class="save">ذخیره کن و برای هم‌تیمی المپیادی‌ات بفرست</div></div>')
 
 # ---------------------------------------------------------------- reels
