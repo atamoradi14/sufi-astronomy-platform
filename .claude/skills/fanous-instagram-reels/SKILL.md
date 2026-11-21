@@ -25,7 +25,10 @@ How:
 ## Rule 3: publishing through Ravands MCP
 
 1. Run `get_upload_link`, then `curl -F file=@out.mp4 "<uploadUrl>"`, then `check_publish_media` with type `reel` and **one** file per call.
-2. Do a `publish_reel` dry run (without `confirm`), then the real call with `confirm=true`. For a series, publish episode 1 now and schedule the rest a day apart. 20:00 Tehran (`+03:30`) has worked well.
+2. Do a `publish_reel` dry run (without `confirm`), then the real call with `confirm=true`.
+   - **Scheduling uses the user's timezone, not the Ravands business timezone.** The business is set to Asia/Tehran, but the user reads the Ravands panel in **UTC+13 (New Zealand daylight time)**. A reel scheduled for "20:00 Tehran" showed up as 05:30 the next morning there.
+   - "Tomorrow" or "the day after" means **exactly 24 h / 48 h after the previous post** in the series, unless the user names a clock time.
+   - Before scheduling, state each time in the user's local time and in UTC, then pass `scheduledAt` with an explicit offset.
 3. If `publish_reel` times out, **don't retry blindly**. Check `list_publish_jobs` first, and only resend if the job isn't there. Otherwise the reel gets posted twice.
 4. Ravands can't delete or edit posts. If something was posted wrong, tell the user exactly which posts to delete in the Instagram app.
 
